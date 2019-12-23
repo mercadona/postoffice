@@ -1,0 +1,27 @@
+<div class="row">
+  <div class="col-md-12">
+    <a class="button"><%= link "Añadir", to: Routes.publisher_path(@conn, :new) %></a>
+  </div>
+  <div class="col-md-12">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Topic</th>
+          <th scope="col">Endpoint</th>
+          <th scope="col">Active</th>
+          <th scope="col">Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for publisher <- @publishers do %>
+        <tr>
+          <th scope="row"><%= link "#{publisher.id}", to: Routes.publisher_path(@conn, :edit, publisher.id) %></th>
+          <td><%= publisher.topic.name %></td>
+          <td><%= publisher.endpoint %></td>
+          <td><%= publisher.active %></td>
+          <td><%= publisher.type %></td>
+        </tr>
+        <% end %>
+  </div>
+</div>

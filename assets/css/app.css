@@ -1,0 +1,13 @@
+
+@import "../node_modules/bootstrap/dist/css/bootstrap.css";
+@import "../node_modules/admin-lte/dist/css/adminlte.css";
+@import "../node_modules/font-awesome/css/font-awesome.css";
+
+.data-content {
+  padding: 0.5rem 1.5rem !important;
+}
+
+.input-group.input-group-sm {
+  width: 200px;
+}
+
