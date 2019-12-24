@@ -4,8 +4,6 @@ defmodule Postoffice.Messaging.Topic do
 
   schema "topics" do
     field :name, :string, null: false
-    field :min_workers, :integer
-    field :max_workers, :integer
 
     has_many :consumers, Postoffice.Messaging.Publisher
     has_many :messages, Postoffice.Messaging.Message
