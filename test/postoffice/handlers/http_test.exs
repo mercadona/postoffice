@@ -1,5 +1,5 @@
 defmodule Postoffice.Handlers.HttpTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   import Mox
 
@@ -23,6 +23,7 @@ defmodule Postoffice.Handlers.HttpTest do
   @valid_topic_attrs %{
     name: "test"
   }
+
   setup [:set_mox_from_context, :verify_on_exit!]
 
   setup do

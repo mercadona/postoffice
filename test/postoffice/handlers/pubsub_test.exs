@@ -1,5 +1,5 @@
 defmodule Postoffice.Handlers.PubsubTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   import Mox
 

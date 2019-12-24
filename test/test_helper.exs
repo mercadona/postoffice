@@ -1,4 +1,4 @@
-ExUnit.start()
+ExUnit.start(trace: true)
 Ecto.Adapters.SQL.Sandbox.mode(Postoffice.Repo, :manual)
 
 Mox.defmock(Postoffice.Adapters.HttpMock, for: Postoffice.Adapters.Impl)

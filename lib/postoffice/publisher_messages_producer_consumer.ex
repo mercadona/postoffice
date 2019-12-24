@@ -11,7 +11,7 @@ defmodule Postoffice.PublisherMessagesProducerConsumer do
 
   def start_link(publisher) do
     Logger.info(
-      "Starting PublisherMEssagesProducerConsumer for publisher #{publisher.id} #{inspect(self())}"
+      "Starting producer/consumer for publisher #{publisher.id} #{inspect(self())}"
     )
 
     GenStage.start_link(__MODULE__, publisher, name: {:via, :swarm, publisher.id})
