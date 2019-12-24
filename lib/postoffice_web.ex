@@ -23,7 +23,6 @@ defmodule PostofficeWeb do
 
       import Plug.Conn
       import PostofficeWeb.Gettext
-      import Phoenix.LiveView.Controller
       alias PostofficeWeb.Router.Helpers, as: Routes
     end
   end
@@ -42,12 +41,6 @@ defmodule PostofficeWeb do
       import PostofficeWeb.ErrorHelpers
       import PostofficeWeb.Gettext
       alias PostofficeWeb.Router.Helpers, as: Routes
-
-      import Phoenix.LiveView,
-        only: [
-          live_render: 2,
-          live_render: 3
-        ]
     end
   end
 
@@ -56,7 +49,6 @@ defmodule PostofficeWeb do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
-      import Phoenix.LiveView.Router
     end
   end
 
