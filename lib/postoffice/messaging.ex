@@ -22,8 +22,8 @@ defmodule Postoffice.Messaging do
       [%Message{}, ...]
 
   """
-  def list_messages do
-    Repo.all(Message)
+  def list_messages(limit \\ 100) do
+    Repo.all(Message, limit: limit)
   end
 
   @doc """
@@ -231,15 +231,15 @@ defmodule Postoffice.Messaging do
     Repo.aggregate(from(m in "messages"), :count, :id)
   end
 
-  def count_publishers(type) do
-    Repo.aggregate(from(p in "publishers", where: p.type == ^type), :count, :id)
+  def count_publishers() do
+    Repo.aggregate(from(p in "publishers"), :count, :id)
   end
 
-  def count_sent_messages do
+  def count_published_messages do
     Repo.aggregate(from(ps in "publisher_success"), :count, :id)
   end
 
-  def count_failed_messages do
+  def count_publishers_failures do
     Repo.aggregate(from(ps in "publisher_failures"), :count, :id)
   end
 

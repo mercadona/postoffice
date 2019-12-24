@@ -55,6 +55,7 @@ defmodule Postoffice do
     case Ecto.UUID.cast(uuid) do
       :error ->
         nil
+
       _ok ->
         Messaging.get_message_by_uuid(uuid)
     end
@@ -67,65 +68,17 @@ defmodule Postoffice do
   def get_message_failures(message_id),
     do: Messaging.get_publisher_failures_for_message(message_id)
 
-  def count_received_messages do
-    case :ets.lookup(:counters, :messages_received) do
-      [{:messages_received, messages}] ->
-        messages
+  def get_last_messages(limit \\ 10), do: Messaging.list_messages(limit)
 
-      [] ->
-        0
-    end
-  end
+  def count_received_messages, do: Messaging.count_messages()
 
-  def count_sent_messages do
-    case :ets.lookup(:counters, :messages_sent) do
-      [{:messages_sent, sent}] ->
-        sent
+  def count_published_messages, do: Messaging.count_published_messages()
 
-      [] ->
-        0
-    end
-  end
+  def count_publishers_failures, do: Messaging.count_publishers_failures()
 
-  def count_failed_messages do
-    case :ets.lookup(:counters, :messages_failed) do
-      [{:messages_failed, failed}] ->
-        failed
+  def count_publishers, do: Messaging.count_publishers()
 
-      [] ->
-        0
-    end
-  end
-
-  def count_http_publishers do
-    case :ets.lookup(:counters, :http_publishers) do
-      [{:http_publishers, http_publishers}] ->
-        http_publishers
-
-      [] ->
-        0
-    end
-  end
-
-  def count_pubsub_publishers do
-    case :ets.lookup(:counters, :pubsub_publishers) do
-      [{:pubsub_publishers, pubsub_publishers}] ->
-        pubsub_publishers
-
-      [] ->
-        0
-    end
-  end
-
-  def count_topics do
-    case :ets.lookup(:counters, :topics) do
-      [{:topics, topics}] ->
-        topics
-
-      [] ->
-        0
-    end
-  end
+  def count_topics, do: Messaging.count_topics()
 
   def ping do
     case :ets.whereis(:counters) do
