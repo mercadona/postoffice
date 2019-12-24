@@ -1,4 +1,4 @@
-defmodule PostofficeWeb.MessageControllerTest do
+defmodule PostofficeWeb.Api.MessageControllerTest do
   use PostofficeWeb.ConnCase
 
   alias Postoffice.Messaging
