@@ -1,5 +1,5 @@
 <div class="row">
-  <h2>Add new HttpConsumer</h2>
+  <h2>Add new Publisher</h2>
 
 <%= form_for @changeset, Routes.publisher_path(@conn, :create), fn f -> %>
     <div class="form-group">

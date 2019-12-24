@@ -24,7 +24,7 @@ defmodule PostofficeWeb.Router do
     live "/", StatsLive, as: :dashboard
 
     resources "/publishers", PublisherController,
-      only: [:index, :show, :new, :create, :edit, :update]
+      only: [:index, :new, :create, :edit, :update]
 
     resources "/messages", MessageController, only: [:index, :show]
   end

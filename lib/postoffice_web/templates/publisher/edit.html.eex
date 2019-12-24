@@ -1,4 +1,4 @@
-<h2>Edit HttpConsumer: <%= @publisher.id %></h2>
+<h2>Edit Publisher</h2>
 
 <%= form_for @changeset, Routes.publisher_path(@conn, :update, @publisher), fn f -> %>
     <div class="form-group">

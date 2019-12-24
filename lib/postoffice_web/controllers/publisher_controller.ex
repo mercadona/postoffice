@@ -27,11 +27,6 @@ defmodule PostofficeWeb.PublisherController do
     render(conn, "index.html", publishers: publishers)
   end
 
-  def show(conn, %{"id" => id}) do
-    http_consumer = Messaging.get_publisher!(id)
-    render(conn, "show.html", http_consumer: http_consumer)
-  end
-
   def edit(conn, %{"id" => id}) do
     publisher = Messaging.get_publisher!(id)
     changeset = Messaging.change_publisher(publisher)
