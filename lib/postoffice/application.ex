@@ -18,10 +18,8 @@ defmodule Postoffice.Application do
        [Application.get_env(:libcluster, :topologies), [name: Postoffice.ClusterSupervisor]]},
       Postoffice.PublisherProducer,
       Postoffice.PublishersConsumerSupervisor,
-      Postoffice.Starters.Counters
     ]
 
-    :ets.new(:counters, [:set, :public, :named_table])
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Postoffice.Supervisor]
