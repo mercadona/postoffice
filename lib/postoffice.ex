@@ -40,16 +40,8 @@ defmodule Postoffice do
       Map.put(publisher_params, "initial_message", initial_message_id)
       |> Messaging.create_publisher()
 
-    :ets.update_counter(:counters, :publishers, 1, {1, 0})
-    increment_publisher_type_counter(publisher_params)
     {:ok, publisher}
   end
-
-  defp increment_publisher_type_counter(%{"type" => type} = _params) when type == "pubsub",
-    do: :ets.update_counter(:counters, :pubsub_publishers, 1, {1, 0})
-
-  defp increment_publisher_type_counter(%{"type" => type} = _params) when type == "http",
-    do: :ets.update_counter(:counters, :http_publishers, 1, {1, 0})
 
   def find_message_by_uuid(uuid) do
     case Ecto.UUID.cast(uuid) do
