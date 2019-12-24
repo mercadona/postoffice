@@ -1,0 +1,54 @@
+<div class="row">
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="info-box bg-info">
+          <span class="info-box-icon"><i class="fa fa-bullhorn"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">Topics</span>
+            <span class="info-box-number"><%= @topics %></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="info-box bg-yellow">
+          <span class="info-box-icon"><i class="fa fa-cogs"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">Publishers</span>
+            <span class="info-box-number"><%= @publishers %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="info-box bg-info">
+          <span class="info-box-icon"><i class="fa fa-envelope"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">Messages received</span>
+            <span class="info-box-number"><%= @messages_received %></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="info-box bg-green">
+          <span class="info-box-icon"><i class="fa fa-envelope"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">Messages published</span>
+            <span class="info-box-number"><%= @messages_published %></span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="info-box bg-red">
+          <span class="info-box-icon"><i class="fa fa-envelope"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">Publishers failures</span>
+            <span class="info-box-number"><%= @publishers_failures %></span>
+          </div>
+        </div>
+      </div>
+    </div>

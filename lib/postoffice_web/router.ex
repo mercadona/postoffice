@@ -4,6 +4,7 @@ defmodule PostofficeWeb.Router do
   alias Api.MessageController, as: ApiMessageController
   alias Api.HealthController, as: ApiHealthController
   alias MessageController, as: MessageController
+  alias IndexController
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -21,7 +22,7 @@ defmodule PostofficeWeb.Router do
   scope "/", PostofficeWeb do
     pipe_through :browser
 
-    live "/", StatsLive, as: :dashboard
+    get "/", IndexController, :index, as: :dashboard
 
     resources "/publishers", PublisherController,
       only: [:index, :new, :create, :edit, :update]
