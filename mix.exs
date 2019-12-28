@@ -54,8 +54,6 @@ defmodule Postoffice.MixProject do
       {:goth, "~> 1.1.0"},
       {:httpoison, "~> 1.6"},
       {:mox, "~> 0.5", only: :test},
-      {:phoenix_live_view, "~> 0.3.0"},
-      {:floki, ">= 0.0.0", only: :test},
       {:gen_stage, "~> 0.14"},
       {:logger_json, "~> 3.0"},
       {:config_tuples, "~> 0.4"},
