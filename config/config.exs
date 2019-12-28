@@ -9,7 +9,7 @@ use Mix.Config
 
 config :postoffice,
   ecto_repos: [Postoffice.Repo],
-  pubsub_project_name: System.get_env("GCLOUD_PUBSUB_PROJECT", "test")
+  pubsub_project_name: System.get_env("GCLOUD_PUBSUB_PROJECT_ID", "test")
 
 config :postoffice, PostofficeWeb.Endpoint,
   http: [port: 4000],
