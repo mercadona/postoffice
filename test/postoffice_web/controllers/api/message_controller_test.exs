@@ -21,13 +21,6 @@ defmodule PostofficeWeb.Api.MessageControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  describe "index" do
-    test "lists all messages", %{conn: conn} do
-      conn = get(conn, Routes.api_message_path(conn, :index))
-      assert json_response(conn, 200)["data"] == []
-    end
-  end
-
   describe "create message" do
     test "renders message when data is valid", %{conn: conn} do
       conn = post(conn, Routes.api_message_path(conn, :create), message: @create_attrs)

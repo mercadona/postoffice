@@ -12,9 +12,6 @@ defmodule PostofficeWeb.MessageController do
         conn
         |> redirect(to: Routes.message_path(conn, :show, message.id))
     end
-
-    # conn
-    # |> redirect(to: Routes.message_path(conn, :show, message.id))
   end
 
   def show(conn, %{"id" => id}) do
