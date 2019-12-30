@@ -21,7 +21,12 @@ defmodule Postoffice do
   end
 
   def create_topic(topic_params) do
-    Messaging.create_topic(topic_params)
+    case Messaging.get_topic(topic_params.name) do
+      nil ->
+        Messaging.create_topic(topic_params)
+      topic ->
+        {:ok, topic}
+    end
   end
 
   def create_publisher(%{"from_now" => from_now} = publisher_params) when from_now == "true" do
