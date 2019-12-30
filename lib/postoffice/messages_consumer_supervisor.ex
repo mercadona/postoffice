@@ -9,17 +9,13 @@ defmodule Postoffice.MessagesConsumerSupervisor do
   end
 
   def name(publisher_id) do
-    {:via, :swarm, "publisher_message_consumer_suppervisor-#{publisher_id}"}
+    {:via, :swarm, "message_consumer_suppervisor-#{publisher_id}"}
   end
 
   def init({pid_to_subscribe, _publisher_id}) do
     children = [
       worker(Postoffice.MessagesConsumer, [], restart: :transient)
     ]
-
-    Logger.info(
-      "Subscribing PublisherMessageConsumerSupervisor to producer #{inspect(pid_to_subscribe)}"
-    )
 
     opts = [
       strategy: :one_for_one,
