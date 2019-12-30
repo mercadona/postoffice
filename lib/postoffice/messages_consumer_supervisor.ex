@@ -1,4 +1,4 @@
-defmodule Postoffice.PublisherMessagesConsumerSupervisor do
+defmodule Postoffice.MessagesConsumerSupervisor do
   use ConsumerSupervisor
 
   require Logger
@@ -14,7 +14,7 @@ defmodule Postoffice.PublisherMessagesConsumerSupervisor do
 
   def init({pid_to_subscribe, _publisher_id}) do
     children = [
-      worker(Postoffice.PublisherMessagesConsumer, [], restart: :transient)
+      worker(Postoffice.MessagesConsumer, [], restart: :transient)
     ]
 
     Logger.info(

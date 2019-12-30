@@ -1,4 +1,4 @@
-defmodule Postoffice.PublishersConsumerSupervisor do
+defmodule Postoffice.MessagesProducerSupervisor do
   use ConsumerSupervisor
 
   require Logger
@@ -9,7 +9,7 @@ defmodule Postoffice.PublishersConsumerSupervisor do
 
   def init(_arg) do
     children = [
-      worker(Postoffice.PublisherMessagesProducerConsumer, [], restart: :transient)
+      worker(Postoffice.MessagesProducer, [], restart: :transient)
     ]
 
     opts = [strategy: :one_for_one, subscribe_to: [{:publisher_producer, max_demand: 5}]]

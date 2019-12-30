@@ -1,9 +1,9 @@
-defmodule Postoffice.PublisherMessagesProducerConsumer do
+defmodule Postoffice.MessagesProducer do
   use GenStage
 
   alias Postoffice.Dispatch
   alias Postoffice.Messaging
-  alias Postoffice.PublisherMessagesConsumerSupervisor
+  alias Postoffice.MessagesConsumerSupervisor
 
   require Logger
 
@@ -11,7 +11,7 @@ defmodule Postoffice.PublisherMessagesProducerConsumer do
 
   def start_link(publisher) do
     Logger.info(
-      "Starting producer/consumer for publisher #{publisher.id} #{inspect(self())}"
+      "Starting messages producer for publisher #{publisher.id} #{inspect(self())}"
     )
 
     GenStage.start_link(__MODULE__, publisher, name: {:via, :swarm, publisher.id})
@@ -38,7 +38,7 @@ defmodule Postoffice.PublisherMessagesProducerConsumer do
         {:fetch_publisher_messages, publisher},
         %{demand_state: {queue, pending_demand}, publisher: publisher} = state
       ) do
-    PublisherMessagesConsumerSupervisor.start_link(publisher.id, self())
+    MessagesConsumerSupervisor.start_link(publisher.id, self())
 
     if :queue.len(queue) < 25 do
       publisher_messages =

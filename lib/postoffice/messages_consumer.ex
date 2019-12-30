@@ -1,4 +1,4 @@
-defmodule Postoffice.PublisherMessagesConsumer do
+defmodule Postoffice.MessagesConsumer do
   require Logger
 
   alias __MODULE__
@@ -12,7 +12,7 @@ defmodule Postoffice.PublisherMessagesConsumer do
       publisher_id: publisher_id
     } = message
 
-    Task.start_link(PublisherMessagesConsumer.get_handler_module(publisher_type), :run, [
+    Task.start_link(MessagesConsumer.get_handler_module(publisher_type), :run, [
       publisher_endpoint,
       publisher_id,
       message
