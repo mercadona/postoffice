@@ -25,8 +25,12 @@ defmodule Postoffice do
   end
 
   def create_publisher(%{"from_now" => from_now} = publisher_params) when from_now == "true" do
-    %{id: id} = Messaging.get_last_message()
-    add_publisher(publisher_params, id)
+    case Messaging.get_last_message() do
+      nil ->
+        add_publisher(publisher_params, 0)
+      %{id: message_id} ->
+        add_publisher(publisher_params, message_id)
+    end
   end
 
   def create_publisher(publisher_params) do
