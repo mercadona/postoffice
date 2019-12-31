@@ -12,7 +12,8 @@ defmodule Postoffice.Adapters.Http do
     case HTTPoison.post(endpoint, Poison.encode!(payload), [
            {"content-type", "application/json"}
          ]) do
-      {:ok, %HTTPoison.Response{status_code: status_code, body: _body}} when status_code in 200..299 ->
+      {:ok, %HTTPoison.Response{status_code: status_code, body: _body}}
+      when status_code in 200..299 ->
         {:ok, message}
 
       {:ok, response} ->

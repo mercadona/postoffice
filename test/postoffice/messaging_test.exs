@@ -216,7 +216,12 @@ defmodule Postoffice.MessagingTest do
 
       second_topic = topic_fixture(@second_topic_attrs)
       publisher_fixture(second_topic, @second_publisher_attrs)
-      _second_message = message_fixture(second_topic, Map.put(@valid_attrs, :public_id, "2d823585-68f8-49cd-89c0-07c1572572c1"))
+
+      _second_message =
+        message_fixture(
+          second_topic,
+          Map.put(@valid_attrs, :public_id, "2d823585-68f8-49cd-89c0-07c1572572c1")
+        )
 
       pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
 

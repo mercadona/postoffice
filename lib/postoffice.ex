@@ -24,6 +24,7 @@ defmodule Postoffice do
     case Messaging.get_topic(topic_name) do
       nil ->
         Messaging.create_topic(topic_params)
+
       topic ->
         {:ok, topic}
     end
@@ -33,6 +34,7 @@ defmodule Postoffice do
     case Messaging.get_last_message() do
       nil ->
         add_publisher(publisher_params, 0)
+
       %{id: message_id} ->
         add_publisher(publisher_params, message_id)
     end

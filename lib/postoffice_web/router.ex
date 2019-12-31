@@ -24,8 +24,7 @@ defmodule PostofficeWeb.Router do
 
     get "/", IndexController, :index, as: :dashboard
 
-    resources "/publishers", PublisherController,
-      only: [:index, :new, :create, :edit, :update]
+    resources "/publishers", PublisherController, only: [:index, :new, :create, :edit, :update]
 
     resources "/messages", MessageController, only: [:index, :show]
   end

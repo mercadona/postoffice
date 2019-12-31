@@ -10,9 +10,7 @@ defmodule Postoffice.MessagesProducer do
   @check_empty_queue_time 1000 * 4
 
   def start_link(publisher) do
-    Logger.info(
-      "Starting messages producer for publisher #{publisher.id} #{inspect(self())}"
-    )
+    Logger.info("Starting messages producer for publisher #{publisher.id} #{inspect(self())}")
 
     GenStage.start_link(__MODULE__, publisher, name: {:via, :swarm, publisher.id})
   end

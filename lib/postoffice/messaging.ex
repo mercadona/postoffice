@@ -121,7 +121,12 @@ defmodule Postoffice.Messaging do
       [%Message{}, ...]
 
   """
-  def list_pending_messages_for_publisher(publisher_id, topic_id, initial_message \\ 0, limit \\ 500) do
+  def list_pending_messages_for_publisher(
+        publisher_id,
+        topic_id,
+        initial_message \\ 0,
+        limit \\ 500
+      ) do
     query =
       from(
         publisher_success in PublisherSuccess,
