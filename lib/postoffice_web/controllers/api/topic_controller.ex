@@ -1,7 +1,6 @@
 defmodule PostofficeWeb.Api.TopicController do
   use PostofficeWeb, :controller
 
-  alias Postoffice.Messaging
   alias Postoffice.Messaging.Topic
 
   action_fallback PostofficeWeb.FallbackController
