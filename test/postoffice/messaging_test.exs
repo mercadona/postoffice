@@ -162,7 +162,6 @@ defmodule Postoffice.MessagingTest do
     test "message_already_processed returns false if it hasnt been processed for a publisher" do
       topic = topic_fixture()
       message = message_fixture(topic)
-      topic = topic_fixture()
       publisher = publisher_fixture(topic)
 
       assert Messaging.message_already_processed(message.id, publisher.id) == false
@@ -171,7 +170,6 @@ defmodule Postoffice.MessagingTest do
     test "message_already_processed returns true if it has been processed for a publisher" do
       topic = topic_fixture()
       message = message_fixture(topic)
-      topic = topic_fixture()
       publisher = publisher_fixture(topic)
       publisher_success_fixture(message, publisher)
 
