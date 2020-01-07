@@ -1,0 +1,64 @@
+<h4>Message: <%= @message.public_id %></h4>
+<div class="row">
+  <div class="col-md-6">
+    <table class="table table-bordered">
+      <thead class="thead-light">
+        <tr>
+          <th>Received at</th>
+          <th>Topic</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= @message.inserted_at %></td>
+          <td><%= @message.topic.name %></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <p>
+      <button class="btn btn-outline-primary btn-sm" data-toggle="collapse" href="#collapsePayload" role="button" aria-expanded="false" aria-controls="collapsePayload">View payload</button>
+      <button class="btn btn-outline-primary btn-sm" data-toggle="collapse" href="#collapseAttributes" role="button" aria-expanded="false" aria-controls="collapseAttributes">View attributes</button>
+    </p>
+  </div>
+  <div class="col-md-12">
+    <div class="collapse" id="collapsePayload">
+      <div class="card card-body">
+        <%= Poison.encode!(@message.payload) %>
+      </div>
+    </div>
+    <div class="collapse" id="collapseAttributes">
+      <div class="card card-body">
+        <%= Poison.encode!(@message.attributes) %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h5>Messages sent</h5>
+<table class="table table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th scope="col">Type</th>
+      <th scope="col">Destination</th>
+      <th scope="col">Sent at</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for success <- @message_success do %>
+    <tr>
+      <%= if success.publisher.type == "pubsub" do %>
+        <td>PubSub</td>
+      <% else %>
+        <td>Http</td>
+      <% end %>
+      <td><%= success.publisher.endpoint %></td>
+      <td><%= success.inserted_at %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,27 @@
+version: '3'
+services:
+  db:
+    image: postgres:12.1
+    volumes:
+      - pgdata12:/var/lib/postgresql12/data
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+    command: --fsync=off -c 'shared_preload_libraries="pg_stat_statements"' -c 'pg_stat_statements.track=all'
+    ports:
+      - "6543:5432"
+
+  # In case you wan to run the application inside a container, you just need to remove comments from thw following lines.
+  # Inside the container you run a release, not `mix phx.server` so you don't have code reloading, and other things
+  # app:
+  #   build:
+  #     context: ..
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - "4001:4000"
+
+volumes:
+  pgdata12:

@@ -1,0 +1,27 @@
+<h2>Edit Publisher</h2>
+
+<%= form_for @changeset, Routes.publisher_path(@conn, :update, @publisher), fn f -> %>
+    <div class="form-group">
+      <label>Topic</label>
+      <%= select f, :topic_id, @topics, disabled: true %>
+    </div>
+
+    <div class="form-group">
+      <%= label f, :endpoint, class: "control-label" %>
+      <%= textarea f, :endpoint, class: "form-control", rows: 5 %>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label">Active</label>
+      <%= checkbox f, :active %>
+    </div>
+
+    <div class="form-group">
+      <%= label f, :type, class: "control-label" %>
+      <%= select f, :type, Postoffice.Messaging.Publisher.types, rows: 5 %>
+    </div>
+
+    <div class="form-group">
+      <%= submit "Submit", class: "btn btn-primary" %>
+    </div>
+<% end %>
