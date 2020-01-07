@@ -21,7 +21,7 @@ defmodule PostofficeWeb.Api.TopicControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.api_topic_path(conn, :create), topic: @invalid_attrs)
-      assert json_response(conn, 400)["errors"] != %{}
+      assert json_response(conn, 400)["data"]["errors"] == %{"name" => ["can't be blank"]}
     end
 
     test "do not create topic in case it already exists", %{conn: conn} do
