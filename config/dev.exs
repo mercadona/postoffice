@@ -2,11 +2,11 @@ use Mix.Config
 
 # Configure your database
 config :postoffice, Postoffice.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "postoffice_dev",
-  hostname: "localhost",
-  port: "6543",
+  username: System.get_env("DB_USERNAME", "postgres"),
+  password: System.get_env("DB_PASSWORD", "postgres"),
+  database: System.get_env("DB_NAME", "postoffice_dev"),
+  hostname: System.get_env("DB_HOST", "localhost"),
+  port: System.get_env("DB_PORT", "6543"),
   show_sensitive_data_on_connection_error: true,
   pool_size: 20,
   queue_target: 3000

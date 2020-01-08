@@ -1,0 +1,38 @@
+# Elixir CircleCI 2.0 configuration file
+# Check https://circleci.com/docs/2.0/language-elixir/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/elixir:1.9.4
+        environment:
+          DB_HOST: 127.0.0.1
+          DB_PASSWORD: postoffice
+          DB_USERNAME: postoffice
+          DB_NAME: postoffice_dev
+          DB_PORT: 5432
+          GCLOUD_PUBSUB_CREDENTIALS_PATH: /home/circleci/repo/config/dummy-credentials.json
+
+      # Required database
+      - image: circleci/postgres:12.0-alpine
+        environment:
+          POSTGRES_USER: postoffice
+          POSTGRES_DB: postoffice
+          POSTGRES_PASSWORD: postoffice
+
+    working_directory: ~/repo
+    steps:
+      - checkout
+
+      - run: mix local.rebar --force && mix local.hex --force
+      - run: mix deps.get
+      - run:
+          name: install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
+      - run:
+          name: Wait for db
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run: mix ecto.setup
+      - run: mix test
