@@ -45,8 +45,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
     test "renders errors when topic does not exists", %{conn: conn} do
       conn = post(conn, Routes.api_publisher_path(conn, :create), @invalid_attrs)
-      assert json_response(conn, 400)["data"] == %{"errors" => "Topic not found"}
-      # assert json_response(conn, 400)["data"] == %{"errors" => %{"topic" => ["is invalid"]}}
+      assert json_response(conn, 400)["data"] == %{"errors" => %{"topic" => ["is invalid"]}}
     end
 
     test "renders errors when data is invalid", %{conn: conn} do

@@ -16,7 +16,7 @@ defmodule PostofficeWeb.Api.PublisherController do
       {:topic_not_found, {}} ->
         conn
         |> put_status(:bad_request)
-        |> render("show.json", error: "Topic not found")
+        |> render("show.json", error: %{topic: ["is invalid"]})
 
       {:error, changeset} ->
         conn
