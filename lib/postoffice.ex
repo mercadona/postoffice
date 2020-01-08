@@ -34,7 +34,7 @@ defmodule Postoffice do
 
   def receive_publisher(%{"topic" => topic} = publisher_params) do
     with %Topic{} = topic <- Messaging.get_topic(topic) do
-      publisher =Map.put(publisher_params, "topic_id", topic.id)
+      publisher = Map.put(publisher_params, "topic_id", topic.id)
 
       changeset = Publisher.changeset(%Publisher{}, publisher)
       case changeset.valid? do

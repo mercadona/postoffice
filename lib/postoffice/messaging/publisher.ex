@@ -29,7 +29,7 @@ defmodule Postoffice.Messaging.Publisher do
     endpoint = get_field(changeset, :endpoint)
     topic = get_field(changeset, :topic_id) |> Messaging.get_topic_for_id
 
-    if type == "pubsub" and topic != endpoint do
+    if type == "pubsub" and topic.name != endpoint do
       add_error(changeset, :endpoint, "is invalid")
     else
       changeset
