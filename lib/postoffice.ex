@@ -45,25 +45,7 @@ defmodule Postoffice do
       end
     else
       nil -> {:topic_not_found, {}}
-      # nil -> {:error, "topic not found"}
     end
-    #   case Messaging.get_topic(topic) do
-    #   nil ->
-    #     {:error, Publisher.changeset(%Publisher{}, publisher_params)}
-
-    #   topic ->
-    #     publisher =Map.put(publisher_params, "topic_id", topic.id)
-
-    #     
-
-    #     case changeset.valid? do
-    #       true ->
-    #         Postoffice.create_publisher(publisher)
-
-    #       false ->
-    #         {:error, changeset}
-    #     end
-    # end
   end
 
   def create_publisher(%{"from_now" => from_now} = publisher_params) when from_now == "true" do
