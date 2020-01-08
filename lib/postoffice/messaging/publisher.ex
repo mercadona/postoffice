@@ -19,6 +19,7 @@ defmodule Postoffice.Messaging.Publisher do
     consumer_http
     |> cast(attrs, [:endpoint, :active, :type, :topic_id, :initial_message])
     |> validate_required([:endpoint, :active, :topic_id, :type, :initial_message])
+    |> validate_inclusion(:type, Keyword.values(types))
   end
 
   def types do

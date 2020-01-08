@@ -13,10 +13,15 @@ defmodule PostofficeWeb.Api.PublisherController do
         |> put_status(:created)
         |> render("show.json", publisher: publisher)
 
-      {:error, errors} ->
+      {:topic_not_found, {}} ->
         conn
         |> put_status(:bad_request)
-        |> render("show.json", changeset: errors)
+        |> render("show.json", error: "Topic not found")
+
+      {:error, changeset} ->
+        conn
+        |> put_status(:bad_request)
+        |> render("show.json", changeset: changeset)
     end
   end
 end

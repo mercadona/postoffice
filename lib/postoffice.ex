@@ -10,6 +10,7 @@ defmodule Postoffice do
 
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Publisher
+  alias Postoffice.Messaging.Topic
 
   def receive_message(message_params) do
     {%{"topic" => topic}, message_attrs} = Map.split(message_params, ["topic"])
@@ -32,33 +33,37 @@ defmodule Postoffice do
   end
 
   def receive_publisher(%{"topic" => topic} = publisher_params) do
-    topic_new = Messaging.get_topic(topic)
+    with %Topic{} = topic <- Messaging.get_topic(topic) do
+      publisher =Map.put(publisher_params, "topic_id", topic.id)
 
-    case topic_new do
-      nil ->
-        {:error, Publisher.changeset(%Publisher{}, publisher_params)}
-
-      topic ->
-        IO.puts "Entro donde no debo"
-        publisher =Map.put(publisher_params, "topic_id", topic.id)
-
-        changeset = Publisher.changeset(%Publisher{}, publisher)
-
-        case changeset.valid? do
-          true ->
-            Postoffice.create_publisher(publisher)
-
-            # conn
-            # |> put_status(:created)
-            #   |> render("show.json", publisher: publisher)
-
-            false ->
-            {:error, changeset}
-            # conn
-            # |> put_status(:bad_request)
-            # |> render("show.json", changeset: changeset)
-        end
+      changeset = Publisher.changeset(%Publisher{}, publisher)
+      case changeset.valid? do
+        true ->
+          Postoffice.create_publisher(publisher)
+        false ->
+          {:error, changeset}
+      end
+    else
+      nil -> {:topic_not_found, {}}
+      # nil -> {:error, "topic not found"}
     end
+    #   case Messaging.get_topic(topic) do
+    #   nil ->
+    #     {:error, Publisher.changeset(%Publisher{}, publisher_params)}
+
+    #   topic ->
+    #     publisher =Map.put(publisher_params, "topic_id", topic.id)
+
+    #     
+
+    #     case changeset.valid? do
+    #       true ->
+    #         Postoffice.create_publisher(publisher)
+
+    #       false ->
+    #         {:error, changeset}
+    #     end
+    # end
   end
 
   def create_publisher(%{"from_now" => from_now} = publisher_params) when from_now == "true" do

@@ -19,6 +19,13 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
     type: "http",
     initial_message: 0
   }
+  @invalid_attrs_2 %{
+    active: true,
+    endpoint: "http://fake.endpoint",
+    topic: "test",
+    type: "no_existe",
+    initial_message: 0
+  }
   @valid_topic_attrs %{
     name: "test"
   }
@@ -36,9 +43,19 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
       assert length(Repo.all(Publisher)) == 1
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
+    test "renders errors when topic does not exists", %{conn: conn} do
       conn = post(conn, Routes.api_publisher_path(conn, :create), @invalid_attrs)
-      assert json_response(conn, 400)["errors"] != %{}
+      assert json_response(conn, 400)["data"] == %{"errors" => "Topic not found"}
+      # assert json_response(conn, 400)["data"] == %{"errors" => %{"topic" => ["is invalid"]}}
+    end
+
+    test "renders errors when data is invalid", %{conn: conn} do
+      {:ok, _topic} = Messaging.create_topic(@valid_topic_attrs)
+
+      conn = post(conn, Routes.api_publisher_path(conn, :create), @invalid_attrs_2)
+
+      assert json_response(conn, 400)["data"] == %{"errors" => %{"type" => ["is invalid"]}}
+      assert length(Repo.all(Publisher)) == 0
     end
 
     # test "do not create topic in case it already exists", %{conn: conn} do
