@@ -6,25 +6,17 @@ defmodule PostofficeWeb.Api.PublisherController do
 
   action_fallback PostofficeWeb.FallbackController
 
-  def create(conn, %{"topic" => topic} = publisher_params) do
-    topic = Messaging.get_topic(topic)
-
-    publisher =Map.put(publisher_params, "topic_id", topic.id)
-
-    changeset = Publisher.changeset(%Publisher{}, publisher)
-
-    case changeset.valid? do
-      true ->
-        {:ok, topic} = Postoffice.create_publisher(publisher)
-
+  def create(conn, publisher_params) do
+    case Postoffice.receive_publisher(publisher_params) do
+      {:ok, publisher} ->
         conn
         |> put_status(:created)
         |> render("show.json", publisher: publisher)
 
-      false ->
+      {:error, errors} ->
         conn
         |> put_status(:bad_request)
-        |> render("show.json", changeset: changeset)
+        |> render("show.json", changeset: errors)
     end
   end
 end

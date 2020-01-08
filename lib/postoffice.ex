@@ -9,6 +9,7 @@ defmodule Postoffice do
   require Logger
 
   alias Postoffice.Messaging
+  alias Postoffice.Messaging.Publisher
 
   def receive_message(message_params) do
     {%{"topic" => topic}, message_attrs} = Map.split(message_params, ["topic"])
@@ -27,6 +28,36 @@ defmodule Postoffice do
 
       topic ->
         {:ok, topic}
+    end
+  end
+
+  def receive_publisher(%{"topic" => topic} = publisher_params) do
+    topic_new = Messaging.get_topic(topic)
+
+    case topic_new do
+      nil ->
+        {:error, Publisher.changeset(%Publisher{}, publisher_params)}
+
+      topic ->
+        IO.puts "Entro donde no debo"
+        publisher =Map.put(publisher_params, "topic_id", topic.id)
+
+        changeset = Publisher.changeset(%Publisher{}, publisher)
+
+        case changeset.valid? do
+          true ->
+            Postoffice.create_publisher(publisher)
+
+            # conn
+            # |> put_status(:created)
+            #   |> render("show.json", publisher: publisher)
+
+            false ->
+            {:error, changeset}
+            # conn
+            # |> put_status(:bad_request)
+            # |> render("show.json", changeset: changeset)
+        end
     end
   end
 
