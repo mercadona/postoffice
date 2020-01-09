@@ -1,9 +1,6 @@
 defmodule PostofficeWeb.Api.PublisherController do
   use PostofficeWeb, :controller
 
-  alias Postoffice.Messaging.Publisher
-  alias Postoffice.Messaging
-
   action_fallback PostofficeWeb.FallbackController
 
   def create(conn, publisher_params) do
@@ -16,7 +13,7 @@ defmodule PostofficeWeb.Api.PublisherController do
       {:topic_not_found, {}} ->
         conn
         |> put_status(:bad_request)
-        |> render("show.json", error: %{topic: ["is invalid"]})
+        |> render("error.json", error: %{topic: ["is invalid"]})
 
       {:error, changeset} ->
         conn
