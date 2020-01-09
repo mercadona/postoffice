@@ -231,6 +231,11 @@ defmodule Postoffice.Messaging do
     |> Repo.one()
   end
 
+  def get_last_publisher do
+    from(p in Publisher, order_by: [desc: :id], limit: 1)
+    |> Repo.one()
+  end
+
   def list_publisher_failures(publisher_id) do
     query = from(p in PublisherFailures, where: p.publisher_id == ^publisher_id)
 

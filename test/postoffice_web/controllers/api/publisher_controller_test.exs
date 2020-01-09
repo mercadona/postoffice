@@ -17,7 +17,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
     active: true,
     endpoint: "test",
     topic: "test",
-    type: "http",
+    type: "pubsub",
     initial_message: 0
   }
 
@@ -64,21 +64,33 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
   describe "create publisher" do
     test "create http publisher when data is valid", %{conn: conn} do
-      Messaging.create_topic(@valid_topic_attrs)
+      {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
 
       conn = post(conn, Routes.api_publisher_path(conn, :create), @valid_http_publisher_payload)
 
       assert json_response(conn, 201)["data"] == %{}
       assert length(Repo.all(Publisher)) == 1
+      created_publisher = Messaging.get_last_publisher
+      assert created_publisher.active == true
+      assert created_publisher.endpoint == "http://fake.endpoint"
+      assert created_publisher.initial_message == 0
+      assert created_publisher.topic_id == topic.id
+      assert created_publisher.type == "http"
     end
 
     test "create pubsub publisher when data is valid", %{conn: conn} do
-      Messaging.create_topic(@valid_topic_attrs)
+      {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
 
       conn = post(conn, Routes.api_publisher_path(conn, :create), @valid_pubsub_publisher_payload)
 
       assert json_response(conn, 201)["data"] == %{}
       assert length(Repo.all(Publisher)) == 1
+      created_publisher = Messaging.get_last_publisher
+      assert created_publisher.active == true
+      assert created_publisher.endpoint == topic.name
+      assert created_publisher.initial_message == 0
+      assert created_publisher.topic_id == topic.id
+      assert created_publisher.type == "pubsub"
     end
 
     test "renders errors when topic does not exists", %{conn: conn} do
