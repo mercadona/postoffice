@@ -96,12 +96,14 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
       assert length(Repo.all(Publisher)) == 0
     end
 
-    # test "do not create topic in case it already exists", %{conn: conn} do
-    #   {:ok, existing_topic} = Messaging.create_topic(%{name: "test"})
-    #   conn = post(conn, Routes.api_topic_path(conn, :create), topic: @create_attrs)
-    #   new_topic = json_response(conn, 201)["data"]
-    #   assert new_topic["id"] == existing_topic.id
-    # end
+    test "do not create publisher in case it already exists", %{conn: conn} do
+      Messaging.create_topic(@valid_topic_attrs)
+      post(conn, Routes.api_publisher_path(conn, :create), @valid_http_publisher_payload)
+
+      conn = post(conn, Routes.api_publisher_path(conn, :create), @valid_http_publisher_payload)
+
+      assert length(Repo.all(Publisher)) == 1
+    end
   end
 end
 

@@ -34,18 +34,44 @@ defmodule Postoffice do
 
   def receive_publisher(%{"topic" => topic} = publisher_params) do
     with %Topic{} = topic <- Messaging.get_topic(topic) do
+      params = %{topic: topic.id, endpoint: publisher_params["endpoint"], type: publisher_params["type"]}
       publisher = Map.put(publisher_params, "topic_id", topic.id)
 
-      changeset = Publisher.changeset(%Publisher{}, publisher)
-      case changeset.valid? do
-        true ->
-          Postoffice.create_publisher(publisher)
-        false ->
-          {:error, changeset}
+      case Messaging.get_publisher_for_params(params) do
+        nil ->
+          changeset = Publisher.changeset(%Publisher{}, publisher)
+          case changeset.valid? do
+            true ->
+              Postoffice.create_publisher(publisher)
+            false ->
+              {:error, changeset}
+          end
+        publisher ->
+          {:ok, publisher}
       end
     else
       nil -> {:topic_not_found, {}}
     end
+
+    # case Messaging.get_publisher(params) do
+    #   publisher ->
+    #     {:ok, publisher}
+
+    #   nil ->
+    #     with %Topic{} = topic <- Messaging.get_topic(topic) do
+    #       publisher = Map.put(publisher_params, "topic_id", topic.id)
+
+    #       changeset = Publisher.changeset(%Publisher{}, publisher)
+    #       case changeset.valid? do
+    #         true ->
+    #           Postoffice.create_publisher(publisher)
+    #         false -> 2 
+    #           {:error, changeset}
+    #       end
+    #     else
+    #       nil -> {:topic_not_found, {}}
+    #     end
+    # end
   end
 
   def create_publisher(%{"from_now" => from_now} = publisher_params) when from_now == "true" do
