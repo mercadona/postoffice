@@ -33,35 +33,18 @@ defmodule Postoffice do
   end
 
   def receive_publisher(%{"topic" => topic} = publisher_params) do
-    with %Topic{} = topic <- Messaging.get_topic(topic) do
-      params = %{topic: topic.id, endpoint: publisher_params["endpoint"], type: publisher_params["type"]}
+    case Messaging.get_topic(topic) do
+      nil ->
+        {:topic_not_found, {}}
 
-      case Messaging.get_publisher_for_params(params) do
-        nil ->
-          case build_publisher(publisher_params, topic.id) do
-            {:ok, publisher} ->
-              create_publisher(publisher)
-            {:error, changeset} ->
-              {:error, changeset}
-          end
-        publisher ->
-          {:ok, publisher}
-      end
-    else
-      nil -> {:topic_not_found, {}}
+        topic ->
+        build_publisher(topic, publisher_params)
     end
   end
 
-  defp build_publisher(publisher_params, topic) do
-    publisher = Map.put(publisher_params, "topic_id", topic)
-    changeset = Publisher.changeset(%Publisher{}, publisher)
-
-    case changeset.valid? do
-      true ->
-        {:ok, publisher}
-      false ->
-        {:error, changeset}
-    end
+  defp build_publisher(topic, publisher_params) do
+    params = Map.put(publisher_params, "topic_id", topic.id)
+    create_publisher(params)
   end
 
   def create_publisher(%{"from_now" => from_now} = publisher_params) when from_now == "true" do
@@ -81,11 +64,8 @@ defmodule Postoffice do
   defp add_publisher(params, initial_message_id) do
     {_value, publisher_params} = Map.pop(params, "from_now")
 
-    {:ok, publisher} =
-      Map.put(publisher_params, "initial_message", initial_message_id)
-      |> Messaging.create_publisher()
-
-    {:ok, publisher}
+    Map.put(publisher_params, "initial_message", initial_message_id)
+    |> Messaging.create_publisher()
   end
 
   def find_message_by_uuid(uuid) do

@@ -132,9 +132,8 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
       conn = post(conn, Routes.api_publisher_path(conn, :create), @valid_http_publisher_payload)
 
-      assert json_response(conn, 201)["data"] == %{}
+      assert json_response(conn, 400)["data"] == %{"errors" => %{"endpoint" => ["has already been taken"]}}
       assert length(Repo.all(Publisher)) == 1
     end
   end
 end
-
