@@ -1,7 +1,6 @@
 defmodule Postoffice.Messaging.Publisher do
   use Ecto.Schema
   import Ecto.Changeset
-  alias Postoffice.Messaging
 
   schema "publishers" do
     field :active, :boolean, default: false

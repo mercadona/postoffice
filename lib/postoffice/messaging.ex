@@ -202,14 +202,6 @@ defmodule Postoffice.Messaging do
     |> Repo.one()
   end
 
-  def get_publisher_for_params(%{:topic => topic, :endpoint => endpoint, :type => type}) do
-    from(p in Publisher, where: p.topic_id == ^topic,
-      where: p.endpoint == ^endpoint,
-      where: p.type == ^type,
-      preload: [:topic])
-      |> Repo.one()
-  end
-
   def change_publisher(%Publisher{} = publisher) do
     Publisher.changeset(publisher, %{})
   end
