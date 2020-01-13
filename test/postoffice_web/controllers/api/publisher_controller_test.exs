@@ -1,6 +1,8 @@
 defmodule PostofficeWeb.Api.PublisherControllerTest do
   use PostofficeWeb.ConnCase
 
+  import Ecto.Query, warn: false
+
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Publisher
   alias Postoffice.Repo
@@ -42,7 +44,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
     active: true,
     endpoint: "http://fake.endpoint",
     topic: "test",
-    type: "no_existe",
+    type: "false_type",
     initial_message: 0
   }
 
@@ -54,6 +56,11 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
+  defp get_last_publisher() do
+    from(p in Publisher, order_by: [desc: :id], limit: 1)
+    |> Repo.one()
+  end
+
   describe "create publisher" do
     test "create http publisher when data is valid", %{conn: conn} do
       {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
@@ -62,7 +69,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
       assert json_response(conn, 201)["data"] == %{}
       assert length(Repo.all(Publisher)) == 1
-      created_publisher = Messaging.get_last_publisher
+      created_publisher =  get_last_publisher()
       assert created_publisher.active == true
       assert created_publisher.endpoint == "http://fake.endpoint"
       assert created_publisher.initial_message == 0
@@ -77,7 +84,8 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
       assert json_response(conn, 201)["data"] == %{}
       assert length(Repo.all(Publisher)) == 1
-      created_publisher = Messaging.get_last_publisher
+
+      created_publisher = get_last_publisher()
       assert created_publisher.active == true
       assert created_publisher.endpoint == topic.name
       assert created_publisher.initial_message == 0
