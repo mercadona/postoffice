@@ -30,6 +30,21 @@ defmodule Postoffice do
     end
   end
 
+  def receive_publisher(%{"topic" => topic} = publisher_params) do
+    case Messaging.get_topic(topic) do
+      nil ->
+        {:topic_not_found, {}}
+
+        topic ->
+        build_publisher(topic, publisher_params)
+    end
+  end
+
+  defp build_publisher(topic, publisher_params) do
+    params = Map.put(publisher_params, "topic_id", topic.id)
+    create_publisher(params)
+  end
+
   def create_publisher(%{"from_now" => from_now} = publisher_params) when from_now == "true" do
     case Messaging.get_last_message() do
       nil ->
@@ -47,11 +62,8 @@ defmodule Postoffice do
   defp add_publisher(params, initial_message_id) do
     {_value, publisher_params} = Map.pop(params, "from_now")
 
-    {:ok, publisher} =
-      Map.put(publisher_params, "initial_message", initial_message_id)
-      |> Messaging.create_publisher()
-
-    {:ok, publisher}
+    Map.put(publisher_params, "initial_message", initial_message_id)
+    |> Messaging.create_publisher()
   end
 
   def find_message_by_uuid(uuid) do

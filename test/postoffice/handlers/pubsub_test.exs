@@ -15,13 +15,13 @@ defmodule Postoffice.Handlers.PubsubTest do
   }
   @valid_publisher_attrs %{
     active: true,
-    topic: "test",
+    topic: "test-publisher",
     endpoint: "test-publisher",
     type: "pubsub",
     initial_message: 0
   }
   @valid_topic_attrs %{
-    name: "test"
+    name: "test-publisher"
   }
   setup [:set_mox_from_context, :verify_on_exit!]
 

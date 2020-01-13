@@ -3,6 +3,7 @@ defmodule PostofficeWeb.Router do
 
   alias Api.MessageController, as: ApiMessageController
   alias Api.TopicController, as: ApiTopicController
+  alias Api.PublisherController, as: ApiPublisherController
   alias Api.HealthController, as: ApiHealthController
   alias MessageController, as: MessageController
   alias IndexController
@@ -33,6 +34,7 @@ defmodule PostofficeWeb.Router do
     pipe_through :api
     resources "/messages", ApiMessageController, only: [:create, :show]
     resources "/topics", ApiTopicController, only: [:create, :show]
+    resources "/publishers", ApiPublisherController, only: [:create]
     resources "/health", ApiHealthController, only: [:index]
   end
 end
