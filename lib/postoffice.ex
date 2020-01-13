@@ -95,13 +95,5 @@ defmodule Postoffice do
 
   def count_topics, do: Messaging.count_topics()
 
-  def ping do
-    case :ets.whereis(:counters) do
-      :undefined ->
-        :ko
-
-      _reference ->
-        :ok
-    end
-  end
+  def ping, do: Application.ensure_started(:postoffice)
 end

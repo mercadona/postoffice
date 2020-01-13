@@ -6,7 +6,7 @@ defmodule PostofficeWeb.Api.HealthController do
       :ok ->
         render(conn, "index.json", health_status: "ok")
 
-      :ko ->
+      {:error, {_reason, _app}} ->
         render(conn, "index.json", health_status: "ko")
     end
   end

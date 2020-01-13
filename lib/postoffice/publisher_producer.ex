@@ -28,7 +28,6 @@ defmodule Postoffice.PublisherProducer do
 
   @impl true
   def handle_info(:populate_state, {queue, pending_demand} = state) do
-    # TODO: We should cancel previous timer here https://hexdocs.pm/elixir/Process.html#cancel_timer/2
     Process.send_after(self(), :populate_state, @repopulate_state_interval)
 
     if :queue.len(queue) < 25 do
