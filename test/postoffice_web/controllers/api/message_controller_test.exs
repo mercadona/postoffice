@@ -23,12 +23,12 @@ defmodule PostofficeWeb.Api.MessageControllerTest do
 
   describe "create message" do
     test "renders message when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.api_message_path(conn, :create), message: @create_attrs)
+      conn = post(conn, Routes.api_message_path(conn, :create), @create_attrs)
       assert %{"public_id" => id} = json_response(conn, 201)["data"]
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.api_message_path(conn, :create), message: @invalid_attrs)
+      conn = post(conn, Routes.api_message_path(conn, :create), @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
