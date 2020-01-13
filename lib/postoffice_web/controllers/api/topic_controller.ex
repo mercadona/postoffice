@@ -5,7 +5,7 @@ defmodule PostofficeWeb.Api.TopicController do
 
   action_fallback PostofficeWeb.FallbackController
 
-  def create(conn, %{"topic" => topic_params}) do
+  def create(conn, topic_params) do
     changeset = Topic.changeset(%Topic{}, topic_params)
 
     case changeset.valid? do
