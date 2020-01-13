@@ -22,19 +22,6 @@ defmodule Postoffice.Messaging.Publisher do
     |> validate_required([:endpoint, :active, :topic_id, :type, :initial_message])
     |> unique_constraint(:endpoint, name: :publishers_topic_id_endpoint_type_index)
     |> validate_inclusion(:type, Keyword.values(types()))
-    |> validate_endpoint()
-  end
-
-  def validate_endpoint(changeset) do
-    type = get_field(changeset, :type)
-    endpoint = get_field(changeset, :endpoint)
-    topic = get_field(changeset, :topic_id) |> Messaging.get_topic_for_id
-
-    if type == "pubsub" and topic.name != endpoint do
-      add_error(changeset, :endpoint, "is invalid")
-    else
-      changeset
-    end
   end
 
   def types do

@@ -9,8 +9,6 @@ defmodule Postoffice do
   require Logger
 
   alias Postoffice.Messaging
-  alias Postoffice.Messaging.Publisher
-  alias Postoffice.Messaging.Topic
 
   def receive_message(message_params) do
     {%{"topic" => topic}, message_attrs} = Map.split(message_params, ["topic"])

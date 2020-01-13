@@ -220,12 +220,6 @@ defmodule Postoffice.Messaging do
     Repo.one(query)
   end
 
-  def get_topic_for_id(id) do
-    query = from(t in Topic, where: t.id == ^id)
-
-    Repo.one(query)
-  end
-
   def get_last_message do
     from(m in Message, order_by: [desc: :id], limit: 1)
     |> Repo.one()

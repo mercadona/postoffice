@@ -21,14 +21,6 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
     initial_message: 0
   }
 
-  @invalid_pubsub_publisher_payload%{
-    active: true,
-    endpoint: "http://fake.endpoint",
-    topic: "test",
-    type: "pubsub",
-    initial_message: 0
-  }
-
   @invalid_http_publisher_payload %{
     active: true,
     endpoint: "http://fake.endpoint",
@@ -114,15 +106,6 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
       conn = post(conn, Routes.api_publisher_path(conn, :create), @invalid_publisher_endpoint_payload)
 
       assert json_response(conn, 400)["data"] == %{"errors" => %{"endpoint" => ["can't be blank"]}}
-      assert length(Repo.all(Publisher)) == 0
-    end
-
-    test "renders errors when type is pubsub and endpoint is different that topic", %{conn: conn} do
-      Messaging.create_topic(@valid_topic_attrs)
-
-      conn = post(conn, Routes.api_publisher_path(conn, :create), @invalid_pubsub_publisher_payload)
-
-      assert json_response(conn, 400)["data"] == %{"errors" => %{"endpoint" => ["is invalid"]}}
       assert length(Repo.all(Publisher)) == 0
     end
 
