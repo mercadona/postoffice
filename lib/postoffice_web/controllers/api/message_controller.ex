@@ -5,7 +5,7 @@ defmodule PostofficeWeb.Api.MessageController do
 
   action_fallback PostofficeWeb.FallbackController
 
-  def create(conn, %{"message" => message_params}) do
+  def create(conn, message_params) do
     with {:ok, %Message{} = message} <- Postoffice.receive_message(message_params) do
       conn
       |> put_status(:created)
