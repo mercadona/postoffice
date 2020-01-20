@@ -20,6 +20,18 @@ defmodule Postoffice do
     )
   end
 
+  def receive_message_final(%{"topic" => topic} = message_params) do
+    case Messaging.get_topic(topic) do
+      nil -> {:topic_not_found, {}}
+
+      topic ->
+        Messaging.create_message(
+          topic,
+          Map.put_new(message_params, "public_id", Ecto.UUID.generate())
+        )
+    end
+  end
+
   def create_topic(%{"name" => topic_name} = topic_params) do
     case Messaging.get_topic(topic_name) do
       nil ->
