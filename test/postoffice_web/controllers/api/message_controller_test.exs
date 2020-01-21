@@ -39,7 +39,11 @@ defmodule PostofficeWeb.Api.MessageControllerTest do
 
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, Routes.api_message_path(conn, :create), @invalid_attrs)
-      assert json_response(conn, 400)["data"]["errors"] == %{"attributes"=> ["can't be blank"],"payload"=> ["can't be blank"]}
+
+      assert json_response(conn, 400)["data"]["errors"] == %{
+               "attributes" => ["can't be blank"],
+               "payload" => ["can't be blank"]
+             }
     end
   end
 end

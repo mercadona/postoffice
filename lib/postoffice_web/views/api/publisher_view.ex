@@ -23,5 +23,4 @@ defmodule PostofficeWeb.Api.PublisherView do
       errors: Ecto.Changeset.traverse_errors(publisher_changeset, &translate_error/1)
     }
   end
-
 end

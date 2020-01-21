@@ -12,7 +12,8 @@ defmodule Postoffice do
 
   def receive_message(%{"topic" => topic} = message_params) do
     case Messaging.get_topic(topic) do
-      nil -> {:relationship_does_not_exists, %{topic: ["is invalid"]}}
+      nil ->
+        {:relationship_does_not_exists, %{topic: ["is invalid"]}}
 
       topic ->
         Messaging.create_message(
@@ -37,7 +38,7 @@ defmodule Postoffice do
       nil ->
         {:topic_not_found, {}}
 
-        topic ->
+      topic ->
         build_publisher(topic, publisher_params)
     end
   end
