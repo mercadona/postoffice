@@ -3,24 +3,13 @@ defmodule PostofficeWeb.Api.MessageController do
 
   alias Postoffice.Messaging.Message
 
-  action_fallback PostofficeWeb.FallbackController
+  action_fallback PostofficeWeb.Api.FallbackController
 
   def create(conn, message_params) do
-    case Postoffice.receive_message_final(message_params) do
-      {:ok, message} ->
-        conn
-        |> put_status(:created)
-        |> render("show.json", message: message)
-
-      {:topic_not_found, {}} ->
-        conn
-        |> put_status(:bad_request)
-        |> render("error.json", error: %{topic: ["is invalid"]})
-
-      {:error, changeset} ->
-        conn
-        |> put_status(:bad_request)
-        |> render("show.json", changeset: changeset)
+    with {:ok, %Message{} = message} <- Postoffice.receive_message(message_params) do
+      conn
+      |> put_status(:created)
+      |> render("show.json", message: message)
     end
   end
 end
