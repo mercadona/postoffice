@@ -3,7 +3,7 @@ defmodule PostofficeWeb.Api.MessageController do
 
   alias Postoffice.Messaging.Message
 
-  action_fallback PostofficeWeb.FallbackController
+  action_fallback PostofficeWeb.Api.FallbackController
 
   def create(conn, message_params) do
     with {:ok, %Message{} = message} <- Postoffice.receive_message(message_params) do

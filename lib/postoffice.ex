@@ -10,14 +10,16 @@ defmodule Postoffice do
 
   alias Postoffice.Messaging
 
-  def receive_message(message_params) do
-    {%{"topic" => topic}, message_attrs} = Map.split(message_params, ["topic"])
-    topic = Messaging.get_topic(topic)
+  def receive_message(%{"topic" => topic} = message_params) do
+    case Messaging.get_topic(topic) do
+      nil -> {:relationship_does_not_exists, %{topic: ["is invalid"]}}
 
-    Messaging.create_message(
-      topic,
-      Map.put_new(message_attrs, "public_id", Ecto.UUID.generate())
-    )
+      topic ->
+        Messaging.create_message(
+          topic,
+          Map.put_new(message_params, "public_id", Ecto.UUID.generate())
+        )
+    end
   end
 
   def create_topic(%{"name" => topic_name} = topic_params) do
