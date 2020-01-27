@@ -161,7 +161,7 @@ defmodule Postoffice.MessagingTest do
     test "list_enabled_publishers/0 returns only enabled publishers" do
       topic = topic_fixture()
       _ = publisher_fixture(topic, @disabled_publisher_attrs)
-      enabled_publisher =  publisher_fixture(topic)
+      enabled_publisher = publisher_fixture(topic)
       listed_publisher = List.first(Messaging.list_enabled_publishers())
 
       assert enabled_publisher.id == listed_publisher.id

@@ -36,19 +36,16 @@ defmodule Postoffice.Handlers.HttpTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    message = %Message{
-      attributes: %{},
-      payload: %{},
-      public_id: "7488a646-e31f-11e4-aace-600308960662",
-      topic_id: topic.id
-    }
+    {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
     expect(HttpMock, :publish, fn "http://fake.endpoint", ^message ->
-      {:ok, 404}
+      {:error, 404}
     end)
 
     Http.run(publisher.endpoint, publisher.id, message)
     assert [] = Messaging.list_publisher_success(publisher.id)
+    message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
+    assert message_failure.message_id == message.id
   end
 
   test "message success is created for publisher if message is successfully delivered" do

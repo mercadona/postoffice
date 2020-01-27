@@ -11,6 +11,7 @@ defmodule Postoffice.Adapters.Pubsub do
     # Authenticate
     case Goth.Token.for_scope("https://www.googleapis.com/auth/cloud-platform") do
       {:ok, token} ->
+        Logger.info("successfully generated token for pubsub")
         conn = GoogleApi.PubSub.V1.Connection.new(token.token)
 
         request = %GoogleApi.PubSub.V1.Model.PublishRequest{
