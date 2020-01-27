@@ -14,6 +14,7 @@ defmodule Postoffice.Handlers.Http do
             message_id: message.id
           })
 
+        Logger.info("Succesfully sent http message to #{publisher_endpoint}")
         {:ok, :sent}
 
       {:ok, status} ->

@@ -15,6 +15,7 @@ defmodule Postoffice.Handlers.Pubsub do
             message_id: message.id
           })
 
+        Logger.info("Succesfully sent pubsub message to #{publisher_endpoint}")
         {:ok, :sent}
 
       {:ok, status_code} ->
