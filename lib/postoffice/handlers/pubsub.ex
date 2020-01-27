@@ -18,16 +18,6 @@ defmodule Postoffice.Handlers.Pubsub do
         Logger.info("Succesfully sent pubsub message to #{publisher_endpoint}")
         {:ok, :sent}
 
-      {:ok, status_code} ->
-        Logger.info("Http handler failed to process message, response code #{status_code}")
-
-        Messaging.create_publisher_failure(%{
-          publisher_id: publisher_id,
-          message_id: message.id
-        })
-
-        {:error, :nosent}
-
       {:error, error} ->
         Logger.info("Error trying to process message from HttpConsumer #{error}")
 
