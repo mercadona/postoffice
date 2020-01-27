@@ -21,6 +21,13 @@ defmodule Postoffice.MessagingTest do
       type: "http"
     }
 
+    @disabled_publisher_attrs %{
+      active: false,
+      endpoint: "http://fake.endpoint/disabled",
+      initial_message: 0,
+      type: "http"
+    }
+
     @second_publisher_attrs %{
       active: true,
       endpoint: "http://fake.endpoint2",
@@ -149,6 +156,18 @@ defmodule Postoffice.MessagingTest do
       assert publisher.endpoint == listed_publisher.endpoint
       assert publisher.active == listed_publisher.active
       assert publisher.type == listed_publisher.type
+    end
+
+    test "list_enabled_publishers/0 returns only enabled publishers" do
+      topic = topic_fixture()
+      _ = publisher_fixture(topic, @disabled_publisher_attrs)
+      enabled_publisher =  publisher_fixture(topic)
+      listed_publisher = List.first(Messaging.list_enabled_publishers())
+
+      assert enabled_publisher.id == listed_publisher.id
+      assert enabled_publisher.endpoint == listed_publisher.endpoint
+      assert enabled_publisher.active == listed_publisher.active
+      assert enabled_publisher.type == listed_publisher.type
     end
 
     test "get_message_by_uuid returns message is found" do

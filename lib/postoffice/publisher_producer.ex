@@ -31,7 +31,7 @@ defmodule Postoffice.PublisherProducer do
     Process.send_after(self(), :populate_state, @repopulate_state_interval)
 
     if :queue.len(queue) < 25 do
-      publishers = Messaging.list_publishers()
+      publishers = Messaging.list_enabled_publishers()
 
       queue =
         Enum.reduce(publishers, queue, fn publisher, acc ->
