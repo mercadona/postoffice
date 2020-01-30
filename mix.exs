@@ -4,7 +4,7 @@ defmodule Postoffice.MixProject do
   def project do
     [
       app: :postoffice,
-      version: "0.3.0",
+      version: "0.3.3",
       elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -16,7 +16,9 @@ defmodule Postoffice.MixProject do
         postoffice: [
           config_providers: [{ConfigTuples.Provider, ""}]
         ]
-      ]
+      ],
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test]
     ]
   end
 
@@ -58,7 +60,8 @@ defmodule Postoffice.MixProject do
       {:logger_json, "~> 3.0"},
       {:config_tuples, "~> 0.4"},
       {:libcluster, "~> 3.1"},
-      {:swarm, "~> 3.0"}
+      {:swarm, "~> 3.0"},
+      {:excoveralls, "~> 0.4"}
     ]
   end
 

@@ -34,5 +34,6 @@ jobs:
       - run:
           name: Wait for db
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
-      - run: mix ecto.setup
-      - run: mix test
+      - run: MIX_ENV=test mix ecto.setup
+      - run: MIX_ENV=test mix test
+      - run: MIX_ENV=test mix coveralls.circle
