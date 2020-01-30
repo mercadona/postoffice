@@ -7,8 +7,6 @@ We can think about postoffice as a real post office. You send `messages` to a `t
 It uses a pub/sub approach, so instead of handling receiver's addresses we use topics, and receivers must subscribe to them through `Publishers`.
 A publisher is isolated from others and it handles itself its own pending messages
 
-
-
 ## Motivation
 This project started as a solution to buffer messages in case some apps are deployed on-premise and could work with connectivity issues. Then it evolved to also offer a pub/sub mechanism.
 
