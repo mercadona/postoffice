@@ -1,0 +1,8 @@
+{
+  "skip_files": [
+    "test",
+    "secrets",
+    "docker",
+    "assets"
+  ]
+}
