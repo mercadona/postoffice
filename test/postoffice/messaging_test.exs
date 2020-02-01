@@ -2,72 +2,71 @@ defmodule Postoffice.MessagingTest do
   use Postoffice.DataCase
 
   alias Postoffice.Messaging
+  alias Postoffice.Messaging.Message
+
+  @topic_attrs %{
+    name: "test"
+  }
+
+  @second_topic_attrs %{
+    name: "test2"
+  }
+
+  @publisher_attrs %{
+    active: true,
+    endpoint: "http://fake.endpoint",
+    initial_message: 0,
+    type: "http"
+  }
+
+  @disabled_publisher_attrs %{
+    active: false,
+    endpoint: "http://fake.endpoint/disabled",
+    initial_message: 0,
+    type: "http"
+  }
+
+  @second_publisher_attrs %{
+    active: true,
+    endpoint: "http://fake.endpoint2",
+    initial_message: 0,
+    type: "http"
+  }
+
+  @valid_attrs %{
+    attributes: %{},
+    payload: %{},
+    public_id: "7488a646-e31f-11e4-aace-600308960662"
+  }
+  @invalid_attrs %{attributes: nil, payload: nil, public_id: nil, topic: nil}
+
+  def message_fixture(topic, attrs \\ @valid_attrs) do
+    {:ok, message} = Messaging.create_message(topic, attrs)
+
+    message
+  end
+
+  def topic_fixture(attrs \\ @topic_attrs) do
+    {:ok, topic} = Messaging.create_topic(attrs)
+    topic
+  end
+
+  def publisher_fixture(topic, attrs \\ @publisher_attrs) do
+    {:ok, publisher} = Messaging.create_publisher(Map.put(attrs, :topic_id, topic.id))
+    publisher
+  end
+
+  def publisher_success_fixture(message, publisher) do
+    {:ok, _publisher_success} =
+      Messaging.create_publisher_success(%{message_id: message.id, publisher_id: publisher.id})
+  end
+
+  def publishers_failure_fixture(message, publisher) do
+    {:ok, _publisher_success} =
+      Messaging.create_publisher_failure(%{message_id: message.id, publisher_id: publisher.id})
+  end
 
   describe "messages" do
-    alias Postoffice.Messaging.Message
-
-    @topic_attrs %{
-      name: "test"
-    }
-
-    @second_topic_attrs %{
-      name: "test2"
-    }
-
-    @publisher_attrs %{
-      active: true,
-      endpoint: "http://fake.endpoint",
-      initial_message: 0,
-      type: "http"
-    }
-
-    @disabled_publisher_attrs %{
-      active: false,
-      endpoint: "http://fake.endpoint/disabled",
-      initial_message: 0,
-      type: "http"
-    }
-
-    @second_publisher_attrs %{
-      active: true,
-      endpoint: "http://fake.endpoint2",
-      initial_message: 0,
-      type: "http"
-    }
-
-    @valid_attrs %{
-      attributes: %{},
-      payload: %{},
-      public_id: "7488a646-e31f-11e4-aace-600308960662"
-    }
-    @update_attrs %{
-      attributes: %{},
-      payload: %{},
-      public_id: "7488a646-e31f-11e4-aace-600308960668"
-    }
-    @invalid_attrs %{attributes: nil, payload: nil, public_id: nil, topic: nil}
-
-    def message_fixture(topic, attrs \\ @valid_attrs) do
-      {:ok, message} = Messaging.create_message(topic, attrs)
-
-      message
-    end
-
-    def topic_fixture(attrs \\ @topic_attrs) do
-      {:ok, topic} = Messaging.create_topic(attrs)
-      topic
-    end
-
-    def publisher_fixture(topic, attrs \\ @publisher_attrs) do
-      {:ok, publisher} = Messaging.create_publisher(Map.put(attrs, :topic_id, topic.id))
-      publisher
-    end
-
-    def publisher_success_fixture(message, publisher) do
-      {:ok, _publisher_success} =
-        Messaging.create_publisher_success(%{message_id: message.id, publisher_id: publisher.id})
-    end
-
     test "list_messages/0 returns all messages" do
       topic = topic_fixture()
       message = message_fixture(topic)
@@ -100,38 +99,6 @@ defmodule Postoffice.MessagingTest do
     test "create_message/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} =
                Messaging.create_message(topic_fixture(), @invalid_attrs)
-    end
-
-    test "update_message/2 with valid data updates the message" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
-
-      assert {:ok, %Message{} = message} = Messaging.update_message(message, @update_attrs)
-      assert message.attributes == %{}
-      assert message.payload == %{}
-      assert message.public_id == "7488a646-e31f-11e4-aace-600308960668"
-    end
-
-    test "update_message/2 with invalid data returns error changeset" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
-
-      assert {:error, %Ecto.Changeset{}} = Messaging.update_message(message, @invalid_attrs)
-    end
-
-    test "delete_message/1 deletes the message" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
-
-      assert {:ok, %Message{}} = Messaging.delete_message(message)
-      assert Messaging.get_message!(message.id) == nil
-    end
-
-    test "change_message/1 returns a message changeset" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
-
-      assert %Ecto.Changeset{} = Messaging.change_message(message)
     end
 
     test "list_topics/0 returns all topics" do
@@ -247,5 +214,67 @@ defmodule Postoffice.MessagingTest do
       assert pending_message.id == message.id
       assert pending_message.topic_id == topic.id
     end
+  end
+
+  describe "counters" do
+    test "count_topics returns 0 if no topic exists" do
+      assert Messaging.count_topics() == 0
+    end
+
+    test "count_topics returns number of created topics" do
+      _topic = topic_fixture()
+
+      assert Messaging.count_topics() == 1
+    end
+
+    test "count_messages returns 0 if no message exists" do
+      assert Messaging.count_messages() == 0
+    end
+
+    test "count_messages returns number of created messages" do
+      topic = topic_fixture()
+      _message = message_fixture(topic)
+
+      assert Messaging.count_messages() == 1
+    end
+
+    test "count_publishers returns 0 if no publisher exists" do
+      assert Messaging.count_publishers() == 0
+    end
+
+    test "count_publishers returns number of created publishers" do
+      topic = topic_fixture()
+      _publisher = publisher_fixture(topic)
+      _publisher = publisher_fixture(topic, @second_publisher_attrs)
+
+      assert Messaging.count_publishers() == 2
+    end
+
+    test "count_published_messages returns 0 if no published message exists" do
+      assert Messaging.count_published_messages() == 0
+    end
+
+    test "count_published_messages returns number of published messages" do
+      topic = topic_fixture()
+      publisher = publisher_fixture(topic)
+      message = message_fixture(topic)
+      publisher_success_fixture(message, publisher)
+
+      assert Messaging.count_published_messages() == 1
+    end
+
+    test "count_publishers_failures returns 0 if no failed message exists" do
+      assert Messaging.count_publishers_failures() == 0
+    end
+
+    test "count_publishers_failures returns number of failed messages" do
+      topic = topic_fixture()
+      publisher = publisher_fixture(topic)
+      message = message_fixture(topic)
+      publishers_failure_fixture(message, publisher)
+
+      assert Messaging.count_publishers_failures() == 1
+    end
+
   end
 end
