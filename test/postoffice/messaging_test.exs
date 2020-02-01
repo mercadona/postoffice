@@ -3,12 +3,12 @@ defmodule Postoffice.MessagingTest do
 
   alias Postoffice.Messaging
 
+  @topic_attrs %{
+    name: "test"
+  }
+
   describe "messages" do
     alias Postoffice.Messaging.Message
-
-    @topic_attrs %{
-      name: "test"
-    }
 
     @second_topic_attrs %{
       name: "test2"
@@ -39,11 +39,6 @@ defmodule Postoffice.MessagingTest do
       attributes: %{},
       payload: %{},
       public_id: "7488a646-e31f-11e4-aace-600308960662"
-    }
-    @update_attrs %{
-      attributes: %{},
-      payload: %{},
-      public_id: "7488a646-e31f-11e4-aace-600308960668"
     }
     @invalid_attrs %{attributes: nil, payload: nil, public_id: nil, topic: nil}
 
@@ -100,38 +95,6 @@ defmodule Postoffice.MessagingTest do
     test "create_message/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} =
                Messaging.create_message(topic_fixture(), @invalid_attrs)
-    end
-
-    test "update_message/2 with valid data updates the message" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
-
-      assert {:ok, %Message{} = message} = Messaging.update_message(message, @update_attrs)
-      assert message.attributes == %{}
-      assert message.payload == %{}
-      assert message.public_id == "7488a646-e31f-11e4-aace-600308960668"
-    end
-
-    test "update_message/2 with invalid data returns error changeset" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
-
-      assert {:error, %Ecto.Changeset{}} = Messaging.update_message(message, @invalid_attrs)
-    end
-
-    test "delete_message/1 deletes the message" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
-
-      assert {:ok, %Message{}} = Messaging.delete_message(message)
-      assert Messaging.get_message!(message.id) == nil
-    end
-
-    test "change_message/1 returns a message changeset" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
-
-      assert %Ecto.Changeset{} = Messaging.change_message(message)
     end
 
     test "list_topics/0 returns all topics" do
