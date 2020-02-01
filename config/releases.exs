@@ -21,16 +21,19 @@ dummy_credentials_file = current_directory <> "/secrets/dummy-credentials.json"
 config :goth,
   json: System.get_env("GCLOUD_PUBSUB_CREDENTIALS_PATH", dummy_credentials_file) |> File.read!()
 
-config :libcluster,
-  topologies: [
-    k8s: [
-      strategy: Elixir.Cluster.Strategy.Kubernetes,
-      config: [
-        mode: :ip,
-        kubernetes_node_basename: "postoffice",
-        kubernetes_selector: "service=postoffice",
-        kubernetes_namespace: System.get_env("NAMESPACE", "staging"),
-        polling_interval: 10_000
+# If K8S_CLUSTER env_variable is set we'll try to setup a k8s cluster
+if System.get_env("K8S_CLUSTER") do
+  config :libcluster,
+    topologies: [
+      k8s: [
+        strategy: Elixir.Cluster.Strategy.Kubernetes,
+        config: [
+          mode: :ip,
+          kubernetes_node_basename: System.get_env("K8S_NODE_BASENAME"),
+          kubernetes_selector: System.get_env("K8S_SELECTOR"),
+          kubernetes_namespace: System.get_env("K8S_NAMESPACE"),
+          polling_interval: 10_000
+        ]
       ]
     ]
-  ]
+end
