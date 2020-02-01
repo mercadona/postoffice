@@ -6,7 +6,6 @@ defmodule Postoffice.Handlers.HttpTest do
   alias Postoffice.Adapters.HttpMock
   alias Postoffice.Handlers.Http
   alias Postoffice.Messaging
-  alias Postoffice.Messaging.Message
 
   @valid_message_attrs %{
     attributes: %{},
