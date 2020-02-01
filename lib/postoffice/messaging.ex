@@ -134,10 +134,6 @@ defmodule Postoffice.Messaging do
     Repo.all(query)
   end
 
-  @spec create_publisher_failure(
-          :invalid
-          | %{optional(:__struct__) => none, optional(atom | binary) => any}
-        ) :: any
   def create_publisher_failure(attrs \\ %{}) do
     %PublisherFailures{}
     |> PublisherFailures.changeset(attrs)
