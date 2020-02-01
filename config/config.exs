@@ -33,6 +33,9 @@ dummy_credentials_file = current_directory <> "/secrets/dummy-credentials.json"
 config :goth,
   json: System.get_env("GCLOUD_PUBSUB_CREDENTIALS_PATH", dummy_credentials_file) |> File.read!()
 
+config :libcluster,
+  topologies: []
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

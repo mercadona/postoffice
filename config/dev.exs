@@ -78,11 +78,3 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
-
-config :libcluster,
-  topologies: [
-    dns_poll_example: [
-      strategy: Elixir.Cluster.Strategy.DNSPoll,
-      config: [polling_interval: 5_000, query: "my-app.example.com", node_basename: "my-app"]
-    ]
-  ]
