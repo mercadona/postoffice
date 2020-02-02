@@ -20,7 +20,7 @@ defmodule Postoffice.Handlers.Pubsub do
         {:ok, :sent}
 
       {:error, error} ->
-        Logger.info("Error trying to process message from HttpConsumer #{error}")
+        Logger.info("Error trying to process message from PubsubConsumer #{error}")
 
         Messaging.create_publisher_failure(%{
           publisher_id: publisher_id,

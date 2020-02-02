@@ -38,7 +38,7 @@ defmodule Postoffice.Handlers.HttpTest do
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
     expect(HttpMock, :publish, fn "http://fake.endpoint", ^message ->
-      {:error, 404}
+      {:ok, %HTTPoison.Response{status_code: 404}}
     end)
 
     Http.run(publisher.endpoint, publisher.id, message)
@@ -56,7 +56,7 @@ defmodule Postoffice.Handlers.HttpTest do
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
     expect(HttpMock, :publish, fn "http://fake.endpoint", ^message ->
-      {:ok, message}
+      {:ok, %HTTPoison.Response{status_code: 201}}
     end)
 
     Http.run(publisher.endpoint, publisher.id, message)
@@ -72,7 +72,7 @@ defmodule Postoffice.Handlers.HttpTest do
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
     expect(HttpMock, :publish, fn "http://fake.endpoint", ^message ->
-      {:error, %HTTPoison.Error{reason: "test"}}
+      {:error, %HTTPoison.Error{reason: "test error reason"}}
     end)
 
     Http.run(publisher.endpoint, publisher.id, message)
@@ -80,7 +80,7 @@ defmodule Postoffice.Handlers.HttpTest do
     assert message_failure.message_id == message.id
   end
 
-  test "message_failure is created for publisher if response is :ok but response_code != 200" do
+  test "message_failure is created for publisher if response is :ok but response_code out of 200 range" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
 
     {:ok, publisher} =
@@ -89,7 +89,7 @@ defmodule Postoffice.Handlers.HttpTest do
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
     expect(HttpMock, :publish, fn "http://fake.endpoint", ^message ->
-      {:error, %HTTPoison.Response{status_code: 201}}
+      {:ok, %HTTPoison.Response{status_code: 300}}
     end)
 
     Http.run(publisher.endpoint, publisher.id, message)
