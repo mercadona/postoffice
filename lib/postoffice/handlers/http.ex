@@ -7,7 +7,7 @@ defmodule Postoffice.Handlers.Http do
 
   def run(publisher_endpoint, publisher_id, message) do
     case impl().publish(publisher_endpoint, message) do
-      {:ok, message = %Message{}} ->
+      {:ok, %HTTPoison.Response{status_code: status_code, body: _body}} when status_code in 200..299 ->
         Logger.info("Succesfully sent http message to #{publisher_endpoint}")
 
         {:ok, _} =
@@ -18,8 +18,8 @@ defmodule Postoffice.Handlers.Http do
 
         {:ok, :sent}
 
-      {:error, status} ->
-        Logger.info("Error trying to process message from HttpConsumer #{status}")
+      {:ok, response} ->
+        Logger.info("Error trying to process message from HttpConsumer #{response.status_code}")
 
         Messaging.create_publisher_failure(%{
           publisher_id: publisher_id,
@@ -27,6 +27,17 @@ defmodule Postoffice.Handlers.Http do
         })
 
         {:error, :nosent}
+
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        Logger.info("Error trying to process message from HttpConsumer #{reason}")
+
+        Messaging.create_publisher_failure(%{
+          publisher_id: publisher_id,
+          message_id: message.id
+        })
+
+        {:error, :nosent}
+
     end
   end
 
