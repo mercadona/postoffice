@@ -9,7 +9,6 @@ defmodule Postoffice.Handlers.PubsubTest do
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Message
 
-
   @valid_message_attrs %{
     attributes: %{},
     payload: %{},
