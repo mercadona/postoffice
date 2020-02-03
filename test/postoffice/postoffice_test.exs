@@ -22,8 +22,8 @@ defmodule Postoffice.PostofficeTest do
     end
 
     test "count_messages returns number of created messages" do
-      topic = Fixtures.topic_fixture()
-      Fixtures.message_fixture(topic)
+      topic = Fixtures.create_topic()
+      Fixtures.create_message(topic)
 
       assert Postoffice.count_received_messages() == 1
     end
@@ -33,10 +33,10 @@ defmodule Postoffice.PostofficeTest do
     end
 
     test "count_published_messages returns number of published messages" do
-      topic = Fixtures.topic_fixture()
-      publisher = Fixtures.publisher_fixture(topic)
-      message = Fixtures.message_fixture(topic)
-      Fixtures.publisher_success_fixture(message, publisher)
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+      message = Fixtures.create_message(topic)
+      Fixtures.create_publisher_success(message, publisher)
 
       assert Postoffice.count_published_messages() == 1
     end
@@ -46,10 +46,10 @@ defmodule Postoffice.PostofficeTest do
     end
 
     test "count_publishers_failures returns number of failed messages" do
-      topic = Fixtures.topic_fixture()
-      publisher = Fixtures.publisher_fixture(topic)
-      message = Fixtures.message_fixture(topic)
-      Fixtures.publishers_failure_fixture(message, publisher)
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+      message = Fixtures.create_message(topic)
+      Fixtures.create_publishers_failure(message, publisher)
 
       assert Postoffice.count_publishers_failures() == 1
     end
@@ -59,9 +59,9 @@ defmodule Postoffice.PostofficeTest do
     end
 
     test "count_publishers returns number of created publishers" do
-      topic = Fixtures.topic_fixture()
-      Fixtures.publisher_fixture(topic)
-      Fixtures.publisher_fixture(topic, @publisher_attrs)
+      topic = Fixtures.create_topic()
+      Fixtures.create_publisher(topic)
+      Fixtures.create_publisher(topic, @publisher_attrs)
 
       assert Postoffice.count_publishers() == 2
     end
@@ -71,7 +71,7 @@ defmodule Postoffice.PostofficeTest do
     end
 
     test "count_topics returns number of created topics" do
-      Fixtures.topic_fixture()
+      Fixtures.create_topic()
 
       assert Postoffice.count_topics() == 1
     end
