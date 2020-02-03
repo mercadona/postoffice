@@ -3,20 +3,10 @@ defmodule Postoffice.MessagingTest do
 
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Message
-
-  @topic_attrs %{
-    name: "test"
-  }
+  alias Postoffice.Fixtures, as: Fixtures
 
   @second_topic_attrs %{
     name: "test2"
-  }
-
-  @publisher_attrs %{
-    active: true,
-    endpoint: "http://fake.endpoint",
-    initial_message: 0,
-    type: "http"
   }
 
   @disabled_publisher_attrs %{
@@ -26,6 +16,12 @@ defmodule Postoffice.MessagingTest do
     type: "http"
   }
 
+  @message_attrs %{
+    attributes: %{},
+    payload: %{},
+    public_id: "7488a646-e31f-11e4-aace-600308960662"
+  }
+
   @second_publisher_attrs %{
     active: true,
     endpoint: "http://fake.endpoint2",
@@ -33,43 +29,12 @@ defmodule Postoffice.MessagingTest do
     type: "http"
   }
 
-  @valid_attrs %{
-    attributes: %{},
-    payload: %{},
-    public_id: "7488a646-e31f-11e4-aace-600308960662"
-  }
-  @invalid_attrs %{attributes: nil, payload: nil, public_id: nil, topic: nil}
-
-  def message_fixture(topic, attrs \\ @valid_attrs) do
-    {:ok, message} = Messaging.create_message(topic, attrs)
-
-    message
-  end
-
-  def topic_fixture(attrs \\ @topic_attrs) do
-    {:ok, topic} = Messaging.create_topic(attrs)
-    topic
-  end
-
-  def publisher_fixture(topic, attrs \\ @publisher_attrs) do
-    {:ok, publisher} = Messaging.create_publisher(Map.put(attrs, :topic_id, topic.id))
-    publisher
-  end
-
-  def publisher_success_fixture(message, publisher) do
-    {:ok, _publisher_success} =
-      Messaging.create_publisher_success(%{message_id: message.id, publisher_id: publisher.id})
-  end
-
-  def publishers_failure_fixture(message, publisher) do
-    {:ok, _publisher_success} =
-      Messaging.create_publisher_failure(%{message_id: message.id, publisher_id: publisher.id})
-  end
+  @invalid_message_attrs %{attributes: nil, payload: nil, public_id: nil, topic: nil}
 
   describe "messages" do
     test "list_messages/0 returns all messages" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
 
       assert Messaging.list_messages() == [message]
     end
@@ -79,17 +44,17 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "get_message!/1 returns the message with given id" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
       message_found = Messaging.get_message!(message.id)
 
       assert message.id == message_found.id
     end
 
     test "create_message/1 with valid data creates a message" do
-      topic = topic_fixture()
+      topic = Fixtures.create_topic()
 
-      assert {:ok, %Message{} = message} = Messaging.create_message(topic, @valid_attrs)
+      assert {:ok, %Message{} = message} = Messaging.create_message(topic, @message_attrs)
       assert message.attributes == %{}
       assert message.payload == %{}
       assert message.public_id == "7488a646-e31f-11e4-aace-600308960662"
@@ -98,11 +63,11 @@ defmodule Postoffice.MessagingTest do
 
     test "create_message/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} =
-               Messaging.create_message(topic_fixture(), @invalid_attrs)
+               Messaging.create_message(Fixtures.create_topic(), @invalid_message_attrs)
     end
 
     test "list_topics/0 returns all topics" do
-      topic = topic_fixture()
+      topic = Fixtures.create_topic()
 
       assert Messaging.list_topics() == [topic]
     end
@@ -116,7 +81,7 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "list_publishers/0 returns all existing publishers" do
-      publisher = publisher_fixture(topic_fixture())
+      publisher = Fixtures.create_publisher(Fixtures.create_topic())
       listed_publisher = List.first(Messaging.list_publishers())
 
       assert publisher.id == listed_publisher.id
@@ -126,9 +91,9 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "list_enabled_publishers/0 returns only enabled publishers" do
-      topic = topic_fixture()
-      _ = publisher_fixture(topic, @disabled_publisher_attrs)
-      enabled_publisher = publisher_fixture(topic)
+      topic = Fixtures.create_topic()
+      _ = Fixtures.create_publisher(topic, @disabled_publisher_attrs)
+      enabled_publisher = Fixtures.create_publisher(topic)
       listed_publisher = List.first(Messaging.list_enabled_publishers())
 
       assert enabled_publisher.id == listed_publisher.id
@@ -138,52 +103,52 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "get_message_by_uuid returns message is found" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
       searched_message = Messaging.get_message_by_uuid(message.public_id)
 
       assert message.id == searched_message.id
     end
 
     test "message_already_processed returns false if it hasnt been processed for a publisher" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
-      publisher = publisher_fixture(topic)
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+      publisher = Fixtures.create_publisher(topic)
 
       assert Messaging.message_already_processed(message.id, publisher.id) == false
     end
 
     test "message_already_processed returns true if it has been processed for a publisher" do
-      topic = topic_fixture()
-      message = message_fixture(topic)
-      publisher = publisher_fixture(topic)
-      publisher_success_fixture(message, publisher)
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+      publisher = Fixtures.create_publisher(topic)
+      Fixtures.create_publisher_success(message, publisher)
 
       assert Messaging.message_already_processed(message.id, publisher.id)
     end
 
     test "list_pending_messages_for_publisher/2 returns empty if no pending messages for a given publisher" do
-      topic = topic_fixture()
-      publisher = publisher_fixture(topic)
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
 
       assert Messaging.list_pending_messages_for_publisher(publisher.id, topic.id) == []
     end
 
     test "list_pending_messages_for_publisher/2 returns empty if no pending messages for a given publisher but we have pending messages for other publisher" do
-      topic = topic_fixture()
-      publisher = publisher_fixture(topic)
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
 
-      second_topic = topic_fixture(@second_topic_attrs)
-      _second_publisher = publisher_fixture(second_topic, @second_publisher_attrs)
-      _message = message_fixture(second_topic)
+      second_topic = Fixtures.create_topic(@second_topic_attrs)
+      _second_publisher = Fixtures.create_publisher(second_topic, @second_publisher_attrs)
+      _message = Fixtures.create_message(second_topic)
 
       assert Messaging.list_pending_messages_for_publisher(publisher.id, topic.id) == []
     end
 
     test "list_pending_messages_for_publisher/2 returns messages for a given publisher and topic" do
-      topic = topic_fixture()
-      publisher = publisher_fixture(topic)
-      message = message_fixture(topic)
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+      message = Fixtures.create_message(topic)
 
       pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
 
@@ -194,17 +159,17 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "list_pending_messages_for_publisher/2 returns messages for a given publisher and topic when there are pending messages for other topics" do
-      topic = topic_fixture()
-      publisher = publisher_fixture(topic)
-      message = message_fixture(topic)
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+      message = Fixtures.create_message(topic)
 
-      second_topic = topic_fixture(@second_topic_attrs)
-      publisher_fixture(second_topic, @second_publisher_attrs)
+      second_topic = Fixtures.create_topic(@second_topic_attrs)
+      Fixtures.create_publisher(second_topic, @second_publisher_attrs)
 
       _second_message =
-        message_fixture(
+        Fixtures.create_message(
           second_topic,
-          Map.put(@valid_attrs, :public_id, "2d823585-68f8-49cd-89c0-07c1572572c1")
+          Map.put(@message_attrs, :public_id, "2d823585-68f8-49cd-89c0-07c1572572c1")
         )
 
       pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
@@ -222,7 +187,7 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "count_topics returns number of created topics" do
-      _topic = topic_fixture()
+      _topic = Fixtures.create_topic()
 
       assert Messaging.count_topics() == 1
     end
@@ -232,8 +197,8 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "count_messages returns number of created messages" do
-      topic = topic_fixture()
-      _message = message_fixture(topic)
+      topic = Fixtures.create_topic()
+      _message = Fixtures.create_message(topic)
 
       assert Messaging.count_messages() == 1
     end
@@ -243,9 +208,9 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "count_publishers returns number of created publishers" do
-      topic = topic_fixture()
-      _publisher = publisher_fixture(topic)
-      _publisher = publisher_fixture(topic, @second_publisher_attrs)
+      topic = Fixtures.create_topic()
+      _publisher = Fixtures.create_publisher(topic)
+      _publisher = Fixtures.create_publisher(topic, @second_publisher_attrs)
 
       assert Messaging.count_publishers() == 2
     end
@@ -255,10 +220,10 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "count_published_messages returns number of published messages" do
-      topic = topic_fixture()
-      publisher = publisher_fixture(topic)
-      message = message_fixture(topic)
-      publisher_success_fixture(message, publisher)
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+      message = Fixtures.create_message(topic)
+      Fixtures.create_publisher_success(message, publisher)
 
       assert Messaging.count_published_messages() == 1
     end
@@ -268,10 +233,10 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "count_publishers_failures returns number of failed messages" do
-      topic = topic_fixture()
-      publisher = publisher_fixture(topic)
-      message = message_fixture(topic)
-      publishers_failure_fixture(message, publisher)
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+      message = Fixtures.create_message(topic)
+      Fixtures.create_publishers_failure(message, publisher)
 
       assert Messaging.count_publishers_failures() == 1
     end
