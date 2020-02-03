@@ -3,7 +3,6 @@ defmodule Postoffice.Handlers.Http do
   require Logger
 
   alias Postoffice.Messaging
-  alias Postoffice.Messaging.Message
 
   def run(publisher_endpoint, publisher_id, message) do
     case impl().publish(publisher_endpoint, message) do
