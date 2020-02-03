@@ -3,6 +3,7 @@ defmodule Postoffice.Handlers.PubsubTest do
 
   import Mox
 
+  alias GoogleApi.PubSub.V1.Model.PublishResponse
   alias Postoffice.Adapters.PubsubMock
   alias Postoffice.Handlers.Pubsub
   alias Postoffice.Messaging
@@ -59,7 +60,7 @@ defmodule Postoffice.Handlers.PubsubTest do
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
     expect(PubsubMock, :publish, fn "test-publisher", ^message ->
-      {:ok, message}
+      {:ok, %PublishResponse{}}
     end)
 
     Pubsub.run(publisher.endpoint, publisher.id, message)

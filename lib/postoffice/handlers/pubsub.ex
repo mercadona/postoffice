@@ -3,12 +3,13 @@ defmodule Postoffice.Handlers.Pubsub do
 
   require Logger
 
+  alias GoogleApi.PubSub.V1.Model.PublishResponse
   alias Postoffice.Messaging
-  alias Postoffice.Messaging.Message
 
+  @spec run(any, any, any) :: {:error, :nosent} | {:ok, :sent}
   def run(publisher_endpoint, publisher_id, message) do
     case impl().publish(publisher_endpoint, message) do
-      {:ok, message = %Message{}} ->
+      {:ok, _response = %PublishResponse{}} ->
         Logger.info("Succesfully sent pubsub message to #{publisher_endpoint}")
 
         {:ok, _} =

@@ -275,6 +275,5 @@ defmodule Postoffice.MessagingTest do
 
       assert Messaging.count_publishers_failures() == 1
     end
-
   end
 end
