@@ -7,6 +7,7 @@ defmodule Postoffice.Application do
 
   def start(_type, _args) do
     # List all child processes to be supervised
+    Postoffice.MetricsSetup.setup()
     children = [
       # Start the Ecto repository
       Postoffice.Repo,
@@ -24,6 +25,7 @@ defmodule Postoffice.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Postoffice.Supervisor]
     Supervisor.start_link(children, opts)
+
   end
 
   # Tell Phoenix to update the endpoint configuration
