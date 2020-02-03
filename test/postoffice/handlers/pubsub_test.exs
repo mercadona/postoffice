@@ -10,8 +10,8 @@ defmodule Postoffice.Handlers.PubsubTest do
   alias Postoffice.Messaging.Message
 
   @valid_message_attrs %{
-    attributes: %{},
-    payload: %{},
+    attributes: %{"attr" => "some_value"},
+    payload: %{"key" => "value"},
     public_id: "7488a646-e31f-11e4-aace-600308960662"
   }
   @valid_publisher_attrs %{
