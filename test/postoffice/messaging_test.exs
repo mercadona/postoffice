@@ -3,7 +3,7 @@ defmodule Postoffice.MessagingTest do
 
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Message
-  alias Postoffice.Fixtures, as: Fixtures
+  alias Postoffice.Fixtures
 
   @second_topic_attrs %{
     name: "test2"

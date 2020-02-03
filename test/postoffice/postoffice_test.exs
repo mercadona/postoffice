@@ -2,7 +2,7 @@ defmodule Postoffice.PostofficeTest do
   use Postoffice.DataCase
 
   alias Postoffice
-  alias Postoffice.Fixtures, as: Fixtures
+  alias Postoffice.Fixtures
 
   @publisher_attrs %{
     active: true,
