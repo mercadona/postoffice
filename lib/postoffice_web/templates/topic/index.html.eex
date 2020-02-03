@@ -1,0 +1,21 @@
+<div class="row">
+  <div class="col-md-12">
+    <a class="button"><%= link "Añadir", to: Routes.topic_path(@conn, :new) %></a>
+  </div>
+  <div class="col-md-12">
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for topic <- @topics do %>
+        <tr>
+          <td><%= topic.id %></td>
+          <td><%= topic.name %></td>
+        </tr>
+        <% end %>
+  </div>
+</div>
