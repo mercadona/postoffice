@@ -31,7 +31,20 @@ defmodule Postoffice.PostofficeTest do
       message = Fixtures.message_fixture(topic)
       Fixtures.publisher_success_fixture(message, publisher)
 
-      assert Messaging.count_published_messages() == 1
+      assert Postoffice.count_published_messages() == 1
+    end
+
+    test "count_publishers_failures returns 0 if no failed message exists" do
+      assert Postoffice.count_publishers_failures() == 0
+    end
+
+    test "count_publishers_failures returns number of failed messages" do
+      topic = Fixtures.topic_fixture()
+      publisher = Fixtures.publisher_fixture(topic)
+      message = Fixtures.message_fixture(topic)
+      Fixtures.publishers_failure_fixture(message, publisher)
+
+      assert Postoffice.count_publishers_failures() == 1
     end
   end
 end
