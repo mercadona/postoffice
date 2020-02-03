@@ -1,6 +1,8 @@
 defmodule PostofficeWeb.Api.TopicControllerTest do
   use PostofficeWeb.ConnCase
 
+  import Ecto.Query, warn: false
+
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Topic
   alias Postoffice.Repo
@@ -14,11 +16,27 @@ defmodule PostofficeWeb.Api.TopicControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
+  defp get_last_topic() do
+    from(t in Topic, order_by: [desc: :id], limit: 1)
+    |> Repo.one()
+  end
+
   describe "create topic" do
     test "renders created topic information when data is valid", %{conn: conn} do
       conn = post(conn, Routes.api_topic_path(conn, :create), @create_attrs)
       created_topic = json_response(conn, 201)["data"]
       assert created_topic["name"] == "test"
+    end
+
+    test "creates the topic when data is valid", %{conn: conn} do
+      conn
+      |> put_req_header("host", "example.com")
+      |> post(Routes.api_topic_path(conn, :create), @create_attrs)
+
+      created_topic = get_last_topic()
+
+      assert created_topic.name == "test"
+      assert created_topic.origin_host == "example.com"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
