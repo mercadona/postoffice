@@ -6,10 +6,6 @@ defmodule PostofficeWeb.Api.TopicView do
     %{data: render_one(topic, TopicView, "topic.json")}
   end
 
-  def render("show.json", %{changeset: changeset}) do
-    %{data: render_one(changeset, TopicView, "error.json")}
-  end
-
   def render("topic.json", %{topic: topic}) do
     %{
       id: topic.id,
