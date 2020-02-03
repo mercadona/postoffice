@@ -3,23 +3,13 @@ defmodule PostofficeWeb.Api.TopicController do
 
   alias Postoffice.Messaging.Topic
 
-  action_fallback PostofficeWeb.FallbackController
+  action_fallback PostofficeWeb.Api.FallbackController
 
   def create(conn, topic_params) do
-    changeset = Topic.changeset(%Topic{}, topic_params)
-
-    case changeset.valid? do
-      true ->
-        {:ok, topic} = Postoffice.create_topic(topic_params)
-
-        conn
-        |> put_status(:created)
-        |> render("show.json", topic: topic)
-
-      false ->
-        conn
-        |> put_status(:bad_request)
-        |> render("show.json", changeset: changeset)
+    with {:ok, %Topic{} = topic} <- Postoffice.create_topic(topic_params) do
+      conn
+      |> put_status(:created)
+      |> render("show.json", topic: topic)
     end
   end
 end

@@ -6,10 +6,6 @@ defmodule PostofficeWeb.Api.TopicView do
     %{data: render_one(topic, TopicView, "topic.json")}
   end
 
-  def render("show.json", %{changeset: changeset}) do
-    %{data: render_one(changeset, TopicView, "error.json")}
-  end
-
   def render("topic.json", %{topic: topic}) do
     %{
       id: topic.id,
@@ -17,9 +13,7 @@ defmodule PostofficeWeb.Api.TopicView do
     }
   end
 
-  def render("error.json", %{topic: topic_changeset}) do
-    %{
-      errors: Ecto.Changeset.traverse_errors(topic_changeset, &translate_error/1)
-    }
+  def render("error.json", %{changeset: changeset}) do
+    %{data: %{errors: Ecto.Changeset.traverse_errors(changeset, &translate_error/1)}}
   end
 end
