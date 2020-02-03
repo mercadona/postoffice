@@ -65,5 +65,15 @@ defmodule Postoffice.PostofficeTest do
 
       assert Postoffice.count_publishers() == 2
     end
+
+    test "count_topics returns 0 if no topic exists" do
+      assert Postoffice.count_topics() == 0
+    end
+
+    test "count_topics returns number of created topics" do
+      Fixtures.topic_fixture()
+
+      assert Postoffice.count_topics() == 1
+    end
   end
 end
