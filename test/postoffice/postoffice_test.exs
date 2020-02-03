@@ -3,27 +3,7 @@ defmodule Postoffice.PostofficeTest do
 
   alias Postoffice
   alias Postoffice.Messaging
-
-  @topic_attrs %{
-    name: "test"
-  }
-
-  @message_attrs %{
-    attributes: %{},
-    payload: %{},
-    public_id: "7488a646-e31f-11e4-aace-600308960662"
-  }
-
-  def message_fixture(topic, attrs \\ @message_attrs) do
-    {:ok, message} = Messaging.create_message(topic, attrs)
-
-    message
-  end
-
-  def topic_fixture(attrs \\ @topic_attrs) do
-    {:ok, topic} = Messaging.create_topic(attrs)
-    topic
-  end
+  alias Postoffice.Fixtures, as: Fixtures
 
   describe "PostofficeWeb external api" do
     test "Returns nil if tried to find message by invalid UUID" do
@@ -35,10 +15,23 @@ defmodule Postoffice.PostofficeTest do
     end
 
     test "count_messages returns number of created messages" do
-      topic = topic_fixture()
-      message_fixture(topic)
+      topic = Fixtures.topic_fixture()
+      Fixtures.message_fixture(topic)
 
       assert Postoffice.count_received_messages() == 1
+    end
+
+    test "count_published_messages returns 0 if no published message exists" do
+      assert Postoffice.count_published_messages() == 0
+    end
+
+    test "count_published_messages returns number of published messages" do
+      topic = Fixtures.topic_fixture()
+      publisher = Fixtures.publisher_fixture(topic)
+      message = Fixtures.message_fixture(topic)
+      Fixtures.publisher_success_fixture(message, publisher)
+
+      assert Messaging.count_published_messages() == 1
     end
   end
 end
