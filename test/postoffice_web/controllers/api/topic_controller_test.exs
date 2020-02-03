@@ -27,7 +27,7 @@ defmodule PostofficeWeb.Api.TopicControllerTest do
     end
 
     test "do not create topic in case it already exists", %{conn: conn} do
-      {:ok, existing_topic} = Messaging.create_topic(@create_attrs)
+      {:ok, _topic} = Messaging.create_topic(@create_attrs)
 
       conn = post(conn, Routes.api_topic_path(conn, :create), @create_attrs)
 
