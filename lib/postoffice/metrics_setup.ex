@@ -1,0 +1,6 @@
+defmodule Postoffice.MetricsSetup do
+  def setup do
+    PostofficeWeb.Metrics.Phoenix.setup()
+    PostofficeWeb.Metrics.Exporter.setup()
+  end
+end

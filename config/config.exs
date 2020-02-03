@@ -16,7 +16,8 @@ config :postoffice, PostofficeWeb.Endpoint,
   secret_key_base: "ltXgZliDmN0mLNWAF5iobiRF6G3q96oWvttpWlqb1hahcxgAwcxOGG9R5khNiWy5",
   render_errors: [view: PostofficeWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: Postoffice.PubSub, adapter: Phoenix.PubSub.PG2],
-  root: "."
+  root: ".",
+  instrumenters: [PostofficeWeb.Metrics.Phoenix]
 
 # Configures Elixir's Logger
 config :logger, :console,
