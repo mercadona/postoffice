@@ -5,6 +5,13 @@ defmodule Postoffice.PostofficeTest do
   alias Postoffice.Messaging
   alias Postoffice.Fixtures, as: Fixtures
 
+  @publisher_attrs %{
+    active: true,
+    endpoint: "http://fake.endpoint2",
+    initial_message: 0,
+    type: "http"
+  }
+
   describe "PostofficeWeb external api" do
     test "Returns nil if tried to find message by invalid UUID" do
       assert Postoffice.find_message_by_uuid(123) == nil
@@ -45,6 +52,18 @@ defmodule Postoffice.PostofficeTest do
       Fixtures.publishers_failure_fixture(message, publisher)
 
       assert Postoffice.count_publishers_failures() == 1
+    end
+
+    test "count_publishers returns 0 if no publisher exists" do
+      assert Postoffice.count_publishers() == 0
+    end
+
+    test "count_publishers returns number of created publishers" do
+      topic = Fixtures.topic_fixture()
+      Fixtures.publisher_fixture(topic)
+      Fixtures.publisher_fixture(topic, @publisher_attrs)
+
+      assert Postoffice.count_publishers() == 2
     end
   end
 end
