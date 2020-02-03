@@ -2,6 +2,8 @@ defmodule PostofficeWeb.Api.TopicControllerTest do
   use PostofficeWeb.ConnCase
 
   alias Postoffice.Messaging
+  alias Postoffice.Messaging.Topic
+  alias Postoffice.Repo
 
   @create_attrs %{
     name: "test"
@@ -26,9 +28,14 @@ defmodule PostofficeWeb.Api.TopicControllerTest do
 
     test "do not create topic in case it already exists", %{conn: conn} do
       {:ok, existing_topic} = Messaging.create_topic(%{name: "test"})
+
       conn = post(conn, Routes.api_topic_path(conn, :create), @create_attrs)
-      new_topic = json_response(conn, 201)["data"]
-      assert new_topic["id"] == existing_topic.id
+
+      assert json_response(conn, 400)["data"] == %{
+        "errors" => %{"name" => ["has already been taken"]}
+      }
+
+      assert length(Repo.all(Topic)) == 1
     end
   end
 end
