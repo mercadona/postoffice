@@ -16,7 +16,7 @@ defmodule Postoffice.Messaging.Topic do
   def changeset(message, attrs) do
     message
     |> cast(attrs, [:name, :origin_host])
-    |> validate_required([:name])
+    |> validate_required([:name, :origin_host])
     |> unique_constraint(:name)
   end
 end

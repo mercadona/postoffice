@@ -8,9 +8,12 @@ defmodule PostofficeWeb.Api.TopicControllerTest do
   alias Postoffice.Repo
 
   @create_attrs %{
-    name: "test"
+    name: "test",
+    origin_host: "example.com"
   }
-  @invalid_attrs %{name: ""}
+
+  @topic_without_name %{name: "", origin_host: "example.com"}
+  @topic_without_origin_host %{name: "test", origin_host: ""}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -30,7 +33,6 @@ defmodule PostofficeWeb.Api.TopicControllerTest do
 
     test "creates the topic when data is valid", %{conn: conn} do
       conn
-      |> put_req_header("host", "example.com")
       |> post(Routes.api_topic_path(conn, :create), @create_attrs)
 
       created_topic = get_last_topic()
@@ -39,10 +41,16 @@ defmodule PostofficeWeb.Api.TopicControllerTest do
       assert created_topic.origin_host == "example.com"
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.api_topic_path(conn, :create), @invalid_attrs)
+    test "renders errors when name is invalid", %{conn: conn} do
+      conn = post(conn, Routes.api_topic_path(conn, :create), @topic_without_name)
       assert json_response(conn, 400)["data"]["errors"] == %{"name" => ["can't be blank"]}
     end
+
+    test "renders errors when origin_host is invalid", %{conn: conn} do
+      conn = post(conn, Routes.api_topic_path(conn, :create), @topic_without_origin_host)
+      assert json_response(conn, 400)["data"]["errors"] == %{"origin_host" => ["can't be blank"]}
+    end
+
 
     test "do not create topic in case it already exists", %{conn: conn} do
       {:ok, _topic} = Messaging.create_topic(@create_attrs)

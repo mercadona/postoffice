@@ -6,10 +6,10 @@ defmodule PostofficeWeb.Api.TopicController do
   action_fallback PostofficeWeb.Api.FallbackController
 
   def create(conn, topic_params) do
-    ramon = Map.put_new(topic_params, "origin_host", "example.com")
-    with {:ok, %Topic{} = topic} <- Postoffice.create_topic(ramon) do
+    with {:ok, %Topic{} = topic} <- Postoffice.create_topic(topic_params) do
       conn
       |> put_status(:created)
       |> render("show.json", topic: topic)
+    end
   end
 end
