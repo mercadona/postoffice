@@ -23,4 +23,13 @@ defmodule PostofficeWeb.TopicControllerTest do
       |> html_response(200) =~ topic.name
     end
   end
+  
+  describe "create topics" do
+    test "can access to topics list", %{conn: conn} do
+
+      conn
+      |> post(Routes.topic_path(conn, :create, [topic: %{name: "Test Topic"}]))
+      |> redirected_to() == "/topics"
+    end
+  end
 end
