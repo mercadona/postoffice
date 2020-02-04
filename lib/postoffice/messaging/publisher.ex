@@ -19,7 +19,7 @@ defmodule Postoffice.Messaging.Publisher do
     consumer_http
     |> cast(attrs, [:target, :active, :type, :topic_id, :initial_message])
     |> validate_required([:target, :active, :topic_id, :type, :initial_message])
-    |> unique_constraint(:target, name: :publishers_topic_id_endpoint_type_index)
+    |> unique_constraint(:target, name: :publishers_topic_id_target_type_index)
     |> validate_inclusion(:type, Keyword.values(types()))
   end
 
