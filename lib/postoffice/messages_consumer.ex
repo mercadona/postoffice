@@ -8,12 +8,12 @@ defmodule Postoffice.MessagesConsumer do
   def start_link(message) do
     %{
       publisher_type: publisher_type,
-      publisher_endpoint: publisher_endpoint,
+      publisher_target: publisher_target,
       publisher_id: publisher_id
     } = message
 
     Task.start_link(MessagesConsumer.get_handler_module(publisher_type), :run, [
-      publisher_endpoint,
+      publisher_target,
       publisher_id,
       message
     ])
