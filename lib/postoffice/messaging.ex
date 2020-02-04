@@ -97,7 +97,7 @@ defmodule Postoffice.Messaging do
         select_merge: %{
           publisher_id: publishers.id,
           publisher_type: publishers.type,
-          publisher_endpoint: publishers.endpoint
+          publisher_endpoint: publishers.target
         }
       )
 
