@@ -5,8 +5,8 @@ defmodule Postoffice.Adapters.Pubsub do
   @behaviour Postoffice.Adapters.Impl
 
   @impl true
-  def publish(endpoint, message) do
-    Logger.info("Publishing PubSub message to #{endpoint}")
+  def publish(target, message) do
+    Logger.info("Publishing PubSub message to #{target}")
     %{payload: payload, attributes: attributes} = message
     # Authenticate
     {:ok, token} = Goth.Token.for_scope("https://www.googleapis.com/auth/cloud-platform")
@@ -26,7 +26,7 @@ defmodule Postoffice.Adapters.Pubsub do
     GoogleApi.PubSub.V1.Api.Projects.pubsub_projects_topics_publish(
       conn,
       Application.get_env(:postoffice, :pubsub_project_name),
-      endpoint,
+      target,
       body: request
     )
   end
