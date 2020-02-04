@@ -51,7 +51,6 @@ defmodule PostofficeWeb.Api.TopicControllerTest do
       assert json_response(conn, 400)["data"]["errors"] == %{"origin_host" => ["can't be blank"]}
     end
 
-
     test "do not create topic in case it already exists", %{conn: conn} do
       {:ok, _topic} = Messaging.create_topic(@create_attrs)
 

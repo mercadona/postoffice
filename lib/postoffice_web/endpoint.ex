@@ -32,9 +32,9 @@ defmodule PostofficeWeb.Endpoint do
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
   plug Plug.Session,
-  store: :cookie,
-  key: "_my_app_key",
-  signing_salt: "To8iCTxd"
+    store: :cookie,
+    key: "_my_app_key",
+    signing_salt: "To8iCTxd"
 
   PostofficeWeb
   plug PostofficeWeb.Metrics.Exporter
