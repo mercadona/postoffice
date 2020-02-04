@@ -17,7 +17,7 @@ defmodule Postoffice.Handlers.PubsubTest do
   @valid_publisher_attrs %{
     active: true,
     topic: "test-publisher",
-    endpoint: "test-publisher",
+    target: "test-publisher",
     type: "pubsub",
     initial_message: 0
   }
@@ -47,7 +47,7 @@ defmodule Postoffice.Handlers.PubsubTest do
       {:error, "test error"}
     end)
 
-    Pubsub.run(publisher.endpoint, publisher.id, message)
+    Pubsub.run(publisher.target, publisher.id, message)
     assert [] = Messaging.list_publisher_success(publisher.id)
   end
 
@@ -63,7 +63,7 @@ defmodule Postoffice.Handlers.PubsubTest do
       {:ok, %PublishResponse{}}
     end)
 
-    Pubsub.run(publisher.endpoint, publisher.id, message)
+    Pubsub.run(publisher.target, publisher.id, message)
     assert [message] = Messaging.list_publisher_success(publisher.id)
   end
 
@@ -79,7 +79,7 @@ defmodule Postoffice.Handlers.PubsubTest do
       {:error, "Not able to deliver"}
     end)
 
-    Pubsub.run(publisher.endpoint, publisher.id, message)
+    Pubsub.run(publisher.target, publisher.id, message)
     publisher_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert publisher_failure.message_id == message.id
   end
