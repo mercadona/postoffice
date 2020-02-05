@@ -6,7 +6,8 @@ defmodule Postoffice.MessagingTest do
   alias Postoffice.Fixtures
 
   @second_topic_attrs %{
-    name: "test2"
+    name: "test2",
+    origin_host: "example2.com"
   }
 
   @disabled_publisher_attrs %{

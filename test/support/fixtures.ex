@@ -6,7 +6,8 @@ defmodule Postoffice.Fixtures do
   alias Postoffice.Messaging
 
   @topic_attrs %{
-    name: "test"
+    name: "test",
+    origin_host: "example.com"
   }
 
   @message_attrs %{

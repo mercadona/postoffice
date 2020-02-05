@@ -4,6 +4,7 @@ defmodule Postoffice.Messaging.Topic do
 
   schema "topics" do
     field :name, :string, null: false
+    field :origin_host, :string, null: true
 
     has_many :consumers, Postoffice.Messaging.Publisher
     has_many :messages, Postoffice.Messaging.Message
@@ -14,8 +15,8 @@ defmodule Postoffice.Messaging.Topic do
   @doc false
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :origin_host])
+    |> validate_required([:name, :origin_host])
     |> unique_constraint(:name)
   end
 end

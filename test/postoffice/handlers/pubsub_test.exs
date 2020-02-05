@@ -22,7 +22,8 @@ defmodule Postoffice.Handlers.PubsubTest do
     initial_message: 0
   }
   @valid_topic_attrs %{
-    name: "test-publisher"
+    name: "test-publisher",
+    origin_host: "example.com"
   }
   setup [:set_mox_from_context, :verify_on_exit!]
 

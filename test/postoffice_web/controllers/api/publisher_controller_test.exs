@@ -48,7 +48,8 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
   }
 
   @valid_topic_attrs %{
-    name: "test"
+    name: "test",
+    origin_host: "example.com"
   }
 
   setup %{conn: conn} do
