@@ -7,10 +7,10 @@ defmodule Postoffice.Handlers.Pubsub do
   alias Postoffice.Messaging
 
   @spec run(any, any, any) :: {:error, :nosent} | {:ok, :sent}
-  def run(publisher_endpoint, publisher_id, message) do
-    case impl().publish(publisher_endpoint, message) do
+  def run(publisher_target, publisher_id, message) do
+    case impl().publish(publisher_target, message) do
       {:ok, _response = %PublishResponse{}} ->
-        Logger.info("Succesfully sent pubsub message to #{publisher_endpoint}")
+        Logger.info("Succesfully sent pubsub message to #{publisher_target}")
 
         {:ok, _} =
           Messaging.create_publisher_success(%{

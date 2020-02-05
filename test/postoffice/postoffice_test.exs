@@ -6,7 +6,7 @@ defmodule Postoffice.PostofficeTest do
 
   @publisher_attrs %{
     active: true,
-    endpoint: "http://fake.endpoint2",
+    target: "http://fake.target2",
     initial_message: 0,
     type: "http"
   }

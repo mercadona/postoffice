@@ -56,7 +56,7 @@
       <% else %>
         <td>Http</td>
       <% end %>
-      <td><%= success.publisher.endpoint %></td>
+      <td><%= success.publisher.target %></td>
       <td><%= success.inserted_at %></td>
     </tr>
     <% end %>
