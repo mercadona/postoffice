@@ -12,7 +12,7 @@ defmodule Postoffice.MessagingTest do
 
   @disabled_publisher_attrs %{
     active: false,
-    endpoint: "http://fake.endpoint/disabled",
+    target: "http://fake.target/disabled",
     initial_message: 0,
     type: "http"
   }
@@ -25,7 +25,7 @@ defmodule Postoffice.MessagingTest do
 
   @second_publisher_attrs %{
     active: true,
-    endpoint: "http://fake.endpoint2",
+    target: "http://fake.target2",
     initial_message: 0,
     type: "http"
   }
@@ -86,7 +86,7 @@ defmodule Postoffice.MessagingTest do
       listed_publisher = List.first(Messaging.list_publishers())
 
       assert publisher.id == listed_publisher.id
-      assert publisher.endpoint == listed_publisher.endpoint
+      assert publisher.target == listed_publisher.target
       assert publisher.active == listed_publisher.active
       assert publisher.type == listed_publisher.type
     end
@@ -98,7 +98,7 @@ defmodule Postoffice.MessagingTest do
       listed_publisher = List.first(Messaging.list_enabled_publishers())
 
       assert enabled_publisher.id == listed_publisher.id
-      assert enabled_publisher.endpoint == listed_publisher.endpoint
+      assert enabled_publisher.target == listed_publisher.target
       assert enabled_publisher.active == listed_publisher.active
       assert enabled_publisher.type == listed_publisher.type
     end

@@ -18,7 +18,7 @@ defmodule Postoffice.Fixtures do
 
   @publisher_attrs %{
     active: true,
-    endpoint: "http://fake.endpoint",
+    target: "http://fake.target",
     initial_message: 0,
     type: "http"
   }

@@ -14,7 +14,7 @@ defmodule Postoffice.Handlers.HttpTest do
   }
   @valid_publisher_attrs %{
     active: true,
-    endpoint: "http://fake.endpoint",
+    target: "http://fake.target",
     topic: "test",
     type: "http",
     initial_message: 0
@@ -30,7 +30,7 @@ defmodule Postoffice.Handlers.HttpTest do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Postoffice.Repo)
   end
 
-  test "no message_success when target endpoint not found" do
+  test "no message_success when target target not found" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
 
     {:ok, publisher} =
@@ -38,11 +38,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
-    expect(HttpMock, :publish, fn "http://fake.endpoint", ^message ->
+    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
       {:ok, %HTTPoison.Response{status_code: 404}}
     end)
 
-    Http.run(publisher.endpoint, publisher.id, message)
+    Http.run(publisher.target, publisher.id, message)
     assert [] = Messaging.list_publisher_success(publisher.id)
     message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert message_failure.message_id == message.id
@@ -56,11 +56,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
-    expect(HttpMock, :publish, fn "http://fake.endpoint", ^message ->
+    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
       {:ok, %HTTPoison.Response{status_code: 201}}
     end)
 
-    Http.run(publisher.endpoint, publisher.id, message)
+    Http.run(publisher.target, publisher.id, message)
     assert [message] = Messaging.list_publisher_success(publisher.id)
   end
 
@@ -72,11 +72,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
-    expect(HttpMock, :publish, fn "http://fake.endpoint", ^message ->
+    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
       {:error, %HTTPoison.Error{reason: "test error reason"}}
     end)
 
-    Http.run(publisher.endpoint, publisher.id, message)
+    Http.run(publisher.target, publisher.id, message)
     message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert message_failure.message_id == message.id
   end
@@ -89,11 +89,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
-    expect(HttpMock, :publish, fn "http://fake.endpoint", ^message ->
+    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
       {:ok, %HTTPoison.Response{status_code: 300}}
     end)
 
-    Http.run(publisher.endpoint, publisher.id, message)
+    Http.run(publisher.target, publisher.id, message)
     message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert message_failure.message_id == message.id
   end

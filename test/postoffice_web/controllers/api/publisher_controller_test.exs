@@ -9,7 +9,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
   @valid_http_publisher_payload %{
     active: true,
-    endpoint: "http://fake.endpoint",
+    target: "http://fake.target",
     topic: "test",
     type: "http",
     initial_message: 0
@@ -17,7 +17,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
   @valid_pubsub_publisher_payload %{
     active: true,
-    endpoint: "test",
+    target: "test",
     topic: "test",
     type: "pubsub",
     initial_message: 0
@@ -25,15 +25,15 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
   @invalid_http_publisher_payload %{
     active: true,
-    endpoint: "http://fake.endpoint",
+    target: "http://fake.target",
     topic: "fake_topic",
     type: "http",
     initial_message: 0
   }
 
-  @invalid_publisher_endpoint_payload %{
+  @invalid_publisher_target_payload %{
     active: true,
-    endpoint: "",
+    target: "",
     topic: "test",
     type: "http",
     initial_message: 0
@@ -41,7 +41,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
   @invalid_publisher_type_payload %{
     active: true,
-    endpoint: "http://fake.endpoint",
+    target: "http://fake.target",
     topic: "test",
     type: "false_type",
     initial_message: 0
@@ -71,7 +71,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
       assert length(Repo.all(Publisher)) == 1
       created_publisher = get_last_publisher()
       assert created_publisher.active == true
-      assert created_publisher.endpoint == "http://fake.endpoint"
+      assert created_publisher.target == "http://fake.target"
       assert created_publisher.initial_message == 0
       assert created_publisher.topic_id == topic.id
       assert created_publisher.type == "http"
@@ -87,7 +87,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
       created_publisher = get_last_publisher()
       assert created_publisher.active == true
-      assert created_publisher.endpoint == topic.name
+      assert created_publisher.target == topic.name
       assert created_publisher.initial_message == 0
       assert created_publisher.topic_id == topic.id
       assert created_publisher.type == "pubsub"
@@ -108,14 +108,14 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
       assert length(Repo.all(Publisher)) == 0
     end
 
-    test "renders errors when endpoint is empty", %{conn: conn} do
+    test "renders errors when target is empty", %{conn: conn} do
       Messaging.create_topic(@valid_topic_attrs)
 
       conn =
-        post(conn, Routes.api_publisher_path(conn, :create), @invalid_publisher_endpoint_payload)
+        post(conn, Routes.api_publisher_path(conn, :create), @invalid_publisher_target_payload)
 
       assert json_response(conn, 400)["data"] == %{
-               "errors" => %{"endpoint" => ["can't be blank"]}
+               "errors" => %{"target" => ["can't be blank"]}
              }
 
       assert length(Repo.all(Publisher)) == 0
@@ -128,7 +128,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
       conn = post(conn, Routes.api_publisher_path(conn, :create), @valid_http_publisher_payload)
 
       assert json_response(conn, 400)["data"] == %{
-               "errors" => %{"endpoint" => ["has already been taken"]}
+               "errors" => %{"target" => ["has already been taken"]}
              }
 
       assert length(Repo.all(Publisher)) == 1

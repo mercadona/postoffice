@@ -14,7 +14,7 @@ defmodule Postoffice.Messaging.Message do
 
     field :publisher_id, :string, virtual: true
     field :publisher_type, :string, virtual: true
-    field :publisher_endpoint, :string, virtual: true
+    field :publisher_target, :string, virtual: true
   end
 
   @doc false
