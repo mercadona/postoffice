@@ -6,7 +6,7 @@ defmodule PostofficeWeb.IndexControllerTest do
   end
 
   describe "index dashboard" do
-    test "cann access", %{conn: conn} do
+    test "can access", %{conn: conn} do
       conn =
         conn
         |> get(Routes.dashboard_path(conn, :index))
