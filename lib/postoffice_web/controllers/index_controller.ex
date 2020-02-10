@@ -7,8 +7,7 @@ defmodule PostofficeWeb.IndexController do
       messages_received: Postoffice.count_received_messages(),
       messages_published: Postoffice.count_published_messages(),
       publishers_failures: Postoffice.count_publishers_failures(),
-      publishers: Postoffice.count_publishers(),
-      last_messages: Postoffice.get_last_messages()
+      publishers: Postoffice.count_publishers()
     )
   end
 end

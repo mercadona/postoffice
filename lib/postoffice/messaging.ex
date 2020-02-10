@@ -22,8 +22,10 @@ defmodule Postoffice.Messaging do
       [%Message{}, ...]
 
   """
-  def list_messages(limit \\ 100) do
-    Repo.all(Message, limit: limit)
+  def list_messages(messages_limit \\ 100) do
+    Message
+    |> limit(^messages_limit)
+    |> Repo.all()
   end
 
   @doc """
@@ -211,13 +213,5 @@ defmodule Postoffice.Messaging do
   def get_publisher_failures_for_message(message_id) do
     from(p in PublisherFailures, where: p.message_id == ^message_id)
     |> Repo.all()
-  end
-
-  def message_already_processed(message_id, publisher_id) do
-    query =
-      from ps in PublisherSuccess,
-        where: ps.publisher_id == ^publisher_id and ps.message_id == ^message_id
-
-    Repo.exists?(query)
   end
 end

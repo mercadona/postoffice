@@ -44,6 +44,14 @@ defmodule Postoffice.MessagingTest do
       assert Messaging.list_messages() == []
     end
 
+    test "list_messages/1 returns limited messages list" do
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+      _second_message = Fixtures.create_message(topic, %{@message_attrs | public_id: "7488a646-e31f-11e4-aace-600308960661"})
+
+      assert Messaging.list_messages(1) == [message]
+    end
+
     test "get_message!/1 returns the message with given id" do
       topic = Fixtures.create_topic()
       message = Fixtures.create_message(topic)
@@ -109,23 +117,6 @@ defmodule Postoffice.MessagingTest do
       searched_message = Messaging.get_message_by_uuid(message.public_id)
 
       assert message.id == searched_message.id
-    end
-
-    test "message_already_processed returns false if it hasnt been processed for a publisher" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.create_message(topic)
-      publisher = Fixtures.create_publisher(topic)
-
-      assert Messaging.message_already_processed(message.id, publisher.id) == false
-    end
-
-    test "message_already_processed returns true if it has been processed for a publisher" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.create_message(topic)
-      publisher = Fixtures.create_publisher(topic)
-      Fixtures.create_publisher_success(message, publisher)
-
-      assert Messaging.message_already_processed(message.id, publisher.id)
     end
 
     test "list_pending_messages_for_publisher/2 returns empty if no pending messages for a given publisher" do
@@ -240,6 +231,59 @@ defmodule Postoffice.MessagingTest do
       Fixtures.create_publishers_failure(message, publisher)
 
       assert Messaging.count_publishers_failures() == 1
+    end
+
+    test "get_publisher! returns asked publisher data" do
+      topic = Fixtures.create_topic()
+      fixture_publisher = Fixtures.create_publisher(topic)
+
+      publisher = Messaging.get_publisher!(fixture_publisher.id)
+      assert publisher.id == fixture_publisher.id
+      assert publisher.target == fixture_publisher.target
+      assert publisher.active == fixture_publisher.active
+      assert publisher.type == fixture_publisher.type
+    end
+
+    test "no publisher_success is returned for a non existing message" do
+      assert Messaging.get_publisher_success_for_message(1) == []
+    end
+
+    test "no publisher_success is returned for a non processed message" do
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+
+      assert Messaging.get_publisher_success_for_message(message.id) == []
+    end
+
+    test "publisher_success for a processed messaged is returned" do
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+      publisher = Fixtures.create_publisher(topic)
+      _publisher_success = Fixtures.create_publisher_success(message, publisher)
+
+      loaded_publisher_success = Messaging.get_publisher_success_for_message(message.id)
+      assert Kernel.length(loaded_publisher_success) == 1
+    end
+
+    test "no publisher_failures is returned for a non existing message" do
+      assert Messaging.get_publisher_failures_for_message(1) == []
+    end
+
+    test "no publisher_failures is returned for a non processed message" do
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+
+      assert Messaging.get_publisher_failures_for_message(message.id) == []
+    end
+
+    test "publisher_failures for a processed messaged is returned" do
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+      publisher = Fixtures.create_publisher(topic)
+      _publisher_failures = Fixtures.create_publishers_failure(message, publisher)
+
+      loaded_publisher_failures = Messaging.get_publisher_failures_for_message(message.id)
+      assert Kernel.length(loaded_publisher_failures) == 1
     end
   end
 end
