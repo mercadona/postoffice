@@ -22,8 +22,10 @@ defmodule Postoffice.Messaging do
       [%Message{}, ...]
 
   """
-  def list_messages(limit \\ 100) do
-    Repo.all(Message, limit: limit)
+  def list_messages(messages_limit \\ 100) do
+    Message
+    |> limit(^messages_limit)
+    |> Repo.all()
   end
 
   @doc """

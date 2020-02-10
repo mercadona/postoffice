@@ -44,6 +44,14 @@ defmodule Postoffice.MessagingTest do
       assert Messaging.list_messages() == []
     end
 
+    test "list_messages/1 returns limited messages list" do
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+      _second_message = Fixtures.create_message(topic, %{@message_attrs | public_id: "7488a646-e31f-11e4-aace-600308960661"})
+
+      assert Messaging.list_messages(1) == [message]
+    end
+
     test "get_message!/1 returns the message with given id" do
       topic = Fixtures.create_topic()
       message = Fixtures.create_message(topic)
