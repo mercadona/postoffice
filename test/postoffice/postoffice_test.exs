@@ -11,6 +11,12 @@ defmodule Postoffice.PostofficeTest do
     type: "http"
   }
 
+  @external_publisher_attrs %{
+    "active" => false,
+    "target" => "http://fake.target2",
+    "type" => "pubsub"
+  }
+
   describe "PostofficeWeb external api" do
     test "Returns nil if tried to find message by invalid UUID" do
       assert Postoffice.find_message_by_uuid(123) == nil
@@ -73,6 +79,57 @@ defmodule Postoffice.PostofficeTest do
       Fixtures.create_topic()
 
       assert Postoffice.count_topics() == 1
+    end
+
+    test "ping postoffice application" do
+      assert Postoffice.ping() == :ok
+    end
+
+    test "create_publisher to consume messages from_now" do
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+      external_publisher_attrs = Map.put(@external_publisher_attrs, "topic_id", topic.id)
+      external_publisher_attrs = Map.put(external_publisher_attrs, "from_now", "true")
+
+      {:ok, saved_publisher} = Postoffice.create_publisher(external_publisher_attrs)
+      assert saved_publisher.initial_message == message.id
+    end
+
+    test "create_publisher to consume messages from first message" do
+      topic = Fixtures.create_topic()
+      external_publisher_attrs = Map.put(@external_publisher_attrs, "topic_id", topic.id)
+
+      {:ok, saved_publisher} = Postoffice.create_publisher(external_publisher_attrs)
+      assert saved_publisher.initial_message == 0
+    end
+
+    test "get_message by id returns asked message" do
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+
+      assert Postoffice.get_message(message.id).id == message.id
+    end
+
+    test "get_message_success returns list with success for this message" do
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+      publisher = Fixtures.create_publisher(topic)
+      Fixtures.create_publisher_success(message, publisher)
+
+      retrieved_success = Postoffice.get_message_success(message.id)
+
+      assert Kernel.length(retrieved_success) == 1
+    end
+
+    test "get_message_failures returns list with failures for this message" do
+      topic = Fixtures.create_topic()
+      message = Fixtures.create_message(topic)
+      publisher = Fixtures.create_publisher(topic)
+      Fixtures.create_publishers_failure(message, publisher)
+
+      retrieved_failures = Postoffice.get_message_failures(message.id)
+
+      assert Kernel.length(retrieved_failures) == 1
     end
   end
 end
