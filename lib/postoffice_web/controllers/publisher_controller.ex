@@ -40,6 +40,7 @@ defmodule PostofficeWeb.PublisherController do
 
   def update(conn, %{"id" => id, "publisher" => publisher_params}) do
     publisher = Messaging.get_publisher!(id)
+    {_key, publisher_params} = Map.pop(publisher_params, "topic_id")
 
     publisher
     |> Publisher.changeset(publisher_params)
