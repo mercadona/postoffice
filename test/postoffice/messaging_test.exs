@@ -119,23 +119,6 @@ defmodule Postoffice.MessagingTest do
       assert message.id == searched_message.id
     end
 
-    test "message_already_processed returns false if it hasnt been processed for a publisher" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.create_message(topic)
-      publisher = Fixtures.create_publisher(topic)
-
-      assert Messaging.message_already_processed(message.id, publisher.id) == false
-    end
-
-    test "message_already_processed returns true if it has been processed for a publisher" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.create_message(topic)
-      publisher = Fixtures.create_publisher(topic)
-      Fixtures.create_publisher_success(message, publisher)
-
-      assert Messaging.message_already_processed(message.id, publisher.id)
-    end
-
     test "list_pending_messages_for_publisher/2 returns empty if no pending messages for a given publisher" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)

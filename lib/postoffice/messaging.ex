@@ -214,12 +214,4 @@ defmodule Postoffice.Messaging do
     from(p in PublisherFailures, where: p.message_id == ^message_id)
     |> Repo.all()
   end
-
-  def message_already_processed(message_id, publisher_id) do
-    query =
-      from ps in PublisherSuccess,
-        where: ps.publisher_id == ^publisher_id and ps.message_id == ^message_id
-
-    Repo.exists?(query)
-  end
 end
