@@ -2,28 +2,29 @@
 [![CircleCI](https://circleci.com/gh/lonamiaec/postoffice/tree/master.svg?style=svg)](https://circleci.com/gh/lonamiaec/postoffice/tree/master) [![Coverage Status](https://coveralls.io/repos/github/lonamiaec/postoffice/badge.svg?branch=master)](https://coveralls.io/github/lonamiaec/postoffice?branch=master)
 
 ---
-## What's postoffice?
-We can think about postoffice as a real post office. You send `messages` to a `topic` and `publishers` send it to anyone interested in this topic. In case the receiver is not available, we'll try to deliver the message later.
-It uses a pub/sub approach, so instead of handling receiver's addresses we use topics, and receivers must subscribe to them through `Publishers`.
-A publisher is isolated from others and it handles itself its own pending messages
+## What's Postoffice?
+We can think about Postoffice as a real post office. You send `messages` to a `topic` and `publishers` send them to anyone interested in this topic. In case the receiver is not available, Postoffice will try to deliver the message later.
+Postoffice uses a pub/sub approach, so instead of handling receiver's addresses it uses topics, to which receivers must subscribe through `Publishers`.
+A publisher is isolated from others and it handles itself its own pending messages.
 
 ## Motivation
-This project started as a solution to buffer messages in case some apps are deployed on-premise and could work with connectivity issues. Then it evolved to also offer a pub/sub mechanism.
+This project started as a solution to buffer messages in case some apps are deployed on-premise and could suffer connectivity issues. Then it evolved to also offer a pub/sub mechanism.
 
 ## What's not Postoffice?
-This is not designed to be realtime. We use `GenStage` to process pending messages. We create a process tree for each `Publisher`. It looks like an ETL, and it's refreshed each 10 seconds.
+This is not designed to be realtime. Postoffice uses [GenStage](https://github.com/elixir-lang/gen_stage) to process pending messages, creating a process tree for each `Publisher`. It looks like an ETL, and it's refreshed every 10 seconds.
 
 ## Features
-* Buffer messages in case receiver system is down or there is no connectivity for any reason.
+* Buffer messages in case the receiver system is down or there is no connectivity for some reason.
 * Deliver messages through:
   * Http.
   * Pub/Sub (GCloud).
 * API to create topics/publishers.
 * Web interface:
   * Manage topics/publishers.
-  * Search messages to see when it was received and proccessed.
+  * Search messages to see when it was received and processed.
 * Cluster nodes. Best effort to avoid sending messages more than once. (More info on clustering later)
 * Endpoint to be used as health-check from k8s `/api/health`
+
 ## How to install it locally
 To start your Phoenix server:
   * `brew update`
