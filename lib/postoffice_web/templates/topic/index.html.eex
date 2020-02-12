@@ -8,6 +8,7 @@
         <tr>
           <th scope="col">#</th>
           <th scope="col">Name</th>
+          <th scope="col">Origin Host</th>
         </tr>
       </thead>
       <tbody>
@@ -15,6 +16,7 @@
         <tr>
           <td><%= topic.id %></td>
           <td><%= topic.name %></td>
+          <td><%= topic.origin_host %></td>
         </tr>
         <% end %>
   </div>
