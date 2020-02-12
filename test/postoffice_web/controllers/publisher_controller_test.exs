@@ -10,7 +10,6 @@ defmodule PostofficeWeb.PublisherControllerTest do
 
   describe "list publishers" do
     test "can access to publishers list", %{conn: conn} do
-
       conn
       |> get(Routes.publisher_path(conn, :index))
       |> html_response(200)
@@ -31,8 +30,17 @@ defmodule PostofficeWeb.PublisherControllerTest do
       topic = Fixtures.create_topic()
 
       assert conn
-      |> post(Routes.publisher_path(conn, :create, [publisher: %{target: "http://tar.get", active: "true", type: "http", topic_id: topic.id}]))
-      |> redirected_to() == "/publishers"
+             |> post(
+               Routes.publisher_path(conn, :create,
+                 publisher: %{
+                   target: "http://tar.get",
+                   active: "true",
+                   type: "http",
+                   topic_id: topic.id
+                 }
+               )
+             )
+             |> redirected_to() == "/publishers"
 
       assert Messaging.count_publishers() == 1
     end
@@ -44,8 +52,12 @@ defmodule PostofficeWeb.PublisherControllerTest do
       publisher = Fixtures.create_publisher(topic)
 
       assert conn
-      |> put(Routes.publisher_path(conn, :update, publisher.id, [publisher: %{target: "http://tar.get", active: "false", type: "http"}]))
-      |> redirected_to() == "/publishers"
+             |> put(
+               Routes.publisher_path(conn, :update, publisher.id,
+                 publisher: %{target: "http://tar.get", active: "false", type: "http"}
+               )
+             )
+             |> redirected_to() == "/publishers"
 
       saved_publisher = Messaging.get_publisher!(publisher.id)
       assert saved_publisher.active == false
@@ -56,9 +68,13 @@ defmodule PostofficeWeb.PublisherControllerTest do
       publisher = Fixtures.create_publisher(topic)
 
       assert conn
-      |> put(Routes.publisher_path(conn, :update, publisher.id, [publisher: %{target: "http://new.target", active: "true", type: "http"}]))
-      # |> html_response(200)
-      |> redirected_to() == "/publishers"
+             |> put(
+               Routes.publisher_path(conn, :update, publisher.id,
+                 publisher: %{target: "http://new.target", active: "true", type: "http"}
+               )
+             )
+             # |> html_response(200)
+             |> redirected_to() == "/publishers"
 
       saved_publisher = Messaging.get_publisher!(publisher.id)
       assert saved_publisher.target == "http://new.target"
@@ -69,8 +85,12 @@ defmodule PostofficeWeb.PublisherControllerTest do
       publisher = Fixtures.create_publisher(topic)
 
       assert conn
-      |> put(Routes.publisher_path(conn, :update, publisher.id, [publisher: %{target: "http://new.target", active: "true", type: "pubsub"}]))
-      |> redirected_to() == "/publishers"
+             |> put(
+               Routes.publisher_path(conn, :update, publisher.id,
+                 publisher: %{target: "http://new.target", active: "true", type: "pubsub"}
+               )
+             )
+             |> redirected_to() == "/publishers"
 
       saved_publisher = Messaging.get_publisher!(publisher.id)
       assert saved_publisher.type == "pubsub"
@@ -82,8 +102,17 @@ defmodule PostofficeWeb.PublisherControllerTest do
       publisher = Fixtures.create_publisher(topic)
 
       assert conn
-      |> put(Routes.publisher_path(conn, :update, publisher.id, [publisher: %{target: "http://new.target", active: "true", type: "pubsub", topic_id: second_topic.id}]))
-      |> redirected_to() == "/publishers"
+             |> put(
+               Routes.publisher_path(conn, :update, publisher.id,
+                 publisher: %{
+                   target: "http://new.target",
+                   active: "true",
+                   type: "pubsub",
+                   topic_id: second_topic.id
+                 }
+               )
+             )
+             |> redirected_to() == "/publishers"
 
       saved_publisher = Messaging.get_publisher!(publisher.id)
       assert saved_publisher.topic_id == topic.id
