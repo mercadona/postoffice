@@ -8,6 +8,11 @@
     </div>
 
     <div class="form-group">
+      <label>Origin Host</label>
+      <%= text_input f, :origin_host, class: "form-control" %>
+    </div>
+
+    <div class="form-group">
       <%= submit "Submit", class: "btn btn-primary" %>
     </div>
 <% end %>
