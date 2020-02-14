@@ -18,6 +18,10 @@ defmodule PostofficeWeb.Api.PublisherView do
     %{}
   end
 
+  def render("error.json", %{changeset: changeset}) do
+    %{data: %{errors: Ecto.Changeset.traverse_errors(changeset, &translate_error/1)}}
+  end
+
   def render("error.json", %{publisher: publisher_changeset}) do
     %{
       errors: Ecto.Changeset.traverse_errors(publisher_changeset, &translate_error/1)

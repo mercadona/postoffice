@@ -60,7 +60,7 @@ defmodule PostofficeWeb.Api.TopicControllerTest do
 
       conn = post(conn, Routes.api_topic_path(conn, :create), @create_attrs)
 
-      assert json_response(conn, 400)["data"] == %{
+      assert json_response(conn, 409)["data"] == %{
                "errors" => %{"name" => ["has already been taken"]}
              }
 

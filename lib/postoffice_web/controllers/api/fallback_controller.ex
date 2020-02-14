@@ -2,8 +2,9 @@ defmodule PostofficeWeb.Api.FallbackController do
   use PostofficeWeb, :controller
 
   def call(conn, {:error, changeset}) do
+    status = select_status(changeset.errors)
     conn
-    |> put_status(:bad_request)
+    |> put_status(status)
     |> render("error.json", changeset: changeset)
   end
 
@@ -11,5 +12,17 @@ defmodule PostofficeWeb.Api.FallbackController do
     conn
     |> put_status(:bad_request)
     |> render("error.json", error: errors)
+  end
+
+  defp select_status(errors) do
+    found = Enum.find_value(errors, fn error ->
+      error |> elem(1) |> elem(0) == "has already been taken"
+    end)
+    case found do
+      true ->
+        :conflict
+      _ ->
+        :bad_request
+    end
   end
 end
