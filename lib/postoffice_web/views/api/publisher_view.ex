@@ -6,10 +6,6 @@ defmodule PostofficeWeb.Api.PublisherView do
     %{data: render_one(publisher, PublisherView, "publisher.json")}
   end
 
-  def render("show.json", %{changeset: changeset}) do
-    %{data: render_one(changeset, PublisherView, "error.json")}
-  end
-
   def render("error.json", %{error: error}) do
     %{data: %{errors: error}}
   end
