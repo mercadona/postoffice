@@ -25,7 +25,13 @@ defmodule PostofficeWeb.Api.FallbackController do
 
   defp violate_unique_constraint(errors) do
     Enum.find_value(errors, fn error ->
-      error |> elem(1) |> elem(0) == "has already been taken"
+      error |>
+        elem(1) |>
+        elem(1) |>
+        Enum.find_value(fn type ->
+          type |>
+            elem(1) == :unique
+        end)
     end)
   end
 end
