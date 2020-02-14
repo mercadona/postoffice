@@ -10,7 +10,6 @@ defmodule PostofficeWeb.TopicControllerTest do
 
   describe "list topics" do
     test "can access to topics list", %{conn: conn} do
-
       conn
       |> get(Routes.topic_path(conn, :index))
       |> html_response(200)
@@ -28,8 +27,12 @@ defmodule PostofficeWeb.TopicControllerTest do
   describe "create topics" do
     test "can create topic", %{conn: conn} do
       assert conn
-      |> post(Routes.topic_path(conn, :create, [topic: %{name: "Test Topic", origin_host: "example.com"}]))
-      |> redirected_to() == "/topics"
+             |> post(
+               Routes.topic_path(conn, :create,
+                 topic: %{name: "Test Topic", origin_host: "example.com"}
+               )
+             )
+             |> redirected_to() == "/topics"
 
       assert Messaging.count_topics() == 1
     end
