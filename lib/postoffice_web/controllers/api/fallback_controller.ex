@@ -15,14 +15,17 @@ defmodule PostofficeWeb.Api.FallbackController do
   end
 
   defp select_status(errors) do
-    found = Enum.find_value(errors, fn error ->
-      error |> elem(1) |> elem(0) == "has already been taken"
-    end)
-    case found do
+    case has_unique_constraint(errors) do
       true ->
         :conflict
       _ ->
         :bad_request
     end
+  end
+
+  defp has_unique_constraint(errors) do
+    Enum.find_value(errors, fn error ->
+      error |> elem(1) |> elem(0) == "has already been taken"
+    end)
   end
 end
