@@ -11,3 +11,6 @@
   width: 200px;
 }
 
+.wrapper .content-wrapper {
+  min-height: calc(100vh - calc(3.5rem + 1px));
+}

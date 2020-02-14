@@ -1,13 +1,16 @@
+<div class="d-flex justify-content-between">
+    <h2>Topics</h2>
+    <%= link "Add new", to: Routes.topic_path(@conn, :new), class: "btn btn-primary mb-2" %>
+</div>
+
 <div class="row">
-  <div class="col-md-12">
-    <a class="button"><%= link "Añadir", to: Routes.topic_path(@conn, :new) %></a>
-  </div>
   <div class="col-md-12">
     <table class="table table-sm">
       <thead>
         <tr>
           <th scope="col">#</th>
           <th scope="col">Name</th>
+          <th scope="col">Origin Host</th>
         </tr>
       </thead>
       <tbody>
@@ -15,6 +18,7 @@
         <tr>
           <td><%= topic.id %></td>
           <td><%= topic.name %></td>
+          <td><%= topic.origin_host %></td>
         </tr>
         <% end %>
   </div>
