@@ -27,7 +27,8 @@ This is not designed to be realtime. Postoffice uses [GenStage](https://github.c
 
 ## API
 We expose an API to enable projects to create the structure they need to work: topics, publishers and messages.
-For both topics and publishers, if the resource already exist we return `400 bad request`.
+For both topics and publishers, if the resource already exist we return `409 Conflict`.
+In case that another validation error happened, we return `400 bad request`
 
 ### Topics
 Here we have a sample request to create a topic. All fields are required
