@@ -22,6 +22,4 @@ defmodule PostofficeWeb.TopicController do
     |> put_flash(:info, "Topic #{topic.id} created!")
     |> redirect(to: Routes.topic_path(conn, :index))
   end
-
-
 end
