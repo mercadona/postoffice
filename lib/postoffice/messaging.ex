@@ -60,9 +60,7 @@ defmodule Postoffice.Messaging do
 
   """
   def create_message(topic, attrs \\ %{}) do
-    message_assoc = Ecto.build_assoc(topic, :messages, attrs)
-
-    message_assoc
+    Ecto.build_assoc(topic, :messages, attrs)
     |> Message.changeset(attrs)
     |> Repo.insert()
   end
@@ -82,46 +80,41 @@ defmodule Postoffice.Messaging do
         initial_message \\ 0,
         limit \\ 500
       ) do
-    query =
-      from(
-        publisher_success in PublisherSuccess,
-        right_join: messages in Message,
-        on:
-          publisher_success.publisher_id == ^publisher_id and
-            publisher_success.message_id == messages.id,
-        join: publishers in Publisher,
-        on: publishers.id == ^publisher_id,
-        select: messages,
-        where: is_nil(publisher_success.id),
-        where: messages.id > ^initial_message,
-        where: messages.topic_id == ^topic_id,
-        limit: ^limit,
-        select_merge: %{
-          publisher_id: publishers.id,
-          publisher_type: publishers.type,
-          publisher_target: publishers.target
-        }
-      )
-
-    Repo.all(query)
+    from(
+      publisher_success in PublisherSuccess,
+      right_join: messages in Message,
+      on:
+        publisher_success.publisher_id == ^publisher_id and
+          publisher_success.message_id == messages.id,
+      join: publishers in Publisher,
+      on: publishers.id == ^publisher_id,
+      select: messages,
+      where: is_nil(publisher_success.id),
+      where: messages.id > ^initial_message,
+      where: messages.topic_id == ^topic_id,
+      limit: ^limit,
+      select_merge: %{
+        publisher_id: publishers.id,
+        publisher_type: publishers.type,
+        publisher_target: publishers.target
+      }
+    )
+    |> Repo.all()
   end
 
   def list_topics do
-    query = from(t in Topic)
-
-    Repo.all(query)
+    from(t in Topic)
+    |> Repo.all()
   end
 
   def list_enabled_publishers do
-    query = from(p in Publisher, where: p.active == true, preload: [:topic])
-
-    Repo.all(query)
+    from(p in Publisher, where: p.active == true, preload: [:topic])
+    |> Repo.all()
   end
 
   def list_publishers do
-    query = from(p in Publisher, preload: [:topic])
-
-    Repo.all(query)
+    from(p in Publisher, preload: [:topic])
+    |> Repo.all()
   end
 
   def create_publisher_success(attrs \\ %{}) do
@@ -131,9 +124,8 @@ defmodule Postoffice.Messaging do
   end
 
   def list_publisher_success(publisher_id) do
-    query = from(p in PublisherSuccess, where: p.publisher_id == ^publisher_id)
-
-    Repo.all(query)
+    from(p in PublisherSuccess, where: p.publisher_id == ^publisher_id)
+    |> Repo.all()
   end
 
   def create_publisher_failure(attrs \\ %{}) do
@@ -164,9 +156,8 @@ defmodule Postoffice.Messaging do
   end
 
   def get_topic(name) do
-    query = from(t in Topic, where: t.name == ^name)
-
-    Repo.one(query)
+    from(t in Topic, where: t.name == ^name)
+    |> Repo.one()
   end
 
   def get_last_message do
@@ -175,9 +166,8 @@ defmodule Postoffice.Messaging do
   end
 
   def list_publisher_failures(publisher_id) do
-    query = from(p in PublisherFailures, where: p.publisher_id == ^publisher_id)
-
-    Repo.all(query)
+    from(p in PublisherFailures, where: p.publisher_id == ^publisher_id)
+    |> Repo.all()
   end
 
   def get_message_by_uuid(message_uuid) do
