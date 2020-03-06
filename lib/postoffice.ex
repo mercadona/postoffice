@@ -30,7 +30,7 @@ defmodule Postoffice do
   def receive_publisher(%{"topic" => topic} = publisher_params) do
     case Messaging.get_topic(topic) do
       nil ->
-        {:topic_not_found, {}}
+        {:relationship_does_not_exists, %{topic: ["is invalid"]}}
 
       topic ->
         build_publisher(topic, publisher_params)

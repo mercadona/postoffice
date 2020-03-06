@@ -2,8 +2,10 @@ defmodule PostofficeWeb.Api.FallbackController do
   use PostofficeWeb, :controller
 
   def call(conn, {:error, changeset}) do
+    status = select_status(changeset.errors)
+
     conn
-    |> put_status(:bad_request)
+    |> put_status(status)
     |> render("error.json", changeset: changeset)
   end
 
@@ -11,5 +13,27 @@ defmodule PostofficeWeb.Api.FallbackController do
     conn
     |> put_status(:bad_request)
     |> render("error.json", error: errors)
+  end
+
+  defp select_status(errors) do
+    case violate_unique_constraint(errors) do
+      true ->
+        :conflict
+
+      _ ->
+        :bad_request
+    end
+  end
+
+  defp violate_unique_constraint(errors) do
+    Enum.find_value(errors, fn error ->
+      error
+      |> elem(1)
+      |> elem(1)
+      |> Enum.find_value(fn type ->
+        type
+        |> elem(1) == :unique
+      end)
+    end)
   end
 end
