@@ -204,4 +204,9 @@ defmodule Postoffice.Messaging do
     from(p in PublisherFailures, where: p.message_id == ^message_id)
     |> Repo.all()
   end
+
+  def get_topic_origin_hosts() do
+    from(t in Topic, distinct: true, select: t.origin_host)
+    |> Repo.all()
+  end
 end

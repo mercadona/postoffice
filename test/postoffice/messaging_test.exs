@@ -290,5 +290,19 @@ defmodule Postoffice.MessagingTest do
       loaded_publisher_failures = Messaging.get_publisher_failures_for_message(message.id)
       assert Kernel.length(loaded_publisher_failures) == 1
     end
+
+    test "get_topic_origin_hosts returns unique hosts" do
+      _topic = Fixtures.create_topic()
+
+      _second_topic =
+        Fixtures.create_topic(%{
+          name: "second_test",
+          origin_host: "example.com"
+        })
+
+      hosts = Messaging.get_topic_origin_hosts()
+
+      assert Kernel.length(hosts) == 1
+    end
   end
 end
