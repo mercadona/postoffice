@@ -9,6 +9,7 @@ defmodule Postoffice.Rescuer.Adapters.Http do
     HTTPoison.get(host)
   end
 
+  @impl true
   def delete(host, message_id) do
     build_message_path(host, message_id)
     |> HTTPoison.delete()

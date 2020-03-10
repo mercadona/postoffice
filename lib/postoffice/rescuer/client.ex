@@ -25,6 +25,27 @@ defmodule Postoffice.Rescuer.Client do
     end
   end
 
+  def delete(host, message_id) do
+    case impl().delete(host, message_id) do
+      {:ok, %HTTPoison.Response{status_code: status_code}}
+      when status_code in 200..299 ->
+        Logger.info("Successfully deleted message #{message_id} from #{host}")
+        {:ok, :deleted}
+      {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
+        Logger.info(
+          "Non successful response deleting message from #{host} with status code: #{
+            status_code
+          }"
+        )
+
+        {:error, "Request status code #{status_code}"}
+
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        Logger.info("Error trying to delete message #{host}: #{reason}")
+        {:error, reason}
+    end
+  end
+
   defp impl do
     Application.get_env(:postoffice, :rescuer_client, Http)
   end

@@ -7,6 +7,8 @@ defmodule Postoffice.Rescuer.ClientTest do
   alias Postoffice.Rescuer.Client
 
   @origin_host "http://fake_origin.host"
+  @wrong_message_id 9999
+  @external_message_id 1
   @one_message_response "[{\"id\": 1, \"topic\": \"test\", \"payload\": {\"products\": [{\"code\": \"1234\"}, {\"code\": 2345}], \"reference\": 1234}, \"attributes\": null}]"
   @two_messages_response "[{\"id\": 1, \"topic\": \"test\", \"payload\": {\"products\": [{\"code\": \"1234\"}, {\"code\": 2345}], \"reference\": 1234}, \"attributes\": null}, {\"id\": 2, \"topic\": \"test2\", \"payload\": {\"products\": [{\"code\": \"1234\"}, {\"code\": 2345}], \"reference\": 1234}, \"attributes\": null}]"
 
@@ -62,6 +64,33 @@ defmodule Postoffice.Rescuer.ClientTest do
       assert Kernel.length(pending_messages) == 2
     end
   end
-end
 
-# ""
+  describe "delete undelivered messages" do
+    test "trying to delete non existing message" do
+      expect(HttpMock, :delete, fn @origin_host, @wrong_message_id ->
+        {:ok, %HTTPoison.Response{status_code: 404, body: ""}}
+      end)
+
+      {:error, reason} = Client.delete(@origin_host, @wrong_message_id)
+      assert reason == "Request status code 404"
+    end
+
+    test "errors are handled from our side" do
+      expect(HttpMock, :delete, fn @origin_host, @wrong_message_id ->
+        {:error, %HTTPoison.Error{reason: "Something weird happened"}}
+      end)
+
+      {:error, reason} = Client.delete(@origin_host, @wrong_message_id)
+      assert reason == "Something weird happened"
+    end
+
+    test "messages are successfuly deleted" do
+      expect(HttpMock, :delete, fn @origin_host, @external_message_id ->
+        {:ok, %HTTPoison.Response{status_code: 204, body: ""}}
+      end)
+
+      {:ok, :deleted} = Client.delete(@origin_host, @external_message_id)
+
+    end
+  end
+end
