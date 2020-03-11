@@ -10,7 +10,7 @@ defmodule Postoffice.Rescuer.MessageRecovery do
         Logger.info("Undelivered messages not found on #{host}")
       {:ok, messages} ->
         messages
-        |> Enum.map(fn message -> handle_message(message, host) end)
+        |> Enum.each(fn message -> handle_message(message, host) end)
       {:error, []} ->
         Logger.info("Error on #{host} listing undelivering messages")
     end
