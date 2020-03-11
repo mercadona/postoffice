@@ -31,11 +31,10 @@ defmodule Postoffice.Rescuer.Client do
       when status_code in 200..299 ->
         Logger.info("Successfully deleted message #{message_id} from #{host}")
         {:ok, :deleted}
+
       {:ok, %HTTPoison.Response{status_code: status_code}} ->
         Logger.info(
-          "Non successful response deleting message from #{host} with status code: #{
-            status_code
-          }"
+          "Non successful response deleting message from #{host} with status code: #{status_code}"
         )
 
         {:error, "Request status code #{status_code}"}

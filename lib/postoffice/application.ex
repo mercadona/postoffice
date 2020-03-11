@@ -19,7 +19,9 @@ defmodule Postoffice.Application do
       {Cluster.Supervisor,
        [Application.get_env(:libcluster, :topologies), [name: Postoffice.ClusterSupervisor]]},
       Postoffice.PublisherProducer,
-      Postoffice.MessagesProducerSupervisor
+      Postoffice.MessagesProducerSupervisor,
+      Postoffice.Rescuer.Producer,
+      Postoffice.Rescuer.Supervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
