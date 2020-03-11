@@ -16,6 +16,7 @@ defmodule Postoffice.Rescuer.Adapters.Http do
   end
 
   defp build_message_path(host, message_id) do
-    host <> message_id <> "/"
+    Logger.info("Building message path host #{host} id #{message_id}")
+    host <> "#{message_id}/"
   end
 end
