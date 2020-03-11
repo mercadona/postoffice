@@ -13,11 +13,9 @@ defmodule Postoffice.Rescuer.Consumer do
     Task.start_link(MessageRecovery, :run, [
       host
     ])
-
   end
 
   def init(:ok) do
     {:consumer, %{}}
   end
-
 end

@@ -49,9 +49,11 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       expect(HttpMock, :list, fn @origin_host ->
         {:ok, %HTTPoison.Response{status_code: 200, body: @two_messages_response}}
       end)
+
       expect(HttpMock, :delete, fn @origin_host, @first_message_id ->
         {:ok, %HTTPoison.Response{status_code: 204}}
       end)
+
       expect(HttpMock, :delete, fn @origin_host, @second_message_id ->
         {:ok, %HTTPoison.Response{status_code: 204}}
       end)

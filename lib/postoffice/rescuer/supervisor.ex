@@ -16,4 +16,3 @@ defmodule Postoffice.Rescuer.Supervisor do
     ConsumerSupervisor.init(children, opts)
   end
 end
-

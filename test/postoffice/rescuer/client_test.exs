@@ -90,7 +90,6 @@ defmodule Postoffice.Rescuer.ClientTest do
       end)
 
       {:ok, :deleted} = Client.delete(@origin_host, @external_message_id)
-
     end
   end
 end

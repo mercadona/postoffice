@@ -21,7 +21,7 @@ defmodule Postoffice.Application do
       Postoffice.PublisherProducer,
       Postoffice.MessagesProducerSupervisor,
       Postoffice.Rescuer.Producer,
-      Postoffice.Rescuer.Supervisor,
+      Postoffice.Rescuer.Supervisor
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
