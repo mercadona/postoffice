@@ -7,7 +7,8 @@ defmodule Postoffice.Fixtures do
 
   @topic_attrs %{
     name: "test",
-    origin_host: "example.com"
+    origin_host: "example.com",
+    recovery_enabled: true
   }
 
   @message_attrs %{

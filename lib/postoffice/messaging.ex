@@ -205,8 +205,8 @@ defmodule Postoffice.Messaging do
     |> Repo.all()
   end
 
-  def get_topic_origin_hosts() do
-    from(t in Topic, distinct: true, select: t.origin_host)
+  def get_recovery_hosts() do
+    from(t in Topic, where: t.recovery_enabled == true, distinct: true, select: t.origin_host)
     |> Repo.all()
   end
 end

@@ -31,7 +31,7 @@ defmodule Postoffice.Rescuer.Producer do
   def handle_info(:populate_state, {queue, pending_demand} = state) do
     Process.send_after(self(), :populate_state, @rescuer_interval)
 
-    hosts = Messaging.get_topic_origin_hosts()
+    hosts = Messaging.get_recovery_hosts()
 
     queue =
       Enum.reduce(hosts, queue, fn host, acc ->

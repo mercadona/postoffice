@@ -7,7 +7,8 @@ defmodule Postoffice.MessagingTest do
 
   @second_topic_attrs %{
     name: "test2",
-    origin_host: "example2.com"
+    origin_host: "example2.com",
+    recovery_enabled: false
   }
 
   @disabled_publisher_attrs %{
@@ -78,6 +79,19 @@ defmodule Postoffice.MessagingTest do
     test "create_message/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} =
                Messaging.create_message(Fixtures.create_topic(), @invalid_message_attrs)
+    end
+
+    test "create_topic/1 with recovery_enabled" do
+      topic_params = %{@second_topic_attrs | recovery_enabled: true}
+      {:ok, topic} = Messaging.create_topic(topic_params)
+
+      assert topic.recovery_enabled == true
+    end
+
+    test "create_topic/1 with disabled recovery_enabled" do
+      {:ok, topic} = Messaging.create_topic(@second_topic_attrs)
+
+      assert topic.recovery_enabled == false
     end
 
     test "list_topics/0 returns all topics" do
@@ -291,7 +305,7 @@ defmodule Postoffice.MessagingTest do
       assert Kernel.length(loaded_publisher_failures) == 1
     end
 
-    test "get_topic_origin_hosts returns unique hosts" do
+    test "get_recovery_hosts returns unique hosts" do
       _topic = Fixtures.create_topic()
 
       _second_topic =
@@ -300,9 +314,17 @@ defmodule Postoffice.MessagingTest do
           origin_host: "example.com"
         })
 
-      hosts = Messaging.get_topic_origin_hosts()
+      hosts = Messaging.get_recovery_hosts()
 
       assert Kernel.length(hosts) == 1
+    end
+
+    test "get_recovery_hosts returns empty list if no topic has recovery enabled" do
+      Messaging.create_topic(@second_topic_attrs)
+
+      hosts = Messaging.get_recovery_hosts()
+
+      assert hosts == []
     end
   end
 end
