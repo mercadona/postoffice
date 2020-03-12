@@ -7,7 +7,8 @@ defmodule Postoffice.MessagingTest do
 
   @second_topic_attrs %{
     name: "test2",
-    origin_host: "example2.com"
+    origin_host: "example2.com",
+    recovery_enabled: true
   }
 
   @disabled_publisher_attrs %{
@@ -78,6 +79,19 @@ defmodule Postoffice.MessagingTest do
     test "create_message/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} =
                Messaging.create_message(Fixtures.create_topic(), @invalid_message_attrs)
+    end
+
+    test "create_topic/1 with recovery_enabled" do
+      {:ok, topic} = Messaging.create_topic(@second_topic_attrs)
+
+      assert topic.recovery_enabled
+    end
+
+    test "create_topic/1 with disabled recovery_enabled" do
+      topic_params = %{@second_topic_attrs | recovery_enabled: false}
+      {:ok, topic} = Messaging.create_topic(topic_params)
+
+      assert topic.recovery_enabled == false
     end
 
     test "list_topics/0 returns all topics" do
