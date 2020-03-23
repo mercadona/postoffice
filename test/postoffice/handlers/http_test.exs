@@ -79,6 +79,7 @@ defmodule Postoffice.Handlers.HttpTest do
     Http.run(publisher.target, publisher.id, message)
     message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert message_failure.message_id == message.id
+    assert message_failure.reason == "test error reason"
   end
 
   test "message_failure is created for publisher if response is :ok but response_code out of 200 range" do

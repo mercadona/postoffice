@@ -33,7 +33,8 @@ defmodule Postoffice.Handlers.Http do
 
         Messaging.create_publisher_failure(%{
           publisher_id: publisher_id,
-          message_id: message.id
+          message_id: message.id,
+          reason: reason
         })
 
         {:error, :nosent}
