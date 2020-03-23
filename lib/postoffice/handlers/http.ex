@@ -19,7 +19,11 @@ defmodule Postoffice.Handlers.Http do
         {:ok, :sent}
 
       {:ok, response} ->
-        error_reason = "Error trying to process message from HttpConsumer with status_code: #{response.status_code}"
+        error_reason =
+          "Error trying to process message from HttpConsumer with status_code: #{
+            response.status_code
+          }"
+
         Logger.info(error_reason)
 
         Messaging.create_publisher_failure(%{
@@ -31,7 +35,7 @@ defmodule Postoffice.Handlers.Http do
         {:error, :nosent}
 
       {:error, %HTTPoison.Error{reason: reason}} ->
-        error_reason ="Error trying to process message from HttpConsumer: #{reason}"
+        error_reason = "Error trying to process message from HttpConsumer: #{reason}"
         Logger.info(error_reason)
 
         Messaging.create_publisher_failure(%{

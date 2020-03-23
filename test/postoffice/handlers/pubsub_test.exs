@@ -83,6 +83,8 @@ defmodule Postoffice.Handlers.PubsubTest do
     Pubsub.run(publisher.target, publisher.id, message)
     publisher_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert publisher_failure.message_id == message.id
-    assert publisher_failure.reason == "Error trying to process message from PubsubConsumer: Not able to deliver"
+
+    assert publisher_failure.reason ==
+             "Error trying to process message from PubsubConsumer: Not able to deliver"
   end
 end

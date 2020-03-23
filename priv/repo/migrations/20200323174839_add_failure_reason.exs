@@ -3,7 +3,7 @@ defmodule Postoffice.Repo.Migrations.AddFailureReason do
 
   def change do
     alter table(:publisher_failures) do
-      add :reason, :string 
+      add :reason, :string
     end
   end
 end
