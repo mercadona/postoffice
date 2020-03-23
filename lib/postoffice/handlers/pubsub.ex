@@ -21,11 +21,13 @@ defmodule Postoffice.Handlers.Pubsub do
         {:ok, :sent}
 
       {:error, error} ->
-        Logger.info("Error trying to process message from PubsubConsumer #{error}")
+        error_reason= "Error trying to process message from PubsubConsumer: #{error}"
+        Logger.info(error_reason)
 
         Messaging.create_publisher_failure(%{
           publisher_id: publisher_id,
-          message_id: message.id
+          message_id: message.id,
+          reason: error_reason
         })
 
         {:error, :nosent}

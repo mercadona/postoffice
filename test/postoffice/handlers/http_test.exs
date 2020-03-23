@@ -46,7 +46,7 @@ defmodule Postoffice.Handlers.HttpTest do
     assert [] = Messaging.list_publisher_success(publisher.id)
     message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert message_failure.message_id == message.id
-    assert message_failure.reason == "Error trying to process message from HttpConsumer: status_code: 404"
+    assert message_failure.reason == "Error trying to process message from HttpConsumer with status_code: 404"
   end
 
   test "message success is created for publisher if message is successfully delivered" do
@@ -98,6 +98,6 @@ defmodule Postoffice.Handlers.HttpTest do
     Http.run(publisher.target, publisher.id, message)
     message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert message_failure.message_id == message.id
-    assert message_failure.reason == "Error trying to process message from HttpConsumer: status_code: 300"
+    assert message_failure.reason == "Error trying to process message from HttpConsumer with status_code: 300"
   end
 end
