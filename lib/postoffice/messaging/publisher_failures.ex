@@ -6,13 +6,14 @@ defmodule Postoffice.Messaging.PublisherFailures do
     belongs_to :publisher, Postoffice.Messaging.Publisher
     belongs_to :message, Postoffice.Messaging.Message
     field :processed, :boolean
+    field :reason, :string
     timestamps()
   end
 
   @doc false
   def changeset(publisher_failed, attrs) do
     publisher_failed
-    |> cast(attrs, [:message_id, :publisher_id])
+    |> cast(attrs, [:message_id, :publisher_id, :reason])
     |> validate_required([:message_id, :publisher_id])
   end
 end
