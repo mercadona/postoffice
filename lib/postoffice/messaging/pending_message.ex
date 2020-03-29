@@ -2,7 +2,7 @@ defmodule Postoffice.Messaging.PendingMessage do
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "pending_message" do
+  schema "pending_messages" do
     belongs_to :topic, Postoffice.Messaging.Topic
     belongs_to :message, Postoffice.Messaging.Message
 

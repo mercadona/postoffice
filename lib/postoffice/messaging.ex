@@ -8,6 +8,7 @@ defmodule Postoffice.Messaging do
   alias Postoffice.Repo
 
   alias Postoffice.Messaging.Message
+  alias Postoffice.Messaging.PendingMessage
   alias Postoffice.Messaging.Publisher
   alias Postoffice.Messaging.PublisherSuccess
   alias Postoffice.Messaging.PublisherFailures
@@ -60,9 +61,18 @@ defmodule Postoffice.Messaging do
 
   """
   def create_message(topic, attrs \\ %{}) do
-    Ecto.build_assoc(topic, :messages, attrs)
+    {status, message} = Ecto.build_assoc(topic, :messages, attrs)
     |> Message.changeset(attrs)
     |> Repo.insert()
+
+    %PendingMessage{"topic_id": topic.id, "message_id": message.id}
+    |> Ecto.Changeset.change
+    |> Ecto.Changeset.put_assoc(:topic, topic)
+    |> Ecto.Changeset.put_assoc(:message, message)
+    |> PendingMessage.changeset(%{})
+    |> Repo.insert()
+
+    {status, message}
   end
 
   @doc """

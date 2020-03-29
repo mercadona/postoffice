@@ -3,6 +3,7 @@ defmodule Postoffice.MessagingTest do
 
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Message
+  alias Postoffice.Messaging.PendingMessage
   alias Postoffice.Fixtures
 
   @second_topic_attrs %{
@@ -74,6 +75,21 @@ defmodule Postoffice.MessagingTest do
       assert message.payload == %{}
       assert message.public_id == "7488a646-e31f-11e4-aace-600308960662"
       assert message.topic_id == topic.id
+    end
+
+    defp get_last_pending_message() do
+      from(pm in PendingMessage, order_by: [desc: :id], limit: 1)
+      |> Repo.one()
+    end
+
+    test "create_message/1 with valid data creates a pending message" do
+      topic = Fixtures.create_topic()
+      {_, message} = Messaging.create_message(topic, @message_attrs)
+
+      assert length(Repo.all(PendingMessage)) == 1
+      pending_message = get_last_pending_message()
+      assert pending_message.topic_id == topic.id
+      assert pending_message.message_id == message.id
     end
 
     test "create_message/1 with invalid data returns error changeset" do
