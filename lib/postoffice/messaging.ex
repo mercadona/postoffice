@@ -61,18 +61,20 @@ defmodule Postoffice.Messaging do
 
   """
   def create_message(topic, attrs \\ %{}) do
-    {status, message} = Ecto.build_assoc(topic, :messages, attrs)
+    message_changeset = Ecto.build_assoc(topic, :messages, attrs)
     |> Message.changeset(attrs)
-    |> Repo.insert()
 
-    %PendingMessage{"topic_id": topic.id, "message_id": message.id}
-    |> Ecto.Changeset.change
-    |> Ecto.Changeset.put_assoc(:topic, topic)
-    |> Ecto.Changeset.put_assoc(:message, message)
-    |> PendingMessage.changeset(%{})
-    |> Repo.insert()
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:message, message_changeset)
+    |> Ecto.Multi.insert(:pending_message, fn %{message: message} ->
+      %PendingMessage{"topic_id": topic.id, "message_id": message.id}
+      |> Ecto.Changeset.change
+      |> Ecto.Changeset.put_assoc(:topic, topic)
+      |> Ecto.Changeset.put_assoc(:message, message)
+      |> PendingMessage.changeset(%{})
+    end)
+    |> Repo.transaction()
 
-    {status, message}
   end
 
   @doc """
