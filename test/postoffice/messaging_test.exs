@@ -89,7 +89,7 @@ defmodule Postoffice.MessagingTest do
       assert length(Repo.all(PendingMessage)) == 1
       pending_message = get_last_pending_message()
       assert pending_message.topic_id == topic.id
-      assert pending_message.message_id == message.message.id
+      assert pending_message.message_id == message.id
     end
 
     test "create_message/1 with invalid data returns error changeset" do

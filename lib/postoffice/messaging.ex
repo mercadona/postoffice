@@ -64,7 +64,7 @@ defmodule Postoffice.Messaging do
     message_changeset = Ecto.build_assoc(topic, :messages, attrs)
     |> Message.changeset(attrs)
 
-    Ecto.Multi.new()
+    multi = Ecto.Multi.new()
     |> Ecto.Multi.insert(:message, message_changeset)
     |> Ecto.Multi.insert(:pending_message, fn %{message: message} ->
       %PendingMessage{"topic_id": topic.id, "message_id": message.id}
@@ -73,8 +73,11 @@ defmodule Postoffice.Messaging do
       |> Ecto.Changeset.put_assoc(:message, message)
       |> PendingMessage.changeset(%{})
     end)
-    |> Repo.transaction()
 
+    case Repo.transaction(multi) do
+      {:ok, result} -> {:ok, result.message}
+      {:error, :message, changeset, %{}} -> {:error, changeset}
+    end
   end
 
   @doc """
