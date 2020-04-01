@@ -3,8 +3,8 @@ defmodule Postoffice.Messaging.PendingMessage do
   import Ecto.Changeset
 
   schema "pending_messages" do
-    belongs_to :topic, Postoffice.Messaging.Topic
     belongs_to :message, Postoffice.Messaging.Message
+    belongs_to :publisher, Postoffice.Messaging.Publisher
 
     timestamps()
   end
@@ -12,8 +12,8 @@ defmodule Postoffice.Messaging.PendingMessage do
   @doc false
   def changeset(pending_message, attrs) do
     pending_message
-    |> cast(attrs, [:topic_id, :message_id])
-    |> validate_required([:topic_id, :message_id])
+    |> cast(attrs, [:publisher_id, :message_id])
+    |> validate_required([:publisher_id, :message_id])
   end
 
 end

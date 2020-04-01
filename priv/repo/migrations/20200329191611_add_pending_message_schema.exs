@@ -3,7 +3,7 @@ defmodule Postoffice.Repo.Migrations.AddPendingMessageSchema do
 
   def change do
     create table(:pending_messages) do
-      add :topic_id, references(:topics), null: false
+      add :publisher_id, references(:publishers), null: false
       add :message_id, references(:messages), null: false
 
       timestamps()

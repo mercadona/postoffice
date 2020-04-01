@@ -84,11 +84,13 @@ defmodule Postoffice.MessagingTest do
 
     test "create_message/1 with valid data creates a pending message" do
       topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+
       {_, message} = Messaging.create_message(topic, @message_attrs)
 
       assert length(Repo.all(PendingMessage)) == 1
       pending_message = get_last_pending_message()
-      assert pending_message.topic_id == topic.id
+      assert pending_message.publisher_id == publisher.id
       assert pending_message.message_id == message.id
     end
 
