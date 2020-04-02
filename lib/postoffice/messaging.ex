@@ -68,13 +68,17 @@ defmodule Postoffice.Messaging do
     create_message_result =
       Ecto.Multi.new()
       |> Ecto.Multi.insert(:message, build_message_changeset(topic, attrs))
-      |> Ecto.Multi.merge(fn %{message: message} ->
-        Ecto.Multi.new()
-        |> Ecto.Multi.insert_all(
-          :pending_messages,
-          PendingMessage,
-          build_pending_messages_changeset(topic.consumers, message)
-        )
+      |> Ecto.Multi.run(:pending_messages, fn repo, %{message: message} ->
+        Enum.each(topic.consumers, fn consumer ->
+          %PendingMessage{publisher_id: consumer.id, message_id: message.id}
+          |> Ecto.Changeset.change()
+          |> Ecto.Changeset.put_assoc(:publisher, consumer)
+          |> Ecto.Changeset.put_assoc(:message, message)
+          |> PendingMessage.changeset(%{})
+          |> Repo.insert!()
+        end)
+
+        {:ok, :ok}
       end)
 
     case Repo.transaction(create_message_result) do
@@ -89,17 +93,46 @@ defmodule Postoffice.Messaging do
   end
 
   defp build_pending_messages_changeset(consumers, message) do
-    Stream.map(consumers, fn consumer ->
-      build_pending_message_changeset(consumer, message)
-    end)
+    IO.puts("\n build_pending_messageS")
+    IO.puts("\n ¿consumers?")
+
+    consumers
+    |> IO.inspect()
+
+    list =
+      Stream.map(consumers, fn consumer ->
+        IO.puts("Itero")
+
+        %PendingMessage{publisher_id: consumer.id, message_id: message.id}
+        |> Ecto.Changeset.change()
+        |> Ecto.Changeset.put_assoc(:publisher, consumer)
+        |> Ecto.Changeset.put_assoc(:message, message)
+        |> PendingMessage.changeset(%{})
+        |> Repo.insert!()
+      end)
+
+    IO.puts("Trato de imprimir la lista")
+
+    list
+    |> IO.inspect()
+
+    list
   end
 
   defp build_pending_message_changeset(consumer, message) do
-    %PendingMessage{publisher_id: consumer.id, message_id: message.id}
-    |> Ecto.Changeset.change()
-    |> Ecto.Changeset.put_assoc(:publisher, consumer)
-    |> Ecto.Changeset.put_assoc(:message, message)
-    |> PendingMessage.changeset(%{})
+    IO.puts("\nEntro")
+
+    message =
+      %PendingMessage{publisher_id: consumer.id, message_id: message.id}
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_assoc(:publisher, consumer)
+      |> Ecto.Changeset.put_assoc(:message, message)
+      |> PendingMessage.changeset(%{})
+
+    message
+    |> IO.inspect()
+
+    message
   end
 
   @doc """
