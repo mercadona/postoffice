@@ -65,26 +65,17 @@ defmodule Postoffice.Messaging do
       topic
       |> Repo.preload(:consumers)
 
-    create_message_result =
       Ecto.Multi.new()
       |> Ecto.Multi.insert(:message, build_message_changeset(topic, attrs))
-      |> Ecto.Multi.run(:pending_messages, fn repo, %{message: message} ->
-        Enum.each(topic.consumers, fn consumer ->
-          %PendingMessage{publisher_id: consumer.id, message_id: message.id}
-          |> Ecto.Changeset.change()
-          |> Ecto.Changeset.put_assoc(:publisher, consumer)
-          |> Ecto.Changeset.put_assoc(:message, message)
-          |> PendingMessage.changeset(%{})
-          |> Repo.insert!()
-        end)
-
-        {:ok, :ok}
+      |> Ecto.Multi.run(:pending_messages, fn _repo, %{message: message} ->
+        insert_pending_messages(topic.consumers, message)
+        {:ok, :multiple_insertion}
       end)
-
-    case Repo.transaction(create_message_result) do
-      {:ok, result} -> {:ok, result.message}
-      {:error, :message, changeset, %{}} -> {:error, changeset}
-    end
+      |> Repo.transaction()
+      |> case do
+        {:ok, result} -> {:ok, result.message}
+        {:error, :message, changeset, %{}} -> {:error, changeset}
+      end
   end
 
   defp build_message_changeset(topic, message) do
@@ -92,6 +83,16 @@ defmodule Postoffice.Messaging do
     |> Message.changeset(message)
   end
 
+  defp insert_pending_messages(consumers, message) do
+    Enum.each(consumers, fn consumer ->
+      %PendingMessage{publisher_id: consumer.id, message_id: message.id}
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_assoc(:publisher, consumer)
+      |> Ecto.Changeset.put_assoc(:message, message)
+      |> PendingMessage.changeset(%{})
+      |> Repo.insert!()
+    end)
+  end
 
   @doc """
   Returns the list of pending messages to be consumed for a topic for a consumer.

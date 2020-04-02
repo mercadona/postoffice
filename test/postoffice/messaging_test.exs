@@ -94,9 +94,23 @@ defmodule Postoffice.MessagingTest do
       assert pending_message.message_id == message.id
     end
 
+    test "create_message/1 with valid data do not create pending message if have not publisher" do
+      topic = Fixtures.create_topic()
+
+      {_, message} = Messaging.create_message(topic, @message_attrs)
+
+      assert length(Repo.all(PendingMessage)) == 0
+    end
+
     test "create_message/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} =
                Messaging.create_message(Fixtures.create_topic(), @invalid_message_attrs)
+    end
+
+    test "create_message/1 with invalid data do not create pending message" do
+      Messaging.create_message(Fixtures.create_topic(), @invalid_message_attrs)
+
+      assert length(Repo.all(PendingMessage)) == 0
     end
 
     test "create_topic/1 with recovery_enabled" do
