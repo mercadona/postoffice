@@ -11,12 +11,13 @@ defmodule Postoffice.Rescuer.Adapters.Http do
 
   @impl true
   def delete(host, message_id) do
+    Logger.info("Deleting message #{message_id} from origin host #{host}")
+
     build_message_path(host, message_id)
     |> HTTPoison.delete()
   end
 
   defp build_message_path(host, message_id) do
-    Logger.info("Building message path host #{host} id #{message_id}")
     host <> "#{message_id}/"
   end
 end
