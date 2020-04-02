@@ -61,11 +61,21 @@ defmodule Postoffice.Messaging do
 
   """
   def create_message(topic, attrs \\ %{}) do
-    create_message_result = Ecto.Multi.new()
-    |> Ecto.Multi.insert(:message, build_message_changeset(topic, attrs))
-    |> Ecto.Multi.insert(:pending_message, fn %{message: message} ->
-      build_pending_message_changeset(topic, message)
-    end)
+    topic =
+      topic
+      |> Repo.preload(:consumers)
+
+    create_message_result =
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(:message, build_message_changeset(topic, attrs))
+      |> Ecto.Multi.merge(fn %{message: message} ->
+        Ecto.Multi.new()
+        |> Ecto.Multi.insert_all(
+          :pending_messages,
+          PendingMessage,
+          build_pending_messages_changeset(topic.consumers, message)
+        )
+      end)
 
     case Repo.transaction(create_message_result) do
       {:ok, result} -> {:ok, result.message}
@@ -78,10 +88,16 @@ defmodule Postoffice.Messaging do
     |> Message.changeset(message)
   end
 
-  defp build_pending_message_changeset(topic, message) do
-    %PendingMessage{topic_id: topic.id, message_id: message.id}
-    |> Ecto.Changeset.change
-    |> Ecto.Changeset.put_assoc(:topic, topic)
+  defp build_pending_messages_changeset(consumers, message) do
+    Stream.map(consumers, fn consumer ->
+      build_pending_message_changeset(consumer, message)
+    end)
+  end
+
+  defp build_pending_message_changeset(consumer, message) do
+    %PendingMessage{publisher_id: consumer.id, message_id: message.id}
+    |> Ecto.Changeset.change()
+    |> Ecto.Changeset.put_assoc(:publisher, consumer)
     |> Ecto.Changeset.put_assoc(:message, message)
     |> PendingMessage.changeset(%{})
   end

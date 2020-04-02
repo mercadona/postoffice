@@ -15,5 +15,4 @@ defmodule Postoffice.Messaging.PendingMessage do
     |> cast(attrs, [:publisher_id, :message_id])
     |> validate_required([:publisher_id, :message_id])
   end
-
 end

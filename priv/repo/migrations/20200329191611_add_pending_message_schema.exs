@@ -8,6 +8,5 @@ defmodule Postoffice.Repo.Migrations.AddPendingMessageSchema do
 
       timestamps()
     end
-
   end
 end
