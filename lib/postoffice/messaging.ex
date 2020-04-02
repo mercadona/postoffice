@@ -92,48 +92,6 @@ defmodule Postoffice.Messaging do
     |> Message.changeset(message)
   end
 
-  defp build_pending_messages_changeset(consumers, message) do
-    IO.puts("\n build_pending_messageS")
-    IO.puts("\n ¿consumers?")
-
-    consumers
-    |> IO.inspect()
-
-    list =
-      Stream.map(consumers, fn consumer ->
-        IO.puts("Itero")
-
-        %PendingMessage{publisher_id: consumer.id, message_id: message.id}
-        |> Ecto.Changeset.change()
-        |> Ecto.Changeset.put_assoc(:publisher, consumer)
-        |> Ecto.Changeset.put_assoc(:message, message)
-        |> PendingMessage.changeset(%{})
-        |> Repo.insert!()
-      end)
-
-    IO.puts("Trato de imprimir la lista")
-
-    list
-    |> IO.inspect()
-
-    list
-  end
-
-  defp build_pending_message_changeset(consumer, message) do
-    IO.puts("\nEntro")
-
-    message =
-      %PendingMessage{publisher_id: consumer.id, message_id: message.id}
-      |> Ecto.Changeset.change()
-      |> Ecto.Changeset.put_assoc(:publisher, consumer)
-      |> Ecto.Changeset.put_assoc(:message, message)
-      |> PendingMessage.changeset(%{})
-
-    message
-    |> IO.inspect()
-
-    message
-  end
 
   @doc """
   Returns the list of pending messages to be consumed for a topic for a consumer.
