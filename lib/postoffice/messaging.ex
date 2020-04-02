@@ -109,26 +109,10 @@ defmodule Postoffice.Messaging do
         initial_message \\ 0,
         limit \\ 500
       ) do
-    from(
-      publisher_success in PublisherSuccess,
-      right_join: messages in Message,
-      on:
-        publisher_success.publisher_id == ^publisher_id and
-          publisher_success.message_id == messages.id,
-      join: publishers in Publisher,
-      on: publishers.id == ^publisher_id,
-      select: messages,
-      where: is_nil(publisher_success.id),
-      where: messages.id > ^initial_message,
-      where: messages.topic_id == ^topic_id,
-      limit: ^limit,
-      select_merge: %{
-        publisher_id: publishers.id,
-        publisher_type: publishers.type,
-        publisher_target: publishers.target
-      }
-    )
+    pending_messages = from(pm in PendingMessage, where: pm.publisher_id == ^publisher_id, preload: [:message])
     |> Repo.all()
+
+    Enum.map(pending_messages, fn pending_message -> pending_message.message end)
   end
 
   def list_topics do
