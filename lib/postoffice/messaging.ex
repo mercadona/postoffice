@@ -65,17 +65,17 @@ defmodule Postoffice.Messaging do
       topic
       |> Repo.preload(:consumers)
 
-      Ecto.Multi.new()
-      |> Ecto.Multi.insert(:message, build_message_changeset(topic, attrs))
-      |> Ecto.Multi.run(:pending_messages, fn _repo, %{message: message} ->
-        insert_pending_messages(topic.consumers, message)
-        {:ok, :multiple_insertion}
-      end)
-      |> Repo.transaction()
-      |> case do
-        {:ok, result} -> {:ok, result.message}
-        {:error, :message, changeset, %{}} -> {:error, changeset}
-      end
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:message, build_message_changeset(topic, attrs))
+    |> Ecto.Multi.run(:pending_messages, fn _repo, %{message: message} ->
+      insert_pending_messages(topic.consumers, message)
+      {:ok, :multiple_insertion}
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, result} -> {:ok, result.message}
+      {:error, :message, changeset, %{}} -> {:error, changeset}
+    end
   end
 
   defp build_message_changeset(topic, message) do

@@ -77,27 +77,39 @@ defmodule Postoffice.MessagingTest do
       assert message.topic_id == topic.id
     end
 
-    defp get_last_pending_message() do
-      from(pm in PendingMessage, order_by: [desc: :id], limit: 1)
+    defp get_pending_message_for(publisher_id) do
+      from(pm in PendingMessage, where: pm.publisher_id == ^publisher_id, order_by: [desc: :id], limit: 1)
       |> Repo.one()
     end
 
     test "create_message/1 with valid data creates a pending message" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
+      second_publisher =
+        Fixtures.create_publisher(topic, %{
+          active: true,
+          target: "some-topic",
+          initial_message: 0,
+          type: "pubsub"
+        })
 
       {_, message} = Messaging.create_message(topic, @message_attrs)
 
-      assert length(Repo.all(PendingMessage)) == 1
-      pending_message = get_last_pending_message()
+      assert length(Repo.all(PendingMessage)) == 2
+
+      pending_message = get_pending_message_for(publisher.id)
       assert pending_message.publisher_id == publisher.id
+      assert pending_message.message_id == message.id
+
+      pending_message = get_pending_message_for(second_publisher.id)
+      assert pending_message.publisher_id == second_publisher.id
       assert pending_message.message_id == message.id
     end
 
     test "create_message/1 with valid data do not create pending message if have not publisher" do
       topic = Fixtures.create_topic()
 
-      {_, message} = Messaging.create_message(topic, @message_attrs)
+      Messaging.create_message(topic, @message_attrs)
 
       assert length(Repo.all(PendingMessage)) == 0
     end
