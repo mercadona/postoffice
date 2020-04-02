@@ -4,8 +4,10 @@ defmodule Postoffice.Handlers.HttpTest do
   import Mox
 
   alias Postoffice.Adapters.HttpMock
+  use Postoffice.DataCase
   alias Postoffice.Handlers.Http
   alias Postoffice.Messaging
+  alias Postoffice.Messaging.PendingMessage
 
   @valid_message_attrs %{
     attributes: %{},
@@ -25,10 +27,6 @@ defmodule Postoffice.Handlers.HttpTest do
   }
 
   setup [:set_mox_from_context, :verify_on_exit!]
-
-  setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Postoffice.Repo)
-  end
 
   test "no message_success when target target not found" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
@@ -64,7 +62,24 @@ defmodule Postoffice.Handlers.HttpTest do
     end)
 
     Http.run(publisher.target, publisher.id, message)
+    # TODO: FIX-MEEEEE
     assert [message] = Messaging.list_publisher_success(publisher.id)
+  end
+
+  test "message is removed from pending messages when is successfully delivered" do
+    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+    {:ok, publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+    {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
+
+    assert length(Repo.all(PendingMessage)) == 1
+
+    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+      {:ok, %HTTPoison.Response{status_code: 201}}
+    end)
+
+    Http.run(publisher.target, publisher.id, message)
+    assert length(Repo.all(PendingMessage)) == 0
   end
 
   test "message_failure is created for publisher if any error happens" do

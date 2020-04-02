@@ -109,8 +109,9 @@ defmodule Postoffice.Messaging do
         initial_message \\ 0,
         limit \\ 500
       ) do
-    pending_messages = from(pm in PendingMessage, where: pm.publisher_id == ^publisher_id, preload: [:message])
-    |> Repo.all()
+    pending_messages =
+      from(pm in PendingMessage, where: pm.publisher_id == ^publisher_id, preload: [:message])
+      |> Repo.all()
 
     Enum.map(pending_messages, fn pending_message -> pending_message.message end)
   end
@@ -134,6 +135,17 @@ defmodule Postoffice.Messaging do
     %PublisherSuccess{}
     |> PublisherSuccess.changeset(attrs)
     |> Repo.insert()
+  end
+
+  def mark_message_as_success(message_information) do
+    create_publisher_success(message_information)
+    delete_pending_message(message_information.message_id, message_information.publisher_id)
+    {:ok, :finished}
+  end
+
+  defp delete_pending_message(message_id, publisher_id) do
+    from(p in PendingMessage, where: p.publisher_id == ^publisher_id and p.message_id == ^message_id)
+    |> Repo.delete_all
   end
 
   def list_publisher_success(publisher_id) do
