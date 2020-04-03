@@ -24,6 +24,14 @@ defmodule Postoffice.Application do
       Postoffice.Rescuer.Supervisor
     ]
 
+    :ok =
+      :telemetry.attach(
+        "prometheus-ecto",
+        [:postoffice, :repo, :query],
+        &PostofficeWeb.Metrics.Ecto.handle_event/4,
+        %{}
+      )
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Postoffice.Supervisor]
