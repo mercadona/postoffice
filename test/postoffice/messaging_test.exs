@@ -106,7 +106,24 @@ defmodule Postoffice.MessagingTest do
       assert pending_message.message_id == message.id
     end
 
-    test "create_message/1 with valid data do not create pending message if have not publisher" do
+    test "create_message/1 with valid data do not create pending message if have not associated publisher" do
+      topic = Fixtures.create_topic()
+      second_topic = Fixtures.create_topic(@second_topic_attrs )
+      Fixtures.create_publisher(second_topic,
+        %{
+          active: true,
+          target: "some_target.com",
+          initial_message: 0,
+          type: "http"
+        }
+      )
+
+      Messaging.create_message(topic, @message_attrs)
+
+      assert length(Repo.all(PendingMessage)) == 0
+    end
+
+    test "create_message/1 with valid data do not create pending message if do not exists any publisher" do
       topic = Fixtures.create_topic()
 
       Messaging.create_message(topic, @message_attrs)
