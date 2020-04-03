@@ -68,9 +68,7 @@ defmodule Postoffice.Handlers.HttpTest do
 
   test "message is removed from pending messages when is successfully delivered" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
-
     publisher = Fixtures.create_publisher(topic)
-
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 1
@@ -83,7 +81,7 @@ defmodule Postoffice.Handlers.HttpTest do
     assert length(Repo.all(PendingMessage)) == 0
   end
 
-  test "remove only published messages" do
+  test "remove only published messages from topic" do
     topic = Fixtures.create_topic()
     publisher = Fixtures.create_publisher(topic)
 
@@ -106,6 +104,47 @@ defmodule Postoffice.Handlers.HttpTest do
     pending_message = get_pending_message_for(publisher.id)
     assert pending_message.message_id == another_message.id
     assert pending_message.publisher_id == publisher.id
+  end
+
+  test "remove only published messages for topic" do
+    topic = Fixtures.create_topic()
+
+    second_topic =
+      Fixtures.create_topic(%{
+        name: "test2",
+        origin_host: "example2.com",
+        recovery_enabled: false
+      })
+
+    publisher = Fixtures.create_publisher(topic)
+
+    second_publisher =
+      Fixtures.create_publisher(second_topic, %{
+        active: true,
+        target: "http://fake.target2",
+        initial_message: 0,
+        type: "http"
+      })
+
+    message = Fixtures.create_message(topic, @valid_message_attrs)
+
+    another_message =
+      Fixtures.create_message(second_topic, %{
+        @valid_message_attrs
+        | public_id: "7488a646-e31f-11e4-aace-600308960661"
+      })
+
+    assert length(Repo.all(PendingMessage)) == 2
+
+    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+      {:ok, %HTTPoison.Response{status_code: 201}}
+    end)
+
+    Http.run(publisher.target, publisher.id, message)
+    assert length(Repo.all(PendingMessage)) == 1
+    pending_message = get_pending_message_for(second_publisher.id)
+    assert pending_message.message_id == another_message.id
+    assert pending_message.publisher_id == second_publisher.id
   end
 
   test "message_failure is created for publisher if any error happens" do
