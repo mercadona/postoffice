@@ -83,6 +83,31 @@ defmodule Postoffice.Handlers.HttpTest do
     assert length(Repo.all(PendingMessage)) == 0
   end
 
+  test "remove only published messages" do
+    topic = Fixtures.create_topic()
+    publisher = Fixtures.create_publisher(topic)
+
+    message = Fixtures.create_message(topic, @valid_message_attrs)
+
+    another_message =
+      Fixtures.create_message(topic, %{
+        @valid_message_attrs
+        | public_id: "7488a646-e31f-11e4-aace-600308960661"
+      })
+
+    assert length(Repo.all(PendingMessage)) == 2
+
+    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+      {:ok, %HTTPoison.Response{status_code: 201}}
+    end)
+
+    Http.run(publisher.target, publisher.id, message)
+    assert length(Repo.all(PendingMessage)) == 1
+    pending_message = get_pending_message_for(publisher.id)
+    assert pending_message.message_id == another_message.id
+    assert pending_message.publisher_id == publisher.id
+  end
+
   test "message_failure is created for publisher if any error happens" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
 
@@ -137,5 +162,14 @@ defmodule Postoffice.Handlers.HttpTest do
 
     assert message_failure.reason ==
              "Error trying to process message from HttpConsumer with status_code: 300"
+  end
+
+  defp get_pending_message_for(publisher_id) do
+    from(pm in PendingMessage,
+      where: pm.publisher_id == ^publisher_id,
+      order_by: [desc: :id],
+      limit: 1
+    )
+    |> Repo.one()
   end
 end

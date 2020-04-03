@@ -29,7 +29,6 @@ defmodule Postoffice.Handlers.PubsubTest do
   }
   setup [:set_mox_from_context, :verify_on_exit!]
 
-
   test "no message_success when some error raised from pubsub" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
 

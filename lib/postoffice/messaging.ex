@@ -139,8 +139,11 @@ defmodule Postoffice.Messaging do
   def mark_message_as_success(message_information) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:publisher_success, create_publisher_success(message_information))
-    |> Ecto.Multi.delete_all(:sessions, delete_pending_message(message_information.message_id, message_information.publisher_id))
-    |> Repo.transaction
+    |> Ecto.Multi.delete_all(
+      :sessions,
+      delete_pending_message(message_information.message_id, message_information.publisher_id)
+    )
+    |> Repo.transaction()
 
     {:ok, :finished}
   end
