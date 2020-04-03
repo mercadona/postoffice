@@ -16,12 +16,12 @@ defmodule Postoffice.Handlers.Http do
           {:postoffice_extra, {:message_id, message.public_id}, {:target, publisher_target}}
         ])
 
-        {:ok, _} = Messaging.mark_message_as_success(
-          %{
+        {:ok, _} =
+          Messaging.mark_message_as_success(%{
             publisher_id: publisher_id,
             message_id: message.id
-          }
-        )
+          })
+
         {:ok, :sent}
 
       {:ok, response} ->

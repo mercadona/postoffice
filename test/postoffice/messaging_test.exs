@@ -78,13 +78,18 @@ defmodule Postoffice.MessagingTest do
     end
 
     defp get_pending_message_for(publisher_id) do
-      from(pm in PendingMessage, where: pm.publisher_id == ^publisher_id, order_by: [desc: :id], limit: 1)
+      from(pm in PendingMessage,
+        where: pm.publisher_id == ^publisher_id,
+        order_by: [desc: :id],
+        limit: 1
+      )
       |> Repo.one()
     end
 
     test "create_message/1 with valid data creates a pending message" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
+
       second_publisher =
         Fixtures.create_publisher(topic, %{
           active: true,
@@ -108,8 +113,10 @@ defmodule Postoffice.MessagingTest do
 
     test "create_message/1 with valid data do not create pending message if have not associated publisher" do
       topic = Fixtures.create_topic()
-      second_topic = Fixtures.create_topic(@second_topic_attrs )
-      Fixtures.create_publisher(second_topic,
+      second_topic = Fixtures.create_topic(@second_topic_attrs)
+
+      Fixtures.create_publisher(
+        second_topic,
         %{
           active: true,
           target: "some_target.com",

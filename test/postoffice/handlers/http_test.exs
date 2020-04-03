@@ -68,8 +68,10 @@ defmodule Postoffice.Handlers.HttpTest do
 
   test "message is removed from pending messages when is successfully delivered" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 1

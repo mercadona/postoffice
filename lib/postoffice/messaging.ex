@@ -144,8 +144,10 @@ defmodule Postoffice.Messaging do
   end
 
   defp delete_pending_message(message_id, publisher_id) do
-    from(p in PendingMessage, where: p.publisher_id == ^publisher_id and p.message_id == ^message_id)
-    |> Repo.delete_all
+    from(p in PendingMessage,
+      where: p.publisher_id == ^publisher_id and p.message_id == ^message_id
+    )
+    |> Repo.delete_all()
   end
 
   def list_publisher_success(publisher_id) do
