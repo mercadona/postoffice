@@ -33,7 +33,7 @@ defmodule Postoffice.MixProject do
   def application do
     [
       mod: {Postoffice.Application, []},
-      extra_applications: [:logger, :runtime_tools, :httpoison, :logger_json, :prometheus_phoenix]
+      extra_applications: [:logger, :runtime_tools, :httpoison, :logger_json, :prometheus_phoenix, :prometheus_ecto]
     ]
   end
 
@@ -69,7 +69,8 @@ defmodule Postoffice.MixProject do
       {:excoveralls, "~> 0.4"},
       {:prometheus_ex, "~> 3.0"},
       {:prometheus_plugs, "~> 1.1"},
-      {:prometheus_phoenix, "~> 1.3.0"}
+      {:prometheus_phoenix, "~> 1.3.0"},
+      {:prometheus_ecto, "~> 1.4.1"}
     ]
   end
 
