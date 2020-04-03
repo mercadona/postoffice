@@ -1,13 +1,14 @@
 defmodule Postoffice.Handlers.HttpTest do
   use ExUnit.Case
+  use Postoffice.DataCase
 
   import Mox
 
   alias Postoffice.Adapters.HttpMock
-  use Postoffice.DataCase
   alias Postoffice.Handlers.Http
   alias Postoffice.Messaging
   alias Postoffice.Messaging.PendingMessage
+  alias Postoffice.Fixtures
 
   @valid_message_attrs %{
     attributes: %{},
@@ -68,8 +69,7 @@ defmodule Postoffice.Handlers.HttpTest do
   test "message is removed from pending messages when is successfully delivered" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
 
-    {:ok, publisher} =
-      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+    publisher = Fixtures.create_publisher(topic)
 
     {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
 
@@ -101,6 +101,22 @@ defmodule Postoffice.Handlers.HttpTest do
 
     assert message_failure.reason ==
              "Error trying to process message from HttpConsumer: test error reason"
+  end
+
+  test "do not remove pending message when can't deliver message" do
+    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+
+    {:ok, publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+
+    {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
+
+    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+      {:error, %HTTPoison.Error{reason: "test error reason"}}
+    end)
+
+    Http.run(publisher.target, publisher.id, message)
+    assert length(Repo.all(PendingMessage)) == 1
   end
 
   test "message_failure is created for publisher if response is :ok but response_code out of 200 range" do
