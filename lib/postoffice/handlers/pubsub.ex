@@ -19,9 +19,9 @@ defmodule Postoffice.Handlers.Pubsub do
         ])
 
         {:ok, _} =
-          Messaging.create_publisher_success(%{
-            publisher_id: publisher_id,
-            message_id: message.id
+          Messaging.mark_message_as_success(%{
+                publisher_id: publisher_id,
+                message_id: message.id
           })
 
         {:ok, :sent}

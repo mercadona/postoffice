@@ -134,12 +134,14 @@ defmodule Postoffice.Messaging do
   def create_publisher_success(attrs \\ %{}) do
     %PublisherSuccess{}
     |> PublisherSuccess.changeset(attrs)
-    |> Repo.insert()
   end
 
   def mark_message_as_success(message_information) do
-    create_publisher_success(message_information)
-    delete_pending_message(message_information.message_id, message_information.publisher_id)
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:publisher_success, create_publisher_success(message_information))
+    |> Ecto.Multi.delete_all(:sessions, delete_pending_message(message_information.message_id, message_information.publisher_id))
+    |> Repo.transaction
+
     {:ok, :finished}
   end
 
@@ -147,7 +149,6 @@ defmodule Postoffice.Messaging do
     from(p in PendingMessage,
       where: p.publisher_id == ^publisher_id and p.message_id == ^message_id
     )
-    |> Repo.delete_all()
   end
 
   def list_publisher_success(publisher_id) do

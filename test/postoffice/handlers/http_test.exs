@@ -62,7 +62,6 @@ defmodule Postoffice.Handlers.HttpTest do
     end)
 
     Http.run(publisher.target, publisher.id, message)
-    # TODO: FIX-MEEEEE
     assert [message] = Messaging.list_publisher_success(publisher.id)
   end
 

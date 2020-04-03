@@ -1,5 +1,6 @@
 defmodule Postoffice.Handlers.PubsubTest do
   use ExUnit.Case
+  use Postoffice.DataCase
 
   import Mox
 
@@ -8,6 +9,7 @@ defmodule Postoffice.Handlers.PubsubTest do
   alias Postoffice.Handlers.Pubsub
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Message
+  alias Postoffice.Messaging.PendingMessage
 
   @valid_message_attrs %{
     attributes: %{"attr" => "some_value"},
@@ -27,9 +29,6 @@ defmodule Postoffice.Handlers.PubsubTest do
   }
   setup [:set_mox_from_context, :verify_on_exit!]
 
-  setup do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Postoffice.Repo)
-  end
 
   test "no message_success when some error raised from pubsub" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
@@ -86,5 +85,23 @@ defmodule Postoffice.Handlers.PubsubTest do
 
     assert publisher_failure.reason ==
              "Error trying to process message from PubsubConsumer: Not able to deliver"
+  end
+
+  test "message is removed from pending messages when is successfully delivered" do
+    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+
+    {:ok, publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+
+    {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
+
+    assert length(Repo.all(PendingMessage)) == 1
+
+    expect(PubsubMock, :publish, fn "test-publisher", ^message ->
+      {:ok, %PublishResponse{}}
+    end)
+
+    Pubsub.run(publisher.target, publisher.id, message)
+    assert length(Repo.all(PendingMessage)) == 0
   end
 end
