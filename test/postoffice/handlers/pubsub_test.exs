@@ -6,6 +6,7 @@ defmodule Postoffice.Handlers.PubsubTest do
 
   alias GoogleApi.PubSub.V1.Model.PublishResponse
   alias Postoffice.Adapters.PubsubMock
+  alias Postoffice.Fixtures
   alias Postoffice.Handlers.Pubsub
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Message
@@ -87,7 +88,7 @@ defmodule Postoffice.Handlers.PubsubTest do
   end
 
   test "message is removed from pending messages when is successfully delivered" do
-    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+    topic = Fixtures.create_topic(@valid_topic_attrs)
 
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
@@ -102,5 +103,91 @@ defmodule Postoffice.Handlers.PubsubTest do
 
     Pubsub.run(publisher.target, publisher.id, message)
     assert length(Repo.all(PendingMessage)) == 0
+  end
+
+  test "remove only published messages for topic" do
+    topic = Fixtures.create_topic()
+
+    second_topic =
+      Fixtures.create_topic(%{
+        name: "test2",
+        origin_host: "example2.com",
+        recovery_enabled: false
+      })
+
+    {:ok, publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+
+    {:ok, second_publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, second_topic.id))
+
+    message = Fixtures.create_message(topic, @valid_message_attrs)
+
+    another_message =
+      Fixtures.create_message(second_topic, %{
+        @valid_message_attrs
+        | public_id: "7488a646-e31f-11e4-aace-600308960661"
+      })
+
+    assert length(Repo.all(PendingMessage)) == 2
+
+    expect(PubsubMock, :publish, fn "test-publisher", ^message ->
+      {:ok, %PublishResponse{}}
+    end)
+
+    Pubsub.run(publisher.target, publisher.id, message)
+    assert length(Repo.all(PendingMessage)) == 1
+
+    pending_message =
+      Messaging.list_pending_messages_for_publisher(second_publisher.id, second_topic.id)
+      |> List.first()
+
+    assert pending_message.id == another_message.id
+  end
+
+  test "remove only published messages from topic" do
+    topic = Fixtures.create_topic()
+
+    {:ok, publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+
+    message = Fixtures.create_message(topic, @valid_message_attrs)
+
+    another_message =
+      Fixtures.create_message(topic, %{
+        @valid_message_attrs
+        | public_id: "7488a646-e31f-11e4-aace-600308960661"
+      })
+
+    assert length(Repo.all(PendingMessage)) == 2
+
+    expect(PubsubMock, :publish, fn "test-publisher", ^message ->
+      {:ok, %PublishResponse{}}
+    end)
+
+    Pubsub.run(publisher.target, publisher.id, message)
+    assert length(Repo.all(PendingMessage)) == 1
+
+    pending_message =
+      Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
+      |> List.first()
+
+    assert pending_message.id == another_message.id
+  end
+
+  test "do not remove pending message when can't deliver message" do
+    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+
+    {:ok, publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+
+    {:ok, message} = Messaging.create_message(topic, @valid_message_attrs)
+
+    expect(PubsubMock, :publish, fn "test-publisher", ^message ->
+      {:error, "Not able to deliver"}
+    end)
+
+    Pubsub.run(publisher.target, publisher.id, message)
+    assert length(Repo.all(PendingMessage)) == 1
   end
 end
