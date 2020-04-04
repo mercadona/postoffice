@@ -9,7 +9,6 @@ defmodule Postoffice.Messaging.Topic do
 
     has_many :consumers, Postoffice.Messaging.Publisher
     has_many :messages, Postoffice.Messaging.Message
-    has_many :pending_messages, Postoffice.Messaging.PendingMessage
 
     timestamps()
   end
