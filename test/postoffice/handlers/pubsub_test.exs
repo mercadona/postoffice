@@ -17,6 +17,11 @@ defmodule Postoffice.Handlers.PubsubTest do
     payload: %{"key" => "value"},
     public_id: "7488a646-e31f-11e4-aace-600308960662"
   }
+  @another_valid_message_attrs %{
+    attributes: %{"attr" => "some_value"},
+    payload: %{"key" => "value"},
+    public_id: "7488a646-e31f-11e4-aace-600308960661"
+  }
   @valid_publisher_attrs %{
     active: true,
     topic: "test-publisher",
@@ -95,10 +100,9 @@ defmodule Postoffice.Handlers.PubsubTest do
   test "message is removed from pending messages when is successfully delivered" do
     topic = Fixtures.create_topic(@valid_topic_attrs)
 
-    {:ok, publisher} =
-      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+    publisher = Fixtures.create_publisher(topic, @valid_publisher_attrs)
 
-    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+    message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 1
 
@@ -120,19 +124,10 @@ defmodule Postoffice.Handlers.PubsubTest do
         recovery_enabled: false
       })
 
-    {:ok, publisher} =
-      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
-
-    {:ok, second_publisher} =
-      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, second_topic.id))
-
+    publisher = Fixtures.create_publisher(topic, @valid_publisher_attrs)
+    second_publisher = Fixtures.create_publisher(second_topic, @valid_publisher_attrs)
     message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
-
-    another_message =
-      Fixtures.add_message_to_deliver(second_topic, %{
-        @valid_message_attrs
-        | public_id: "7488a646-e31f-11e4-aace-600308960661"
-      })
+    another_message = Fixtures.add_message_to_deliver(second_topic, @another_valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 2
 
@@ -152,17 +147,9 @@ defmodule Postoffice.Handlers.PubsubTest do
 
   test "remove only published messages from topic" do
     topic = Fixtures.create_topic()
-
-    {:ok, publisher} =
-      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
-
+    publisher = Fixtures.create_publisher(topic, @valid_publisher_attrs)
     message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
-
-    another_message =
-      Fixtures.add_message_to_deliver(topic, %{
-        @valid_message_attrs
-        | public_id: "7488a646-e31f-11e4-aace-600308960661"
-      })
+    another_message = Fixtures.add_message_to_deliver(topic, @another_valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 2
 
@@ -181,12 +168,9 @@ defmodule Postoffice.Handlers.PubsubTest do
   end
 
   test "do not remove pending message when can't deliver message" do
-    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
-
-    {:ok, publisher} =
-      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
-
-    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+    topic = Fixtures.create_topic(@valid_topic_attrs)
+    publisher = Fixtures.create_publisher(topic, @valid_publisher_attrs)
+    message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
 
     expect(PubsubMock, :publish, fn "test-publisher", ^message ->
       {:error, "Not able to deliver"}
