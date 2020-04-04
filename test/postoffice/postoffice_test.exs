@@ -28,7 +28,7 @@ defmodule Postoffice.PostofficeTest do
 
     test "count_messages returns number of created messages" do
       topic = Fixtures.create_topic()
-      Fixtures.create_message(topic)
+      Fixtures.add_message_to_consume(topic)
 
       assert Postoffice.count_received_messages() == 1
     end
@@ -40,7 +40,7 @@ defmodule Postoffice.PostofficeTest do
     test "count_published_messages returns number of published messages" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.create_message(topic)
+      message = Fixtures.add_message_to_consume(topic)
       Fixtures.create_publisher_success(message, publisher)
 
       assert Postoffice.count_published_messages() == 1
@@ -53,7 +53,7 @@ defmodule Postoffice.PostofficeTest do
     test "count_publishers_failures returns number of failed messages" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.create_message(topic)
+      message = Fixtures.add_message_to_consume(topic)
       Fixtures.create_publishers_failure(message, publisher)
 
       assert Postoffice.count_publishers_failures() == 1
@@ -87,7 +87,7 @@ defmodule Postoffice.PostofficeTest do
 
     test "create_publisher to consume messages from_now" do
       topic = Fixtures.create_topic()
-      message = Fixtures.create_message(topic)
+      message = Fixtures.add_message_to_consume(topic)
       external_publisher_attrs = Map.put(@external_publisher_attrs, "topic_id", topic.id)
       external_publisher_attrs = Map.put(external_publisher_attrs, "from_now", "true")
 
@@ -105,14 +105,14 @@ defmodule Postoffice.PostofficeTest do
 
     test "get_message by id returns asked message" do
       topic = Fixtures.create_topic()
-      message = Fixtures.create_message(topic)
+      message = Fixtures.add_message_to_consume(topic)
 
       assert Postoffice.get_message(message.id).id == message.id
     end
 
     test "get_message_success returns list with success for this message" do
       topic = Fixtures.create_topic()
-      message = Fixtures.create_message(topic)
+      message = Fixtures.add_message_to_consume(topic)
       publisher = Fixtures.create_publisher(topic)
       Fixtures.create_publisher_success(message, publisher)
 
@@ -123,7 +123,7 @@ defmodule Postoffice.PostofficeTest do
 
     test "get_message_failures returns list with failures for this message" do
       topic = Fixtures.create_topic()
-      message = Fixtures.create_message(topic)
+      message = Fixtures.add_message_to_consume(topic)
       publisher = Fixtures.create_publisher(topic)
       Fixtures.create_publishers_failure(message, publisher)
 

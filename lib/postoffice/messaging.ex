@@ -53,14 +53,14 @@ defmodule Postoffice.Messaging do
 
   ## Examples
 
-      iex> create_message(%{field: value})
+      iex> add_message_to_consume(%{field: value})
       {:ok, %Message{}}
 
-      iex> create_message(%{field: bad_value})
+      iex> add_message_to_consume(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_message(topic, attrs \\ %{}) do
+  def add_message_to_consume(topic, attrs \\ %{}) do
     topic =
       topic
       |> Repo.preload(:consumers)
