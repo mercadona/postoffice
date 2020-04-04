@@ -141,16 +141,16 @@ defmodule Postoffice.Messaging do
     |> Ecto.Multi.insert(:publisher_success, create_publisher_success(message_information))
     |> Ecto.Multi.delete_all(
       :sessions,
-      delete_pending_message(message_information.message_id, message_information.publisher_id)
+      delete_pending_message(message_information)
     )
     |> Repo.transaction()
 
     {:ok, :finished}
   end
 
-  defp delete_pending_message(message_id, publisher_id) do
+  defp delete_pending_message(message_information) do
     from(p in PendingMessage,
-      where: p.publisher_id == ^publisher_id and p.message_id == ^message_id
+      where: p.publisher_id == ^message_information.publisher_id and p.message_id == ^message_information.message_id
     )
   end
 
