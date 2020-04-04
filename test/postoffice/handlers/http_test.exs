@@ -27,6 +27,12 @@ defmodule Postoffice.Handlers.HttpTest do
     origin_host: "example.com"
   }
 
+  @another_valid_message_attrs %{
+    attributes: %{},
+    payload: %{},
+    public_id: "7488a646-e31f-11e4-aace-600308960661"
+  }
+
   setup [:set_mox_from_context, :verify_on_exit!]
 
   setup do
@@ -71,8 +77,9 @@ defmodule Postoffice.Handlers.HttpTest do
   end
 
   test "message is removed from pending messages when is successfully delivered" do
-    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+    topic = Fixtures.create_topic(@valid_topic_attrs)
     publisher = Fixtures.create_publisher(topic)
+
     {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 1
@@ -90,12 +97,7 @@ defmodule Postoffice.Handlers.HttpTest do
     publisher = Fixtures.create_publisher(topic)
 
     message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
-
-    another_message =
-      Fixtures.add_message_to_deliver(topic, %{
-        @valid_message_attrs
-        | public_id: "7488a646-e31f-11e4-aace-600308960661"
-      })
+    another_message = Fixtures.add_message_to_deliver(topic, @another_valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 2
 
@@ -134,12 +136,7 @@ defmodule Postoffice.Handlers.HttpTest do
       })
 
     message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
-
-    another_message =
-      Fixtures.add_message_to_deliver(second_topic, %{
-        @valid_message_attrs
-        | public_id: "7488a646-e31f-11e4-aace-600308960661"
-      })
+    another_message = Fixtures.add_message_to_deliver(second_topic, @another_valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 2
 
@@ -178,10 +175,8 @@ defmodule Postoffice.Handlers.HttpTest do
   end
 
   test "do not remove pending message when can't deliver message" do
-    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
-
-    {:ok, publisher} =
-      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+    topic = Fixtures.create_topic(@valid_topic_attrs)
+    publisher = Fixtures.create_publisher(topic, @valid_publisher_attrs)
 
     {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
