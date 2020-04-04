@@ -16,7 +16,7 @@ defmodule Postoffice do
         {:relationship_does_not_exists, %{topic: ["is invalid"]}}
 
       topic ->
-        Messaging.add_message_to_consume(
+        Messaging.add_message_to_deliver(
           topic,
           Map.put_new(message_params, "public_id", Ecto.UUID.generate())
         )

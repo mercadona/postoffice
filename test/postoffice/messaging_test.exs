@@ -37,7 +37,7 @@ defmodule Postoffice.MessagingTest do
   describe "messages" do
     test "list_messages/0 returns all messages" do
       topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
 
       assert Messaging.list_messages() == [message]
     end
@@ -48,10 +48,10 @@ defmodule Postoffice.MessagingTest do
 
     test "list_messages/1 returns limited messages list" do
       topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
 
       _second_message =
-        Fixtures.add_message_to_consume(topic, %{
+        Fixtures.add_message_to_deliver(topic, %{
           @message_attrs
           | public_id: "7488a646-e31f-11e4-aace-600308960661"
         })
@@ -61,23 +61,23 @@ defmodule Postoffice.MessagingTest do
 
     test "get_message!/1 returns the message with given id" do
       topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
       message_found = Messaging.get_message!(message.id)
 
       assert message.id == message_found.id
     end
 
-    test "create_message/1 with valid data creates a message" do
+    test "add_message_to_deliver/1 with valid data creates a message" do
       topic = Fixtures.create_topic()
 
-      assert {:ok, %Message{} = message} = Messaging.add_message_to_consume(topic, @message_attrs)
+      assert {:ok, %Message{} = message} = Messaging.add_message_to_deliver(topic, @message_attrs)
       assert message.attributes == %{}
       assert message.payload == %{}
       assert message.public_id == "7488a646-e31f-11e4-aace-600308960662"
       assert message.topic_id == topic.id
     end
 
-    test "create_message/1 with valid data creates a pending message" do
+    test "add_message_to_deliver/1 with valid data creates a pending message" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
 
@@ -89,7 +89,7 @@ defmodule Postoffice.MessagingTest do
           type: "pubsub"
         })
 
-      {_, message} = Messaging.add_message_to_consume(topic, @message_attrs)
+      {_, message} = Messaging.add_message_to_deliver(topic, @message_attrs)
 
       assert length(Repo.all(PendingMessage)) == 2
 
@@ -104,7 +104,7 @@ defmodule Postoffice.MessagingTest do
       assert pending_message.id == message.id
     end
 
-    test "create_message/1 with valid data do not create pending message if have not associated publisher" do
+    test "add_message_to_deliver/1 with valid data do not create pending message if have not associated publisher" do
       topic = Fixtures.create_topic()
       second_topic = Fixtures.create_topic(@second_topic_attrs)
 
@@ -118,26 +118,26 @@ defmodule Postoffice.MessagingTest do
         }
       )
 
-      Messaging.add_message_to_consume(topic, @message_attrs)
+      Messaging.add_message_to_deliver(topic, @message_attrs)
 
       assert length(Repo.all(PendingMessage)) == 0
     end
 
-    test "create_message/1 with valid data do not create pending message if do not exists any publisher" do
+    test "add_message_to_deliver/1 with valid data do not create pending message if do not exists any publisher" do
       topic = Fixtures.create_topic()
 
-      Messaging.add_message_to_consume(topic, @message_attrs)
+      Messaging.add_message_to_deliver(topic, @message_attrs)
 
       assert length(Repo.all(PendingMessage)) == 0
     end
 
-    test "create_message/1 with invalid data returns error changeset" do
+    test "add_message_to_deliver/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} =
-               Messaging.add_message_to_consume(Fixtures.create_topic(), @invalid_message_attrs)
+               Messaging.add_message_to_deliver(Fixtures.create_topic(), @invalid_message_attrs)
     end
 
-    test "create_message/1 with invalid data do not create pending message" do
-      Messaging.add_message_to_consume(Fixtures.create_topic(), @invalid_message_attrs)
+    test "add_message_to_deliver/1 with invalid data do not create pending message" do
+      Messaging.add_message_to_deliver(Fixtures.create_topic(), @invalid_message_attrs)
 
       assert length(Repo.all(PendingMessage)) == 0
     end
@@ -193,7 +193,7 @@ defmodule Postoffice.MessagingTest do
 
     test "get_message_by_uuid returns message is found" do
       topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
       searched_message = Messaging.get_message_by_uuid(message.public_id)
 
       assert message.id == searched_message.id
@@ -212,7 +212,7 @@ defmodule Postoffice.MessagingTest do
 
       second_topic = Fixtures.create_topic(@second_topic_attrs)
       _second_publisher = Fixtures.create_publisher(second_topic, @second_publisher_attrs)
-      _message = Fixtures.add_message_to_consume(second_topic)
+      _message = Fixtures.add_message_to_deliver(second_topic)
 
       assert Messaging.list_pending_messages_for_publisher(publisher.id, topic.id) == []
     end
@@ -220,7 +220,7 @@ defmodule Postoffice.MessagingTest do
     test "list_pending_messages_for_publisher/2 returns messages for a given publisher and topic" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
 
       pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
 
@@ -233,13 +233,13 @@ defmodule Postoffice.MessagingTest do
     test "list_pending_messages_for_publisher/2 returns messages for a given publisher and topic when there are pending messages for other topics" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
 
       second_topic = Fixtures.create_topic(@second_topic_attrs)
       Fixtures.create_publisher(second_topic, @second_publisher_attrs)
 
       _second_message =
-        Fixtures.add_message_to_consume(
+        Fixtures.add_message_to_deliver(
           second_topic,
           Map.put(@message_attrs, :public_id, "2d823585-68f8-49cd-89c0-07c1572572c1")
         )
@@ -270,7 +270,7 @@ defmodule Postoffice.MessagingTest do
 
     test "count_messages returns number of created messages" do
       topic = Fixtures.create_topic()
-      _message = Fixtures.add_message_to_consume(topic)
+      _message = Fixtures.add_message_to_deliver(topic)
 
       assert Messaging.count_messages() == 1
     end
@@ -294,7 +294,7 @@ defmodule Postoffice.MessagingTest do
     test "count_published_messages returns number of published messages" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
       Fixtures.create_publisher_success(message, publisher)
 
       assert Messaging.count_published_messages() == 1
@@ -307,7 +307,7 @@ defmodule Postoffice.MessagingTest do
     test "count_publishers_failures returns number of failed messages" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
       Fixtures.create_publishers_failure(message, publisher)
 
       assert Messaging.count_publishers_failures() == 1
@@ -330,14 +330,14 @@ defmodule Postoffice.MessagingTest do
 
     test "no publisher_success is returned for a non processed message" do
       topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
 
       assert Messaging.get_publisher_success_for_message(message.id) == []
     end
 
     test "publisher_success for a processed messaged is returned" do
       topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
       publisher = Fixtures.create_publisher(topic)
       _publisher_success = Fixtures.create_publisher_success(message, publisher)
 
@@ -351,14 +351,14 @@ defmodule Postoffice.MessagingTest do
 
     test "no publisher_failures is returned for a non processed message" do
       topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
 
       assert Messaging.get_publisher_failures_for_message(message.id) == []
     end
 
     test "publisher_failures for a processed messaged is returned" do
       topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_consume(topic)
+      message = Fixtures.add_message_to_deliver(topic)
       publisher = Fixtures.create_publisher(topic)
       _publisher_failures = Fixtures.create_publishers_failure(message, publisher)
 

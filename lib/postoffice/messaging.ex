@@ -49,18 +49,18 @@ defmodule Postoffice.Messaging do
   end
 
   @doc """
-  Creates a message.
+  Add a message to deliver marking this as pending.
 
   ## Examples
 
-      iex> add_message_to_consume(%{field: value})
+      iex> add_message_to_deliver(%{field: value})
       {:ok, %Message{}}
 
-      iex> add_message_to_consume(%{field: bad_value})
+      iex> add_message_to_deliver(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def add_message_to_consume(topic, attrs \\ %{}) do
+  def add_message_to_deliver(topic, attrs \\ %{}) do
     topic =
       topic
       |> Repo.preload(:consumers)

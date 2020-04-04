@@ -35,7 +35,7 @@ defmodule Postoffice.Handlers.HttpTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    {:ok, message} = Messaging.add_message_to_consume(topic, @valid_message_attrs)
+    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     expect(HttpMock, :publish, fn "http://fake.target", ^message ->
       {:ok, %HTTPoison.Response{status_code: 404}}
@@ -56,7 +56,7 @@ defmodule Postoffice.Handlers.HttpTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    {:ok, message} = Messaging.add_message_to_consume(topic, @valid_message_attrs)
+    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     expect(HttpMock, :publish, fn "http://fake.target", ^message ->
       {:ok, %HTTPoison.Response{status_code: 201}}
@@ -69,7 +69,7 @@ defmodule Postoffice.Handlers.HttpTest do
   test "message is removed from pending messages when is successfully delivered" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
     publisher = Fixtures.create_publisher(topic)
-    {:ok, message} = Messaging.add_message_to_consume(topic, @valid_message_attrs)
+    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 1
 
@@ -85,10 +85,10 @@ defmodule Postoffice.Handlers.HttpTest do
     topic = Fixtures.create_topic()
     publisher = Fixtures.create_publisher(topic)
 
-    message = Fixtures.add_message_to_consume(topic, @valid_message_attrs)
+    message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
 
     another_message =
-      Fixtures.add_message_to_consume(topic, %{
+      Fixtures.add_message_to_deliver(topic, %{
         @valid_message_attrs
         | public_id: "7488a646-e31f-11e4-aace-600308960661"
       })
@@ -127,10 +127,10 @@ defmodule Postoffice.Handlers.HttpTest do
         type: "http"
       })
 
-    message = Fixtures.add_message_to_consume(topic, @valid_message_attrs)
+    message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
 
     another_message =
-      Fixtures.add_message_to_consume(second_topic, %{
+      Fixtures.add_message_to_deliver(second_topic, %{
         @valid_message_attrs
         | public_id: "7488a646-e31f-11e4-aace-600308960661"
       })
@@ -155,7 +155,7 @@ defmodule Postoffice.Handlers.HttpTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    {:ok, message} = Messaging.add_message_to_consume(topic, @valid_message_attrs)
+    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     expect(HttpMock, :publish, fn "http://fake.target", ^message ->
       {:error, %HTTPoison.Error{reason: "test error reason"}}
@@ -175,7 +175,7 @@ defmodule Postoffice.Handlers.HttpTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    {:ok, message} = Messaging.add_message_to_consume(topic, @valid_message_attrs)
+    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     expect(HttpMock, :publish, fn "http://fake.target", ^message ->
       {:error, %HTTPoison.Error{reason: "test error reason"}}
@@ -191,7 +191,7 @@ defmodule Postoffice.Handlers.HttpTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    {:ok, message} = Messaging.add_message_to_consume(topic, @valid_message_attrs)
+    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     expect(HttpMock, :publish, fn "http://fake.target", ^message ->
       {:ok, %HTTPoison.Response{status_code: 300}}

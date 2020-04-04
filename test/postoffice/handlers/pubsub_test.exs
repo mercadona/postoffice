@@ -57,7 +57,7 @@ defmodule Postoffice.Handlers.PubsubTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    {:ok, message} = Messaging.add_message_to_consume(topic, @valid_message_attrs)
+    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     expect(PubsubMock, :publish, fn "test-publisher", ^message ->
       {:ok, %PublishResponse{}}
@@ -73,7 +73,7 @@ defmodule Postoffice.Handlers.PubsubTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    {:ok, message} = Messaging.add_message_to_consume(topic, @valid_message_attrs)
+    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     expect(PubsubMock, :publish, fn "test-publisher", ^message ->
       {:error, "Not able to deliver"}
@@ -93,7 +93,7 @@ defmodule Postoffice.Handlers.PubsubTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    {:ok, message} = Messaging.add_message_to_consume(topic, @valid_message_attrs)
+    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 1
 
@@ -121,10 +121,10 @@ defmodule Postoffice.Handlers.PubsubTest do
     {:ok, second_publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, second_topic.id))
 
-    message = Fixtures.add_message_to_consume(topic, @valid_message_attrs)
+    message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
 
     another_message =
-      Fixtures.add_message_to_consume(second_topic, %{
+      Fixtures.add_message_to_deliver(second_topic, %{
         @valid_message_attrs
         | public_id: "7488a646-e31f-11e4-aace-600308960661"
       })
@@ -151,10 +151,10 @@ defmodule Postoffice.Handlers.PubsubTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    message = Fixtures.add_message_to_consume(topic, @valid_message_attrs)
+    message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
 
     another_message =
-      Fixtures.add_message_to_consume(topic, %{
+      Fixtures.add_message_to_deliver(topic, %{
         @valid_message_attrs
         | public_id: "7488a646-e31f-11e4-aace-600308960661"
       })
@@ -181,7 +181,7 @@ defmodule Postoffice.Handlers.PubsubTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    {:ok, message} = Messaging.add_message_to_consume(topic, @valid_message_attrs)
+    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
     expect(PubsubMock, :publish, fn "test-publisher", ^message ->
       {:error, "Not able to deliver"}

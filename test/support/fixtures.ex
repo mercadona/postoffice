@@ -25,8 +25,8 @@ defmodule Postoffice.Fixtures do
     type: "http"
   }
 
-  def add_message_to_consume(topic, attrs \\ @message_attrs) do
-    {:ok, message} = Messaging.add_message_to_consume(topic, attrs)
+  def add_message_to_deliver(topic, attrs \\ @message_attrs) do
+    {:ok, message} = Messaging.add_message_to_deliver(topic, attrs)
 
     message
   end
