@@ -136,7 +136,7 @@ defmodule Postoffice.Messaging do
     |> PublisherSuccess.changeset(attrs)
   end
 
-  def mark_message_as_success(message_information) do
+  def mark_message_as_delivered(message_information) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:publisher_success, create_publisher_success(message_information))
     |> Ecto.Multi.delete_all(
