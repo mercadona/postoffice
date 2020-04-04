@@ -110,7 +110,7 @@ defmodule Postoffice.Messaging do
         limit \\ 500
       ) do
     pending_messages =
-      from(pm in PendingMessage, where: pm.publisher_id == ^publisher_id, preload: [:message])
+      from(pm in PendingMessage, where: pm.publisher_id == ^publisher_id, limit: ^limit, preload: [:message])
       |> Repo.all()
 
     Enum.map(pending_messages, fn pending_message -> pending_message.message end)
