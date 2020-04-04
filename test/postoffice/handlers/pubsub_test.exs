@@ -1,6 +1,5 @@
 defmodule Postoffice.Handlers.PubsubTest do
   use ExUnit.Case
-  use Postoffice.DataCase
 
   import Mox
 
@@ -11,6 +10,7 @@ defmodule Postoffice.Handlers.PubsubTest do
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Message
   alias Postoffice.Messaging.PendingMessage
+  alias Postoffice.Repo
 
   @valid_message_attrs %{
     attributes: %{"attr" => "some_value"},
@@ -28,7 +28,12 @@ defmodule Postoffice.Handlers.PubsubTest do
     name: "test-publisher",
     origin_host: "example.com"
   }
+
   setup [:set_mox_from_context, :verify_on_exit!]
+
+  setup do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Postoffice.Repo)
+  end
 
   test "no message_success when some error raised from pubsub" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)

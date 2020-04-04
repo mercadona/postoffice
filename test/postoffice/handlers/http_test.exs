@@ -1,6 +1,5 @@
 defmodule Postoffice.Handlers.HttpTest do
   use ExUnit.Case
-  use Postoffice.DataCase
 
   import Mox
 
@@ -8,6 +7,7 @@ defmodule Postoffice.Handlers.HttpTest do
   alias Postoffice.Handlers.Http
   alias Postoffice.Messaging
   alias Postoffice.Messaging.PendingMessage
+  alias Postoffice.Repo
   alias Postoffice.Fixtures
 
   @valid_message_attrs %{
@@ -28,6 +28,10 @@ defmodule Postoffice.Handlers.HttpTest do
   }
 
   setup [:set_mox_from_context, :verify_on_exit!]
+
+  setup do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Postoffice.Repo)
+  end
 
   test "no message_success when target target not found" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)

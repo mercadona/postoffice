@@ -140,7 +140,7 @@ defmodule Postoffice.Messaging do
     Ecto.Multi.new()
     |> Ecto.Multi.insert(:publisher_success, create_publisher_success(message_information))
     |> Ecto.Multi.delete_all(
-      :sessions,
+      :pending_messages,
       delete_pending_message(message_information)
     )
     |> Repo.transaction()
