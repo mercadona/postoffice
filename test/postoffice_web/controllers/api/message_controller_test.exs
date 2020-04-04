@@ -15,12 +15,6 @@ defmodule PostofficeWeb.Api.MessageControllerTest do
     topic: "no_topic"
   }
 
-  def fixture(:message) do
-    {:ok, topic} = Messaging.create_topic(%{name: "test", origin_host: "example.com", id: 1})
-    {:ok, message} = Messaging.create_message(topic, @create_attrs)
-    message
-  end
-
   setup %{conn: conn} do
     {:ok, _topic} = Messaging.create_topic(%{name: "test", origin_host: "example.com"})
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
