@@ -80,43 +80,29 @@ defmodule Postoffice.MessagingTest do
     test "add_message_to_deliver/1 with valid data creates a pending message" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-
-      second_publisher =
-        Fixtures.create_publisher(topic, %{
-          active: true,
-          target: "some-topic",
-          initial_message: 0,
-          type: "pubsub"
-        })
+      second_publisher = Fixtures.create_publisher(topic, @second_publisher_attrs)
 
       {_, message} = Messaging.add_message_to_deliver(topic, @message_attrs)
 
       assert length(Repo.all(PendingMessage)) == 2
 
-      pending_message =
+      first_pending_message =
         Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
         |> List.first()
-      assert pending_message.id == message.id
 
-      pending_message =
+      assert first_pending_message.id == message.id
+
+      second_pending_message =
         Messaging.list_pending_messages_for_publisher(second_publisher.id, topic.id)
         |> List.first()
-      assert pending_message.id == message.id
+
+      assert second_pending_message.id == message.id
     end
 
     test "add_message_to_deliver/1 with valid data do not create pending message if have not associated publisher" do
       topic = Fixtures.create_topic()
       second_topic = Fixtures.create_topic(@second_topic_attrs)
-
-      Fixtures.create_publisher(
-        second_topic,
-        %{
-          active: true,
-          target: "some_target.com",
-          initial_message: 0,
-          type: "http"
-        }
-      )
+      Fixtures.create_publisher(second_topic, @second_publisher_attrs)
 
       Messaging.add_message_to_deliver(topic, @message_attrs)
 

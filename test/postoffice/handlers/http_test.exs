@@ -101,9 +101,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     Http.run(publisher.target, publisher.id, message)
     assert length(Repo.all(PendingMessage)) == 1
+
     pending_message =
       Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
       |> List.first()
+
     assert pending_message.id == another_message.id
   end
 
@@ -143,9 +145,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     Http.run(publisher.target, publisher.id, message)
     assert length(Repo.all(PendingMessage)) == 1
+
     pending_message =
       Messaging.list_pending_messages_for_publisher(second_publisher.id, topic.id)
       |> List.first()
+
     assert pending_message.id == another_message.id
   end
 
