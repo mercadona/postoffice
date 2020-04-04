@@ -101,9 +101,10 @@ defmodule Postoffice.Handlers.HttpTest do
 
     Http.run(publisher.target, publisher.id, message)
     assert length(Repo.all(PendingMessage)) == 1
-    pending_message = get_pending_message_for(publisher.id)
-    assert pending_message.message_id == another_message.id
-    assert pending_message.publisher_id == publisher.id
+    pending_message =
+      Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
+      |> List.first()
+    assert pending_message.id == another_message.id
   end
 
   test "remove only published messages for topic" do
@@ -142,9 +143,10 @@ defmodule Postoffice.Handlers.HttpTest do
 
     Http.run(publisher.target, publisher.id, message)
     assert length(Repo.all(PendingMessage)) == 1
-    pending_message = get_pending_message_for(second_publisher.id)
-    assert pending_message.message_id == another_message.id
-    assert pending_message.publisher_id == second_publisher.id
+    pending_message =
+      Messaging.list_pending_messages_for_publisher(second_publisher.id, topic.id)
+      |> List.first()
+    assert pending_message.id == another_message.id
   end
 
   test "message_failure is created for publisher if any error happens" do
@@ -201,14 +203,5 @@ defmodule Postoffice.Handlers.HttpTest do
 
     assert message_failure.reason ==
              "Error trying to process message from HttpConsumer with status_code: 300"
-  end
-
-  defp get_pending_message_for(publisher_id) do
-    from(pm in PendingMessage,
-      where: pm.publisher_id == ^publisher_id,
-      order_by: [desc: :id],
-      limit: 1
-    )
-    |> Repo.one()
   end
 end
