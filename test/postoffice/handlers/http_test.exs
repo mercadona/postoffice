@@ -79,8 +79,7 @@ defmodule Postoffice.Handlers.HttpTest do
   test "message is removed from pending messages when is successfully delivered" do
     topic = Fixtures.create_topic(@valid_topic_attrs)
     publisher = Fixtures.create_publisher(topic)
-
-    {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+    message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
 
     assert length(Repo.all(PendingMessage)) == 1
 
@@ -95,7 +94,6 @@ defmodule Postoffice.Handlers.HttpTest do
   test "remove only published messages from topic" do
     topic = Fixtures.create_topic()
     publisher = Fixtures.create_publisher(topic)
-
     message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
     another_message = Fixtures.add_message_to_deliver(topic, @another_valid_message_attrs)
 
