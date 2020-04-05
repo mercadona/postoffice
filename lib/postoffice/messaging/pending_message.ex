@@ -15,6 +15,5 @@ defmodule Postoffice.Messaging.PendingMessage do
     |> cast(attrs, [:publisher_id, :message_id])
     |> validate_required([:publisher_id, :message_id])
     |> unique_constraint(:publisher_id, name: :index_publisher_and_message)
-
   end
 end

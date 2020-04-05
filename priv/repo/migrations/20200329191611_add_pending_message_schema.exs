@@ -9,6 +9,8 @@ defmodule Postoffice.Repo.Migrations.AddPendingMessageSchema do
       timestamps()
     end
 
-    create unique_index(:pending_messages, [:publisher_id, :message_id], name: :index_publisher_and_message)
+    create unique_index(:pending_messages, [:publisher_id, :message_id],
+             name: :index_publisher_and_message
+           )
   end
 end

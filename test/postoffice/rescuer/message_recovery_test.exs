@@ -57,7 +57,9 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
       MessageRecovery.run(@origin_host)
-      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)) == 1
+
+      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)) ==
+               1
     end
 
     test "more than one message is created if multiple undelivered messages found" do
@@ -78,7 +80,6 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       assert Kernel.length(Messaging.list_messages()) == 2
     end
 
-
     test "more than one message is created as pending if multiple undelivered messages found" do
       expect(HttpMock, :list, fn @origin_host ->
         {:ok, %HTTPoison.Response{status_code: 200, body: @two_messages_response}}
@@ -95,7 +96,9 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
       MessageRecovery.run(@origin_host)
-      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)) == 2
+
+      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)) ==
+               2
     end
 
     test "no message created if something fails" do
@@ -115,7 +118,9 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
       MessageRecovery.run(@origin_host)
-      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)) == 0
+
+      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)) ==
+               0
     end
   end
 end

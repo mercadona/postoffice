@@ -33,7 +33,14 @@ defmodule Postoffice.MixProject do
   def application do
     [
       mod: {Postoffice.Application, []},
-      extra_applications: [:logger, :runtime_tools, :httpoison, :logger_json, :prometheus_phoenix, :prometheus_ecto]
+      extra_applications: [
+        :logger,
+        :runtime_tools,
+        :httpoison,
+        :logger_json,
+        :prometheus_phoenix,
+        :prometheus_ecto
+      ]
     ]
   end
 
