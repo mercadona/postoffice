@@ -99,25 +99,19 @@ defmodule Postoffice.Messaging do
 
   ## Examples
 
-      iex> list_pending_messages_for_publisher(publisher_id, topic_id)
+      iex> list_pending_messages_for_publisher(publisher_id,)
       [%Message{}, ...]
 
   """
-  def list_pending_messages_for_publisher(
-        publisher_id,
-        topic_id,
-        initial_message \\ 0,
-        limit \\ 500
-      ) do
+  def list_pending_messages_for_publisher(publisher_id, limit \\ 300) do
     pending_messages =
       from(pm in PendingMessage,
         where: pm.publisher_id == ^publisher_id,
         limit: ^limit,
-        preload: [:message]
+        preload: [:message, :publisher]
       )
       |> Repo.all()
 
-    Enum.map(pending_messages, fn pending_message -> pending_message.message end)
   end
 
   def list_topics do
