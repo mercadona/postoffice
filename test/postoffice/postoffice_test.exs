@@ -1,5 +1,5 @@
 defmodule Postoffice.PostofficeTest do
-  use Postoffice.DataCase
+  use Postoffice.DataCase, async: true
 
   alias Postoffice
   alias Postoffice.Fixtures

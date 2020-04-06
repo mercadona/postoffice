@@ -1,5 +1,5 @@
 defmodule PostofficeWeb.TopicControllerTest do
-  use PostofficeWeb.ConnCase
+  use PostofficeWeb.ConnCase, async: true
 
   alias Postoffice.Fixtures
   alias Postoffice.Messaging

@@ -41,16 +41,11 @@ defmodule Postoffice.MessagesProducer do
     MessagesConsumerSupervisor.start_link(publisher.id, self())
 
     if :queue.len(queue) < 25 do
-      publisher_messages =
-        Messaging.list_pending_messages_for_publisher(
-          publisher.id,
-          publisher.topic_id,
-          publisher.initial_message,
-          500
-        )
+      pending_messages =
+        Messaging.list_pending_messages_for_publisher(publisher.id)
 
       queue =
-        Enum.reduce(publisher_messages, queue, fn publisher_message, acc ->
+        Enum.reduce(pending_messages, queue, fn publisher_message, acc ->
           :queue.in(publisher_message, acc)
         end)
 

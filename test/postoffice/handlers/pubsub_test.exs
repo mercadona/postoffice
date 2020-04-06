@@ -1,5 +1,5 @@
 defmodule Postoffice.Handlers.PubsubTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import Mox
 
@@ -139,10 +139,10 @@ defmodule Postoffice.Handlers.PubsubTest do
     assert length(Repo.all(PendingMessage)) == 1
 
     pending_message =
-      Messaging.list_pending_messages_for_publisher(second_publisher.id, second_topic.id)
+      Messaging.list_pending_messages_for_publisher(second_publisher.id)
       |> List.first()
 
-    assert pending_message.id == another_message.id
+    assert pending_message.message.id == another_message.id
   end
 
   test "remove only published messages from topic" do
@@ -161,10 +161,10 @@ defmodule Postoffice.Handlers.PubsubTest do
     assert length(Repo.all(PendingMessage)) == 1
 
     pending_message =
-      Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
+      Messaging.list_pending_messages_for_publisher(publisher.id)
       |> List.first()
 
-    assert pending_message.id == another_message.id
+    assert pending_message.message.id == another_message.id
   end
 
   test "do not remove pending message when can't deliver message" do

@@ -1,5 +1,5 @@
 defmodule PostofficeWeb.Api.HealthControllerTest do
-  use PostofficeWeb.ConnCase
+  use PostofficeWeb.ConnCase, async: true
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}

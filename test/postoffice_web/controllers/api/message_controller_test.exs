@@ -1,5 +1,5 @@
 defmodule PostofficeWeb.Api.MessageControllerTest do
-  use PostofficeWeb.ConnCase
+  use PostofficeWeb.ConnCase, async: true
 
   alias Postoffice.Messaging
 

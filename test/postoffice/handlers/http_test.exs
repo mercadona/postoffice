@@ -1,5 +1,5 @@
 defmodule Postoffice.Handlers.HttpTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import Mox
 
@@ -15,6 +15,7 @@ defmodule Postoffice.Handlers.HttpTest do
     payload: %{},
     public_id: "7488a646-e31f-11e4-aace-600308960662"
   }
+
   @valid_publisher_attrs %{
     active: true,
     target: "http://fake.target",
@@ -22,6 +23,7 @@ defmodule Postoffice.Handlers.HttpTest do
     type: "http",
     initial_message: 0
   }
+
   @valid_topic_attrs %{
     name: "test",
     origin_host: "example.com"
@@ -91,7 +93,7 @@ defmodule Postoffice.Handlers.HttpTest do
     assert length(Repo.all(PendingMessage)) == 0
   end
 
-  test "remove only published messages from topic" do
+  test "remove only published messages from publisher" do
     topic = Fixtures.create_topic()
     publisher = Fixtures.create_publisher(topic)
     message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
@@ -104,13 +106,12 @@ defmodule Postoffice.Handlers.HttpTest do
     end)
 
     Http.run(publisher.target, publisher.id, message)
-    assert length(Repo.all(PendingMessage)) == 1
 
-    pending_message =
-      Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
-      |> List.first()
-
-    assert pending_message.id == another_message.id
+    pending_messages =
+      Messaging.list_pending_messages_for_publisher(publisher.id)
+    assert Kernel.length(pending_messages) == 1
+    pending_message = List.first(pending_messages)
+    assert pending_message.message.id == another_message.id
   end
 
   test "remove only published messages for topic" do
@@ -146,10 +147,10 @@ defmodule Postoffice.Handlers.HttpTest do
     assert length(Repo.all(PendingMessage)) == 1
 
     pending_message =
-      Messaging.list_pending_messages_for_publisher(second_publisher.id, topic.id)
+      Messaging.list_pending_messages_for_publisher(second_publisher.id)
       |> List.first()
 
-    assert pending_message.id == another_message.id
+    assert pending_message.message.id == another_message.id
   end
 
   test "message_failure is created for publisher if any error happens" do

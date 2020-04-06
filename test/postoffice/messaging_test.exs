@@ -1,5 +1,5 @@
 defmodule Postoffice.MessagingTest do
-  use Postoffice.DataCase
+  use Postoffice.DataCase, async: true
 
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Message
@@ -87,16 +87,16 @@ defmodule Postoffice.MessagingTest do
       assert length(Repo.all(PendingMessage)) == 2
 
       first_pending_message =
-        Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
+        Messaging.list_pending_messages_for_publisher(publisher.id)
         |> List.first()
 
-      assert first_pending_message.id == message.id
+      assert first_pending_message.message.id == message.id
 
       second_pending_message =
-        Messaging.list_pending_messages_for_publisher(second_publisher.id, topic.id)
+        Messaging.list_pending_messages_for_publisher(second_publisher.id)
         |> List.first()
 
-      assert second_pending_message.id == message.id
+      assert second_pending_message.message.id == message.id
     end
 
     test "add_message_to_deliver/1 with valid data do not create pending message if have not associated publisher" do
@@ -189,7 +189,7 @@ defmodule Postoffice.MessagingTest do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
 
-      assert Messaging.list_pending_messages_for_publisher(publisher.id, topic.id) == []
+      assert Messaging.list_pending_messages_for_publisher(publisher.id) == []
     end
 
     test "list_pending_messages_for_publisher/2 returns empty if no pending messages for a given publisher but we have pending messages for other publisher" do
@@ -203,7 +203,7 @@ defmodule Postoffice.MessagingTest do
       assert Messaging.list_pending_messages_for_publisher(publisher.id, topic.id) == []
     end
 
-    test "list_pending_messages_for_publisher/2 returns messages for a given publisher and topic" do
+    test "list_pending_messages_for_publisher/2 returns messages for a given publisher" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
       message = Fixtures.add_message_to_deliver(topic)
@@ -212,30 +212,23 @@ defmodule Postoffice.MessagingTest do
 
       assert Kernel.length(pending_messages) == 1
       pending_message = List.first(pending_messages)
-      assert pending_message.id == message.id
-      assert pending_message.topic_id == topic.id
+      assert pending_message.message.id == message.id
+      assert pending_message.message.topic_id == topic.id
     end
 
-    test "list_pending_messages_for_publisher/2 returns messages for a given publisher and topic when there are pending messages for other topics" do
+    test "list_pending_messages_for_publisher/2 returns messages for a given publisher when there are pending messages for other publishers" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
       message = Fixtures.add_message_to_deliver(topic)
 
-      second_topic = Fixtures.create_topic(@second_topic_attrs)
-      Fixtures.create_publisher(second_topic, @second_publisher_attrs)
-
-      _second_message =
-        Fixtures.add_message_to_deliver(
-          second_topic,
-          Map.put(@message_attrs, :public_id, "2d823585-68f8-49cd-89c0-07c1572572c1")
-        )
+      Fixtures.create_publisher(topic, @second_publisher_attrs)
 
       pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)
 
       assert Kernel.length(pending_messages) == 1
       pending_message = List.first(pending_messages)
-      assert pending_message.id == message.id
-      assert pending_message.topic_id == topic.id
+      assert pending_message.message.id == message.id
+      assert pending_message.message.topic_id == topic.id
     end
   end
 

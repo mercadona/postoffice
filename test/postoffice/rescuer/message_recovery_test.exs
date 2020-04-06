@@ -1,5 +1,5 @@
 defmodule Postoffice.Rescuer.MessageRecoveryTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import Mox
 
@@ -58,7 +58,7 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       publisher = Fixtures.create_publisher(topic)
       MessageRecovery.run(@origin_host)
 
-      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)) ==
+      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id)) ==
                1
     end
 
@@ -97,7 +97,7 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       publisher = Fixtures.create_publisher(topic)
       MessageRecovery.run(@origin_host)
 
-      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)) ==
+      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id)) ==
                2
     end
 
@@ -119,7 +119,7 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       publisher = Fixtures.create_publisher(topic)
       MessageRecovery.run(@origin_host)
 
-      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id, topic.id)) ==
+      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id)) ==
                0
     end
   end

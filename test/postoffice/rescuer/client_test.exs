@@ -1,5 +1,5 @@
 defmodule Postoffice.Rescuer.ClientTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import Mox
 
