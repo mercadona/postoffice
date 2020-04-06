@@ -1,5 +1,5 @@
 defmodule PostofficeWeb.Api.PublisherControllerTest do
-  use PostofficeWeb.ConnCase
+  use PostofficeWeb.ConnCase, async: true
 
   import Ecto.Query, warn: false
 

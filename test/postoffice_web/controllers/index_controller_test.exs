@@ -1,5 +1,5 @@
 defmodule PostofficeWeb.IndexControllerTest do
-  use PostofficeWeb.ConnCase
+  use PostofficeWeb.ConnCase, async: true
 
   setup do
     {:ok, conn: Phoenix.ConnTest.build_conn()}

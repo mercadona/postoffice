@@ -8,6 +8,7 @@ defmodule Postoffice.Messaging do
   alias Postoffice.Repo
 
   alias Postoffice.Messaging.Message
+  alias Postoffice.Messaging.PendingMessage
   alias Postoffice.Messaging.Publisher
   alias Postoffice.Messaging.PublisherSuccess
   alias Postoffice.Messaging.PublisherFailures
@@ -48,21 +49,49 @@ defmodule Postoffice.Messaging do
   end
 
   @doc """
-  Creates a message.
+  Add a message to deliver marking this as pending.
 
   ## Examples
 
-      iex> create_message(%{field: value})
+      iex> add_message_to_deliver(%{field: value})
       {:ok, %Message{}}
 
-      iex> create_message(%{field: bad_value})
+      iex> add_message_to_deliver(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_message(topic, attrs \\ %{}) do
-    Ecto.build_assoc(topic, :messages, attrs)
-    |> Message.changeset(attrs)
-    |> Repo.insert()
+  def add_message_to_deliver(topic, attrs \\ %{}) do
+    topic =
+      topic
+      |> Repo.preload(:consumers)
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:message, build_message_changeset(topic, attrs))
+    |> Ecto.Multi.run(:pending_messages, fn _repo, %{message: message} ->
+      insert_pending_messages(topic.consumers, message)
+      {:ok, :multiple_insertion}
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, result} -> {:ok, result.message}
+      {:error, :message, changeset, %{}} -> {:error, changeset}
+    end
+  end
+
+  defp build_message_changeset(topic, message) do
+    Ecto.build_assoc(topic, :messages, message)
+    |> Message.changeset(message)
+  end
+
+  defp insert_pending_messages(consumers, message) do
+    Enum.each(consumers, fn consumer ->
+      %PendingMessage{publisher_id: consumer.id, message_id: message.id}
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_assoc(:publisher, consumer)
+      |> Ecto.Changeset.put_assoc(:message, message)
+      |> PendingMessage.changeset(%{})
+      |> Repo.insert!()
+    end)
   end
 
   @doc """
@@ -70,34 +99,15 @@ defmodule Postoffice.Messaging do
 
   ## Examples
 
-      iex> list_pending_messages_for_publisher(publisher_id, topic_id)
+      iex> list_pending_messages_for_publisher(publisher_id,)
       [%Message{}, ...]
 
   """
-  def list_pending_messages_for_publisher(
-        publisher_id,
-        topic_id,
-        initial_message \\ 0,
-        limit \\ 500
-      ) do
-    from(
-      publisher_success in PublisherSuccess,
-      right_join: messages in Message,
-      on:
-        publisher_success.publisher_id == ^publisher_id and
-          publisher_success.message_id == messages.id,
-      join: publishers in Publisher,
-      on: publishers.id == ^publisher_id,
-      select: messages,
-      where: is_nil(publisher_success.id),
-      where: messages.id > ^initial_message,
-      where: messages.topic_id == ^topic_id,
+  def list_pending_messages_for_publisher(publisher_id, limit \\ 300) do
+    from(pm in PendingMessage,
+      where: pm.publisher_id == ^publisher_id,
       limit: ^limit,
-      select_merge: %{
-        publisher_id: publishers.id,
-        publisher_type: publishers.type,
-        publisher_target: publishers.target
-      }
+      preload: [:message, :publisher]
     )
     |> Repo.all()
   end
@@ -120,7 +130,26 @@ defmodule Postoffice.Messaging do
   def create_publisher_success(attrs \\ %{}) do
     %PublisherSuccess{}
     |> PublisherSuccess.changeset(attrs)
-    |> Repo.insert()
+  end
+
+  def mark_message_as_delivered(message_information) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert(:publisher_success, create_publisher_success(message_information))
+    |> Ecto.Multi.delete_all(
+      :pending_messages,
+      delete_pending_message(message_information)
+    )
+    |> Repo.transaction()
+
+    {:ok, :finished}
+  end
+
+  defp delete_pending_message(message_information) do
+    from(p in PendingMessage,
+      where:
+        p.publisher_id == ^message_information.publisher_id and
+          p.message_id == ^message_information.message_id
+    )
   end
 
   def list_publisher_success(publisher_id) do

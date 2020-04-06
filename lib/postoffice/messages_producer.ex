@@ -10,9 +10,7 @@ defmodule Postoffice.MessagesProducer do
   @check_empty_queue_time 1000 * 4
 
   def start_link(publisher) do
-    Logger.info("Starting messages producer for publisher", [
-      {:postoffice_extra, {:publisher_id, publisher.id}}
-    ])
+    Logger.info("Starting messages producer for publisher", publisher_id: publisher.id)
 
     GenStage.start_link(__MODULE__, publisher, name: {:via, :swarm, publisher.id})
   end
@@ -41,16 +39,10 @@ defmodule Postoffice.MessagesProducer do
     MessagesConsumerSupervisor.start_link(publisher.id, self())
 
     if :queue.len(queue) < 25 do
-      publisher_messages =
-        Messaging.list_pending_messages_for_publisher(
-          publisher.id,
-          publisher.topic_id,
-          publisher.initial_message,
-          500
-        )
+      pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id)
 
       queue =
-        Enum.reduce(publisher_messages, queue, fn publisher_message, acc ->
+        Enum.reduce(pending_messages, queue, fn publisher_message, acc ->
           :queue.in(publisher_message, acc)
         end)
 

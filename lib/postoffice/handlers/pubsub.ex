@@ -8,18 +8,20 @@ defmodule Postoffice.Handlers.Pubsub do
 
   @spec run(any, any, any) :: {:error, :nosent} | {:ok, :sent}
   def run(publisher_target, publisher_id, message) do
-    Logger.info("Processing pubsub message", [
-      {:postoffice_extra, {:message_id, message.public_id}, {:target, publisher_target}}
-    ])
+    Logger.info("Processing pubsub message",
+      message_id: message.public_id,
+      target: publisher_target
+    )
 
     case impl().publish(publisher_target, message) do
       {:ok, _response = %PublishResponse{}} ->
-        Logger.info("Succesfully sent pubsub message", [
-          {:postoffice_extra, {:message_id, message.public_id}, {:target, publisher_target}}
-        ])
+        Logger.info("Succesfully sent pubsub message",
+          message_id: message.public_id,
+          target: publisher_target
+        )
 
         {:ok, _} =
-          Messaging.create_publisher_success(%{
+          Messaging.mark_message_as_delivered(%{
             publisher_id: publisher_id,
             message_id: message.id
           })

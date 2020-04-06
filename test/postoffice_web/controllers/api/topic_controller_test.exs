@@ -1,5 +1,5 @@
 defmodule PostofficeWeb.Api.TopicControllerTest do
-  use PostofficeWeb.ConnCase
+  use PostofficeWeb.ConnCase, async: true
 
   import Ecto.Query, warn: false
 
