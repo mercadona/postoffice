@@ -9,7 +9,6 @@ defmodule Postoffice.MessagesConsumerTest do
   alias Postoffice.Messaging
   alias Postoffice.MessagesConsumer
 
-
   @message_attrs %{
     attributes: %{},
     payload: %{},
@@ -33,7 +32,6 @@ defmodule Postoffice.MessagesConsumerTest do
 
       MessagesConsumer.start_link(pending_message)
       Process.sleep(300)
-
     end
   end
 end

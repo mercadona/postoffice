@@ -107,8 +107,7 @@ defmodule Postoffice.Handlers.HttpTest do
 
     Http.run(publisher.target, publisher.id, message)
 
-    pending_messages =
-      Messaging.list_pending_messages_for_publisher(publisher.id)
+    pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id)
     assert Kernel.length(pending_messages) == 1
     pending_message = List.first(pending_messages)
     assert pending_message.message.id == another_message.id

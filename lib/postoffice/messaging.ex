@@ -104,14 +104,12 @@ defmodule Postoffice.Messaging do
 
   """
   def list_pending_messages_for_publisher(publisher_id, limit \\ 300) do
-    pending_messages =
-      from(pm in PendingMessage,
-        where: pm.publisher_id == ^publisher_id,
-        limit: ^limit,
-        preload: [:message, :publisher]
-      )
-      |> Repo.all()
-
+    from(pm in PendingMessage,
+      where: pm.publisher_id == ^publisher_id,
+      limit: ^limit,
+      preload: [:message, :publisher]
+    )
+    |> Repo.all()
   end
 
   def list_topics do
