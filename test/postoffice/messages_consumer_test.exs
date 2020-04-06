@@ -23,8 +23,8 @@ defmodule Postoffice.MessagesConsumerTest do
       publisher = Fixtures.create_publisher(topic)
       {_, message} = Messaging.add_message_to_deliver(topic, @message_attrs)
 
-      pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id)
-      pending_message = List.first(pending_messages)
+      pending_message =
+        Messaging.list_pending_messages_for_publisher(publisher.id) |> List.first()
 
       expect(HttpMock, :publish, fn "http://fake.target", ^message ->
         {:ok, %HTTPoison.Response{status_code: 200}}
