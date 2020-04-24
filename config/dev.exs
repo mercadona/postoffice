@@ -67,7 +67,7 @@ config :postoffice, PostofficeWeb.Endpoint,
 
 config :goth,
   json:
-    System.get_env("GCLOUD_PUBSUB_CREDENTIALS_PATH", "/secrets/credentials.json") |> File.read!()
+    System.get_env("GCLOUD_PUBSUB_CREDENTIALS_PATH", "/secrets/dummy-credentials.json") |> File.read!()
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
