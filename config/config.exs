@@ -28,11 +28,8 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 config :phoenix, :template_engines, leex: Phoenix.LiveView.Engine
 
-{:ok, current_directory} = File.cwd()
-dummy_credentials_file = current_directory <> "/secrets/dummy-credentials.json"
-
 config :goth,
-  json: System.get_env("GCLOUD_PUBSUB_CREDENTIALS_PATH", dummy_credentials_file) |> File.read!()
+  json: System.get_env("GCLOUD_PUBSUB_CREDENTIALS_PATH", "/secrets/dummy-credentials.json") |> File.read!()
 
 config :libcluster,
   topologies: []
