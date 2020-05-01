@@ -11,6 +11,7 @@ config :postoffice, Postoffice.Repo,
   pool_size: 20,
   queue_target: 3000
 
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
@@ -64,10 +65,6 @@ config :postoffice, PostofficeWeb.Endpoint,
       ~r"lib/postoffice_web/templates/.*(eex)$"
     ]
   ]
-
-config :goth,
-  json:
-    System.get_env("GCLOUD_PUBSUB_CREDENTIALS_PATH", "/secrets/dummy-credentials.json") |> File.read!()
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
