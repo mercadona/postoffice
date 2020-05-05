@@ -28,9 +28,6 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 config :phoenix, :template_engines, leex: Phoenix.LiveView.Engine
 
-config :goth,
-  json: System.get_env("GCLOUD_PUBSUB_CREDENTIALS_PATH", "/secrets/dummy-credentials.json") |> File.read!()
-
 config :libcluster,
   topologies: []
 

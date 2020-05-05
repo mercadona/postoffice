@@ -15,9 +15,6 @@ config :postoffice, Postoffice.Repo,
   queue_target: {:system, "DB_QUEUE_TARGET", type: :integer, default: 3000},
   show_sensitive_data_on_connection_error: false
 
-config :goth,
-  json: System.get_env("GCLOUD_PUBSUB_CREDENTIALS_PATH", "/secrets/dummy-credentials.json") |> File.read!()
-
 # If K8S_CLUSTER env_variable is set we'll try to setup a k8s cluster
 if System.get_env("K8S_CLUSTER") do
   config :libcluster,

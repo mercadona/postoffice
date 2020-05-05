@@ -12,9 +12,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN mkdir /secrets
-COPY config/dummy-credentials.json /secrets/dummy-credentials.json
-
 RUN mix deps.get --only prod && npm run deploy --prefix ./assets && mix phx.digest && mix release --quiet
 
 # RELEASE
@@ -22,8 +19,9 @@ FROM alpine:3.10.3
 
 RUN apk add --no-cache --update bash
 
-RUN mkdir /secrets
-COPY --from=build /secrets/dummy-credentials.json /secrets/dummy-credentials.json
+COPY config/dummy-credentials.json /secrets/dummy-credentials.json
+ENV GOOGLE_APPLICATION_CREDENTIALS /secrets/dummy-credentials.json
+
 WORKDIR /app
 
 COPY --from=build /app/_build/prod/rel/postoffice ./
