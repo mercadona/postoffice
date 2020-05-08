@@ -17,33 +17,17 @@ defmodule Postoffice.PostofficeTest do
     "type" => "pubsub"
   }
 
-  describe "PostofficeWeb external api" do
+  describe "Postoffice api" do
     test "Returns nil if tried to find message by invalid UUID" do
       assert Postoffice.find_message_by_uuid(123) == nil
     end
 
-    test "count_received_messages returns 0 if no message exists" do
-      assert Postoffice.count_received_messages() == 0
+    test "estimated_messages_count returns 0 if no message exists" do
+      assert Postoffice.estimated_messages_count() == 0
     end
 
-    test "count_messages returns number of created messages" do
-      topic = Fixtures.create_topic()
-      Fixtures.add_message_to_deliver(topic)
-
-      assert Postoffice.count_received_messages() == 1
-    end
-
-    test "count_published_messages returns 0 if no published message exists" do
-      assert Postoffice.count_published_messages() == 0
-    end
-
-    test "count_published_messages returns number of published messages" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_deliver(topic)
-      Fixtures.create_publisher_success(message, publisher)
-
-      assert Postoffice.count_published_messages() == 1
+    test "estimated_published_messages_count returns 0 if no published message exists" do
+      assert Postoffice.estimated_published_messages_count() == 0
     end
 
     test "count_publishers_failures returns 0 if no failed message exists" do

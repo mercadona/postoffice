@@ -82,9 +82,9 @@ defmodule Postoffice do
 
   def get_last_messages(limit \\ 10), do: Messaging.list_messages(limit)
 
-  def count_received_messages, do: Messaging.count_messages()
+  def estimated_messages_count, do: Messaging.get_estimated_count("messages")
 
-  def count_published_messages, do: Messaging.count_published_messages()
+  def estimated_published_messages_count, do: Messaging.get_estimated_count("publisher_success")
 
   def count_publishers_failures, do: Messaging.count_publishers_failures()
 
