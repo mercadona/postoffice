@@ -238,4 +238,23 @@ defmodule Postoffice.Messaging do
     from(t in Topic, where: t.recovery_enabled == true, distinct: true, select: t.origin_host)
     |> Repo.all()
   end
+
+  @doc """
+  Returns an integer representing an estimated count from the given schema.
+
+  ## Examples
+
+      iex> get_estimate_count("messages")
+      0
+
+  """
+  def get_estimated_count(schema) do
+    IO.puts(schema)
+    Ecto.Adapters.SQL.query!(
+      Postoffice.Repo,
+      "SELECT reltuples::bigint FROM pg_catalog.pg_class WHERE relname = $1;", [schema]
+    ).rows
+    |> List.first
+    |> List.first
+  end
 end
