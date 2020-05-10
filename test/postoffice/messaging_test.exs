@@ -366,5 +366,9 @@ defmodule Postoffice.MessagingTest do
 
       assert hosts == []
     end
+
+    test "get_estimate_count returns 0 when no topic exists" do
+      assert Messaging.get_estimated_count("topics") == 0
+    end
   end
 end

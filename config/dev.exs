@@ -11,7 +11,6 @@ config :postoffice, Postoffice.Repo,
   pool_size: 20,
   queue_target: 3000
 
-
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
