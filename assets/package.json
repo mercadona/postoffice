@@ -6,12 +6,7 @@
     "watch": "webpack --mode development --watch"
   },
   "dependencies": {
-    "admin-lte": "^3.0.1",
-    "bootstrap": "^4.4.1",
-    "font-awesome": "^4.7.0",
-    "jquery": "^3.5.0",
-    "popper.js": "^1.16.0",
-    "save": "^2.4.0"
+    "font-awesome": "^4.7.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
