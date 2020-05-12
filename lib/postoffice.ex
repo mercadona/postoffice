@@ -90,6 +90,8 @@ defmodule Postoffice do
 
   def count_publishers, do: Messaging.count_publishers()
 
+  def count_pending_messages, do: Messaging.count_pending_messages()
+
   def count_topics, do: Messaging.count_topics()
 
   def ping, do: Application.ensure_started(:postoffice)

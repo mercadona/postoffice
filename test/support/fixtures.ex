@@ -48,7 +48,7 @@ defmodule Postoffice.Fixtures do
   end
 
   def create_publishers_failure(message, publisher) do
-    {:ok, _publisher_success} =
+    {:ok, _publisher_failure} =
       Messaging.create_publisher_failure(%{message_id: message.id, publisher_id: publisher.id})
   end
 end
