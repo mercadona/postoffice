@@ -86,7 +86,7 @@ defmodule Postoffice do
 
   def estimated_published_messages_count, do: Messaging.get_estimated_count("publisher_success")
 
-  def count_publishers_failures, do: Messaging.count_publishers_failures()
+  def count_publishers_failures, do: Messaging.count_publishers_failures_aggregated()
 
   def count_publishers, do: Messaging.count_publishers()
 

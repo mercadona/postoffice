@@ -12,7 +12,7 @@
       <div class="card-footer">
         <div class="stats">
           <i class="material-icons">update</i>
-          <a href="javascript:;">Real value</a>
+          <a href="">Real value.</a>
         </div>
       </div>
     </div>
@@ -30,7 +30,7 @@
       <div class="card-footer">
         <div class="stats">
           <i class="material-icons">update</i>
-          <a href="javascript:;">Real value</a>
+          <a href="">Real value.</a>
         </div>
       </div>
     </div>
@@ -47,8 +47,8 @@
       </div>
       <div class="card-footer">
         <div class="stats">
-          <i class="material-icons text-danger">warning</i>
-          <a href="javascript:;">This is an estimated count.</a>
+          <i class="material-icons text-warning">warning</i>
+          <a href="">This is an estimated count.</a>
         </div>
       </div>
     </div>
@@ -59,16 +59,16 @@
     <div class="card card-stats">
       <div class="card-header card-header-success card-header-icon">
         <div class="card-icon">
-          <i class="material-icons">input</i>
+          <i class="material-icons">done_all</i>
         </div>
-        <p class="card-category">Messages processed</p>
+        <p class="card-category">Processed messages</p>
         <h3 class="card-title"><%= @messages_published %>
         </h3>
       </div>
       <div class="card-footer">
         <div class="stats">
-          <i class="material-icons text-danger">warning</i>
-          <a href="javascript:;">This is an estimated count.</a>
+          <i class="material-icons text-warning">warning</i>
+          <a href="">This is an estimated count.</a>
         </div>
       </div>
     </div>
@@ -77,7 +77,7 @@
     <div class="card card-stats">
       <div class="card-header card-header-warning card-header-icon">
         <div class="card-icon">
-          <i class="material-icons">input</i>
+          <i class="material-icons">sms</i>
         </div>
         <p class="card-category">Pending messages</p>
         <h3 class="card-title"><%= @pending_messages %>
@@ -86,7 +86,7 @@
       <div class="card-footer">
         <div class="stats">
           <i class="material-icons">update</i>
-          <a href="javascript:;">Real value</a>
+          <a href="">Real value.</a>
         </div>
       </div>
     </div>
@@ -95,16 +95,16 @@
     <div class="card card-stats">
       <div class="card-header card-header-danger card-header-icon">
         <div class="card-icon">
-          <i class="material-icons">input</i>
+          <i class="material-icons">sms_failed</i>
         </div>
-        <p class="card-category">Publisher failures</p>
+        <p class="card-category">Failed messages</p>
         <h3 class="card-title"><%= @publishers_failures %>
         </h3>
       </div>
       <div class="card-footer">
         <div class="stats">
           <i class="material-icons">update</i>
-          <a href="javascript:;">Real value</a>
+          <a href="">Real value.</a>
         </div>
       </div>
     </div>
