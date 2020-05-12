@@ -6,7 +6,7 @@ defmodule PostofficeWeb.TopicController do
 
   def index(conn, _params) do
     topics = Messaging.list_topics()
-    render(conn, "index.html", topics: topics)
+    render(conn, "index.html", topics: topics, page_name: "Topics")
   end
 
   def new(conn, _params) do

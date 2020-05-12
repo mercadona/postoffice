@@ -1,54 +1,112 @@
 <div class="row">
-      <div class="col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box bg-info">
-          <span class="info-box-icon"><i class="fa fa-bullhorn"></i></span>
-
-          <div class="info-box-content">
-            <span class="info-box-text">Topics</span>
-            <span class="info-box-number"><%= @topics %></span>
-          </div>
+  <div class="col-md-4">
+    <div class="card card-stats">
+      <div class="card-header card-header-info card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">input</i>
         </div>
+        <p class="card-category">Topics</p>
+        <h3 class="card-title"><%= @topics %>
+        </h3>
       </div>
-      <div class="col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box bg-yellow">
-          <span class="info-box-icon"><i class="fa fa-cogs"></i></span>
-
-          <div class="info-box-content">
-            <span class="info-box-text">Publishers</span>
-            <span class="info-box-number"><%= @publishers %></span>
-          </div>
+      <div class="card-footer">
+        <div class="stats">
+          <i class="material-icons">update</i>
+          <a href="javascript:;">Real value</a>
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box bg-info">
-          <span class="info-box-icon"><i class="fa fa-envelope"></i></span>
-
-          <div class="info-box-content">
-            <span class="info-box-text">Messages received</span>
-            <span class="info-box-number"><%= @messages_received %></span>
-          </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-stats">
+      <div class="card-header card-header-info card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">call_split</i>
         </div>
+        <p class="card-category">Publishers</p>
+        <h3 class="card-title"><%= @publishers %>
+        </h3>
       </div>
-      <div class="col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box bg-green">
-          <span class="info-box-icon"><i class="fa fa-envelope"></i></span>
-
-          <div class="info-box-content">
-            <span class="info-box-text">Messages published</span>
-            <span class="info-box-number"><%= @messages_published %></span>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 col-sm-6 col-xs-12">
-        <div class="info-box bg-red">
-          <span class="info-box-icon"><i class="fa fa-envelope"></i></span>
-
-          <div class="info-box-content">
-            <span class="info-box-text">Publishers failures</span>
-            <span class="info-box-number"><%= @publishers_failures %></span>
-          </div>
+      <div class="card-footer">
+        <div class="stats">
+          <i class="material-icons">update</i>
+          <a href="javascript:;">Real value</a>
         </div>
       </div>
     </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-stats">
+      <div class="card-header card-header-info card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">email</i>
+        </div>
+        <p class="card-category">Messages received</p>
+        <h3 class="card-title"><%= @messages_received %>
+        </h3>
+      </div>
+      <div class="card-footer">
+        <div class="stats">
+          <i class="material-icons text-danger">warning</i>
+          <a href="javascript:;">This is an estimated count.</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <div class="card card-stats">
+      <div class="card-header card-header-success card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">input</i>
+        </div>
+        <p class="card-category">Messages processed</p>
+        <h3 class="card-title"><%= @messages_published %>
+        </h3>
+      </div>
+      <div class="card-footer">
+        <div class="stats">
+          <i class="material-icons text-danger">warning</i>
+          <a href="javascript:;">This is an estimated count.</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-stats">
+      <div class="card-header card-header-warning card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">input</i>
+        </div>
+        <p class="card-category">Pending messages</p>
+        <h3 class="card-title"><%= @pending_messages %>
+        </h3>
+      </div>
+      <div class="card-footer">
+        <div class="stats">
+          <i class="material-icons">update</i>
+          <a href="javascript:;">Real value</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-stats">
+      <div class="card-header card-header-danger card-header-icon">
+        <div class="card-icon">
+          <i class="material-icons">input</i>
+        </div>
+        <p class="card-category">Publisher failures</p>
+        <h3 class="card-title"><%= @publishers_failures %>
+        </h3>
+      </div>
+      <div class="card-footer">
+        <div class="stats">
+          <i class="material-icons">update</i>
+          <a href="javascript:;">Real value</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

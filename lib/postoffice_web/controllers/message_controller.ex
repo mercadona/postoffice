@@ -6,7 +6,7 @@ defmodule PostofficeWeb.MessageController do
       nil ->
         conn
         |> put_flash(:info, "Message not found")
-        |> redirect(to: Routes.publisher_path(conn, :index))
+        |> redirect(to: Routes.dashboard_path(conn, :index))
 
       message ->
         conn
@@ -22,7 +22,8 @@ defmodule PostofficeWeb.MessageController do
     render(conn, "show.html",
       message: message,
       message_success: message_success,
-      message_failures: message_failures
+      message_failures: message_failures,
+      page_name: "Message detail"
     )
   end
 end
