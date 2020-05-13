@@ -54,7 +54,8 @@
             <span class="navbar-toggler-icon icon-bar"></span>
           </button>
           <div class="collapse navbar-collapse justify-content-end">
-            <%= form_for @conn, Routes.message_path(@conn, :index), [method: :get, class: "navbar-form"],fn f -> %>              <span class="bmd-form-group">
+            <%= form_for @conn, Routes.message_path(@conn, :index), [method: :get, class: "navbar-form"],fn _f -> %>
+              <span class="bmd-form-group">
                 <div class="input-group no-border">
                   <input type="text" id="uuid" name="uuid" value="" class="form-control" placeholder="Search message uuid">
                   <button type="submit" class="btn btn-white btn-round btn-just-icon">

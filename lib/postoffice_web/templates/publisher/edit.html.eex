@@ -10,8 +10,15 @@
     </div>
 
     <div class="form-group">
-      <label class="control-label">Active</label>
-      <%= checkbox f, :active %>
+      <div class="form-check">
+          <label class="form-check-label">
+              Active
+              <%= checkbox f, :active, class: "form-check-input" %>
+              <span class="form-check-sign">
+                  <span class="check"></span>
+              </span>
+          </label>
+      </div>
     </div>
 
     <div class="form-group">

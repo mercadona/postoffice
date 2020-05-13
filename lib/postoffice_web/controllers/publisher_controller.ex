@@ -35,7 +35,12 @@ defmodule PostofficeWeb.PublisherController do
       Messaging.list_topics()
       |> Enum.map(&{"#{&1.name}", &1.id})
 
-    render(conn, "edit.html", publisher: publisher, changeset: changeset, topics: topics, page_name: "Edit publishers")
+    render(conn, "edit.html",
+      publisher: publisher,
+      changeset: changeset,
+      topics: topics,
+      page_name: "Edit publishers"
+    )
   end
 
   def update(conn, %{"id" => id, "publisher" => publisher_params}) do

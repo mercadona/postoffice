@@ -228,7 +228,6 @@ defmodule Postoffice.Messaging do
     Repo.aggregate(from(ps in "publisher_failures"), :count)
   end
 
-
   def get_publisher_success_for_message(message_id) do
     from(p in PublisherSuccess, where: p.message_id == ^message_id, preload: [:publisher])
     |> Repo.all()
@@ -256,10 +255,11 @@ defmodule Postoffice.Messaging do
   def get_estimated_count(schema) do
     Ecto.Adapters.SQL.query!(
       Postoffice.Repo,
-      "SELECT reltuples::bigint FROM pg_catalog.pg_class WHERE relname = $1;", [schema]
+      "SELECT reltuples::bigint FROM pg_catalog.pg_class WHERE relname = $1;",
+      [schema]
     ).rows
-    |> List.first
-    |> List.first
+    |> List.first()
+    |> List.first()
   end
 
   @doc """
@@ -274,6 +274,7 @@ defmodule Postoffice.Messaging do
   def count_publishers_failures_aggregated() do
     Ecto.Adapters.SQL.query!(
       Postoffice.Repo,
-      "select COUNT(*) from publisher_failures group by publisher_id, message_id;").num_rows
+      "select COUNT(*) from publisher_failures group by publisher_id, message_id;"
+    ).num_rows
   end
 end
