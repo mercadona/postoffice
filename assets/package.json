@@ -17,6 +17,8 @@
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^5.0.2",
     "font-awesome-loader": "^1.0.2",
+    "phoenix": "^1.4.7",
+    "phoenix_html": "^2.13.2",
     "style-loader": "^1.1.2",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10"
