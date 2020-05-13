@@ -2,82 +2,87 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-    <title>PostOffice</title>
+  <title>PostOffice</title>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <link rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
 </head>
 
-<body class="skin-blue sidebar-mini" style="height: auto; min-height: 100%;">
-  <div class="wrapper">
-<nav class="main-header navbar navbar-expand navbar-white navbar-light">
-    <!-- Left navbar links -->
-    <ul class="navbar-nav">
-      <li class="nav-item">
-        <a class="nav-link" data-widget="pushmenu" href="#"><i class="fa fa-bars"></i></a>
-      </li>
-    </ul>
-
-      <%= form_for @conn, Routes.message_path(@conn, :index), [method: :get, class: "form-inline ml-3"],fn f -> %>
-        <div class="input-group input-group-sm">
-          <%= search_input f, :uuid, [class: "form-control form-control-navbar", placeholder: "Search message uuid"] %>
-          <div class="input-group-append">
-            <%= submit f, [class: "btn btn-navbar nav-icon fa fa-search"] %>
-          </div>
-        </div>
-      <% end %>
-  </nav>
-
-  <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
-    <a href="/" class="brand-link">
-      <span class="brand-text align-center font-weight-light">PostOffice</span>
-    </a>
-
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <!-- Sidebar Menu -->
-      <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          <li class="nav-item">
-            <a href="/" class="nav-link">
-              <i class="nav-icon fa fa-dashboard"></i>
-              <p>
-                Dashboard
-              </p>
+<body>
+  <div class="wrapper ">
+    <div class="sidebar" data-color="purple" data-background-color="white">
+      <div class="logo">
+        <a href="" class="simple-text logo-mini">
+          PostOffice
+        </a>
+      </div>
+      <div class="sidebar-wrapper">
+        <ul class="nav">
+          <li class="nav-item <%= if @page_name == "Dashboard" do %>active <% end %>">
+            <a class="nav-link" href="<%= Routes.dashboard_path(@conn, :index) %>">
+              <i class="material-icons">dashboard</i>
+              <p>Dashboard</p>
             </a>
           </li>
-          <li class="nav-item">
-            <a href="<%= Routes.publisher_path(@conn, :index) %>" class="nav-link">
-              <i class="nav-icon fa fa-play"></i>
-              <p>
-                Publishers
-              </p>
+          <li class="nav-item <%= if @page_name == "Topics" do %>active <% end %>"">
+            <a class="nav-link" href="<%= Routes.topic_path(@conn, :index) %>">
+              <i class="material-icons">input</i>
+              <p>Topics</p>
             </a>
           </li>
-          <li class="nav-item">
-            <a href="<%= Routes.topic_path(@conn, :index) %>" class="nav-link">
-              <i class="nav-icon fa fa-bullhorn"></i>
-              <p>
-                Topics
-              </p>
+          <li class="nav-item <%= if @page_name == "Publishers" do %>active <% end %>"">
+            <a class="nav-link" href="<%= Routes.publisher_path(@conn, :index) %>">
+              <i class="material-icons">call_split</i>
+              <p>Publishers</p>
             </a>
           </li>
         </ul>
-      </nav>
-      <!-- /.sidebar-menu -->
-    </div>
-    <!-- /.sidebar -->
-  </aside>
-
-    <div class="content-wrapper">
-      <div class="content data-content">
-        <%= render @view_module, @view_template, assigns %>
       </div>
     </div>
+    <div class="main-panel">
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+          <div class="navbar-wrapper">
+            <a class="navbar-brand" href="javascript:;"><%= @page_name %></a>
+          </div>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-end">
+            <%= form_for @conn, Routes.message_path(@conn, :index), [method: :get, class: "navbar-form"],fn f -> %>              <span class="bmd-form-group">
+                <div class="input-group no-border">
+                  <input type="text" id="uuid" name="uuid" value="" class="form-control" placeholder="Search message uuid">
+                  <button type="submit" class="btn btn-white btn-round btn-just-icon">
+                    <i class="material-icons">search</i>
+                    <div class="ripple-container"></div>
+                  </button>
+                </div>
+              </span>
+            <% end %>
+          </div>
+        </div>
+      </nav>
+      <!-- End Navbar -->
+      <div class="content">
+        <div class="container-fluid">
+          <%= render @view_module, @view_template, assigns %>
+        </div>
+      </div>
+      <footer class="footer">
+        <div class="container-fluid">
+          <div class="copyright float-right">
+            Postoffice uses the <i class="material-icons">favorite</i> Material Dashboard&copy; by
+            <a href="https://www.creative-tim.com" target="_blank">Creative Tim</a>.
+          </div>
+        </div>
+      </footer>
+    </div>
   </div>
-  <script src="/js/app.js"></script>
+  <script type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
 </body>
-
 </html>

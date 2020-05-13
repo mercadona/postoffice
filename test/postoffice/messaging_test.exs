@@ -279,17 +279,19 @@ defmodule Postoffice.MessagingTest do
       assert Messaging.count_published_messages() == 1
     end
 
-    test "count_publishers_failures returns 0 if no failed message exists" do
-      assert Messaging.count_publishers_failures() == 0
+    test "count_publishers_failures_aggregated returns 0 if no failed message exists" do
+      assert Messaging.count_publishers_failures_aggregated() == 0
     end
 
-    test "count_publishers_failures returns number of failed messages" do
+    test "count_publishers_failures_aggregated returns number of failed messages aggregated by publisher and message" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
       message = Fixtures.add_message_to_deliver(topic)
       Fixtures.create_publishers_failure(message, publisher)
+      Fixtures.create_publishers_failure(message, publisher)
+      Fixtures.create_publishers_failure(message, publisher)
 
-      assert Messaging.count_publishers_failures() == 1
+      assert Messaging.count_publishers_failures_aggregated() == 1
     end
 
     test "get_publisher! returns asked publisher data" do

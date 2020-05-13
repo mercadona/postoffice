@@ -209,20 +209,25 @@ defmodule Postoffice.Messaging do
   end
 
   def count_messages do
-    Repo.aggregate(from(m in "messages"), :count, :id)
+    Repo.aggregate(from(m in "messages"), :count)
   end
 
   def count_publishers() do
-    Repo.aggregate(from(p in "publishers"), :count, :id)
+    Repo.aggregate(from(p in "publishers"), :count)
   end
 
   def count_published_messages do
-    Repo.aggregate(from(ps in "publisher_success"), :count, :id)
+    Repo.aggregate(from(ps in "publisher_success"), :count)
+  end
+
+  def count_pending_messages do
+    Repo.aggregate(from(ps in "pending_messages"), :count)
   end
 
   def count_publishers_failures do
-    Repo.aggregate(from(ps in "publisher_failures"), :count, :id)
+    Repo.aggregate(from(ps in "publisher_failures"), :count)
   end
+
 
   def get_publisher_success_for_message(message_id) do
     from(p in PublisherSuccess, where: p.message_id == ^message_id, preload: [:publisher])
@@ -249,12 +254,26 @@ defmodule Postoffice.Messaging do
 
   """
   def get_estimated_count(schema) do
-    IO.puts(schema)
     Ecto.Adapters.SQL.query!(
       Postoffice.Repo,
       "SELECT reltuples::bigint FROM pg_catalog.pg_class WHERE relname = $1;", [schema]
     ).rows
     |> List.first
     |> List.first
+  end
+
+  @doc """
+  Returns an integer representing a count of publisher failures. This value is agregated by publisher and message.
+
+  ## Examples
+
+      iex> count_publishers_failures_aggregated()
+      10
+
+  """
+  def count_publishers_failures_aggregated() do
+    Ecto.Adapters.SQL.query!(
+      Postoffice.Repo,
+      "select COUNT(*) from publisher_failures group by publisher_id, message_id;").num_rows
   end
 end
