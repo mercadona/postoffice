@@ -1,6 +1,8 @@
 defmodule PostofficeWeb.Router do
   use PostofficeWeb, :router
 
+  import Phoenix.LiveDashboard.Router
+
   alias Api.MessageController, as: ApiMessageController
   alias Api.TopicController, as: ApiTopicController
   alias Api.PublisherController, as: ApiPublisherController
@@ -11,7 +13,7 @@ defmodule PostofficeWeb.Router do
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
-    plug :fetch_flash
+    plug :fetch_live_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
@@ -30,6 +32,8 @@ defmodule PostofficeWeb.Router do
     resources "/publishers", PublisherController, only: [:index, :new, :create, :edit, :update]
 
     resources "/messages", MessageController, only: [:index, :show]
+
+    live_dashboard "/dashboard"
   end
 
   scope "/api", PostofficeWeb, as: :api do
