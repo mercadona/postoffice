@@ -17,7 +17,7 @@ defmodule Postoffice.Application do
       # Starts a worker by calling: Postoffice.Worker.start_link(arg)
       # {Postoffice.Worker, arg},
       {Cluster.Supervisor,
-       [Application.get_env(:libcluster, :topologies), [name: Postoffice.ClusterSupervisor]]},
+       [Application.get_env(:libcluster, :topologies), [name: Postoffice.ClusterSupervisor]]}
       # Postoffice.PublisherProducer,
       # Postoffice.MessagesProducerSupervisor,
       # Postoffice.Rescuer.Producer,

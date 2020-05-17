@@ -4,25 +4,21 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
   def get(%{topic: topic_name, sub: sub_name}) do
     case impl().get(sub_name) do
       {:ok, response} ->
-        case response.receivedMessages != nil do
-          true ->
-            build_messages(response.receivedMessages, topic_name)
+        get_messages(response.receivedMessages, topic_name)
 
-          false ->
-            {:ok, :empty}
-        end
-      {:error, reason} -> {:error, reason}
-
+      {:error, reason} ->
+        {:error, reason}
     end
-    # {:ok, response} = impl().get(sub_name)
+  end
 
-    # case response.receivedMessages != nil do
-    #   true ->
-    #     build_messages(response.receivedMessages, topic_name)
+  defp get_messages(receivedMessages, topic_name) do
+    case receivedMessages != nil do
+      true ->
+        build_messages(receivedMessages, topic_name)
 
-    #   false ->
-    #     {:ok, :empty}
-    # end
+      false ->
+        {:ok, :empty}
+    end
   end
 
   defp build_messages(receivedMessages, topic_name) do
