@@ -56,10 +56,6 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
       assert 1 == 2
     end
 
-
-
-
-
     test "do not ack message on error" do
       assert 1 == 2
     end
@@ -69,6 +65,7 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
       Fixtures.create_publisher(topic)
 
       expect(PubSubMock, :get, fn "fake_sub" -> @without_messages end)
+      expect(PubSubMock, :confirm, 0, fn @acks_ids -> @ack_message end)
 
       PubSubIngester.run(@argument)
 
@@ -85,16 +82,6 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
       PubSubIngester.run(@argument)
 
       assert length(Repo.all(PendingMessage)) == 2
-    end
-
-    test "do not ack message when no message received" do
-      topic = Fixtures.create_topic()
-      Fixtures.create_publisher(topic)
-
-      expect(PubSubMock, :get, fn "fake_sub" -> @without_messages end)
-      expect(PubSubMock, :confirm, 0, fn @acks_ids -> @ack_message end)
-
-      PubSubIngester.run(@argument)
     end
   end
 end

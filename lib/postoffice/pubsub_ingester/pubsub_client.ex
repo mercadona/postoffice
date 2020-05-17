@@ -21,7 +21,7 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
         {:ok, messages}
 
       false ->
-        {:ok, []}
+        {:ok, :empty}
     end
   end
 
