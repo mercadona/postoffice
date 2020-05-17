@@ -5,6 +5,10 @@ Mox.defmock(Postoffice.Adapters.HttpMock, for: Postoffice.Adapters.Impl)
 Mox.defmock(Postoffice.Adapters.PubsubMock, for: Postoffice.Adapters.Impl)
 Mox.defmock(Postoffice.Rescuer.Adapters.HttpMock, for: Postoffice.Rescuer.Adapters.Impl)
 
+Mox.defmock(Postoffice.PubSubIngester.Adapters.PubSubMock,
+  for: Postoffice.PubSubIngester.Adapters.Impl
+)
+
 Application.put_env(
   :postoffice,
   :http_consumer_impl,
@@ -21,4 +25,10 @@ Application.put_env(
   :postoffice,
   :rescuer_client,
   Postoffice.Rescuer.Adapters.HttpMock
+)
+
+Application.put_env(
+  :postoffice,
+  :pubsub_ingester_client,
+  Postoffice.PubSubIngester.Adapters.PubSubMock
 )

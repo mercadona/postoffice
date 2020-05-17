@@ -1,16 +1,10 @@
-defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
-  use Postoffice.DataCase, async: true
+defmodule Postoffice.PubSubIngester.PubSubClientTest do
   use ExUnit.Case, async: true
 
   import Mox
 
-  alias Postoffice.Fixtures
-  alias Postoffice.Messaging
-  alias Postoffice.Messaging.PendingMessage
-  alias Postoffice.PubSubIngester.PubSubIngester
   alias Postoffice.PubSubIngester.Adapters.PubSubMock
-
-  setup [:set_mox_from_context, :verify_on_exit!]
+  alias Postoffice.PubSubIngester.PubSubClient
 
   @two_messages {
     :ok,
@@ -40,34 +34,29 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
     }
   }
 
-  @without_messages {:ok, %GoogleApi.PubSub.V1.Model.PullResponse{receivedMessages: nil}}
-
-  @argument %{
+  describe "get messages from pubsub" do
+    test "get messages" do
+      argument = %{
         topic: "test",
         sub: "fake_sub"
       }
 
-  describe "pubsub ingester" do
-    test "no message created if no undelivered message found" do
-      topic = Fixtures.create_topic()
-      Fixtures.create_publisher(topic)
-
-      expect(PubSubMock, :get, fn "fake_sub" -> @without_messages end)
-
-      PubSubIngester.run(@argument)
-
-      assert Messaging.list_messages() == []
-    end
-
-    test "create message when is ingested" do
-      topic = Fixtures.create_topic()
-      Fixtures.create_publisher(topic)
-
       expect(PubSubMock, :get, fn "fake_sub" -> @two_messages end)
 
-      PubSubIngester.run(@argument)
+      {:ok, messages} = PubSubClient.get(argument)
 
-      assert length(Repo.all(PendingMessage)) == 2
+      assert messages == [
+               %{
+                 "attributes" => %{},
+                 "payload" => %{"one" => "two"},
+                 "topic" => "test"
+               },
+               %{
+                 "attributes" => %{"att_one" => "one"},
+                 "payload" => %{"two" => "three"},
+                 "topic" => "test"
+               }
+             ]
     end
   end
 end
