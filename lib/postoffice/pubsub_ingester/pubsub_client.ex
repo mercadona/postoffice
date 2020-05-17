@@ -11,14 +11,12 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
     end
   end
 
-  defp get_messages(receivedMessages, topic_name) do
-    case receivedMessages != nil do
-      true ->
-        build_messages(receivedMessages, topic_name)
+  defp get_messages(receivedMessages, topic_name) when receivedMessages != nil do
+    build_messages(receivedMessages, topic_name)
+  end
 
-      false ->
-        {:ok, :empty}
-    end
+  defp get_messages(receivedMessages, _topic_name) when receivedMessages == nil do
+    {:ok, []}
   end
 
   defp build_messages(receivedMessages, topic_name) do

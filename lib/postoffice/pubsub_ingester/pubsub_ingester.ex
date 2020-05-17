@@ -2,34 +2,25 @@ defmodule Postoffice.PubSubIngester.PubSubIngester do
   alias Postoffice.PubSubIngester.PubSubClient
 
   def run(subscription_to_topic) do
-    case ingest_messages(subscription_to_topic) do
-      {:ok, :empty} ->
-        {:ok}
-
-      {:ok, ackIds} ->
-        PubSubClient.confirm(ackIds)
-
-      {:error, reason} ->
-        {:error, reason}
-    end
+    PubSubClient.get(subscription_to_topic)
+    |> ingest_messages
+    |> confirm
   end
 
-  defp ingest_messages(subscription_to_topic) do
-    case PubSubClient.get(subscription_to_topic) do
-      {:ok, :empty} ->
-        {:ok, :empty}
+  defp ingest_messages({:error, _reason} = response), do: response
 
-      {:ok, messages} ->
-        ackIds =
-          Enum.map(messages, fn message ->
-            {:ok, _message} = Postoffice.receive_message(message)
-            message["ackId"]
-          end)
+  defp ingest_messages({:ok, []} = response), do: response
 
-        {:ok, ackIds}
-
-      {:error, reason} ->
-        {:error, reason}
-    end
+  defp ingest_messages({:ok, messages}) do
+    Enum.map(messages, fn message ->
+      {:ok, _message} = Postoffice.receive_message(message)
+      message["ackId"]
+    end)
   end
+
+  defp confirm({:error, _reason} = response), do: response
+
+  defp confirm({:ok, []} = response), do: response
+
+  defp confirm(ackIds), do: PubSubClient.confirm(ackIds)
 end
