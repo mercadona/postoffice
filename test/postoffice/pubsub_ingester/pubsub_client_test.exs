@@ -34,29 +34,46 @@ defmodule Postoffice.PubSubIngester.PubSubClientTest do
     }
   }
 
+  @argument %{
+    topic: "test",
+    sub: "fake_sub"
+  }
+
+  @ack_message {:ok, %GoogleApi.PubSub.V1.Model.Empty{}}
+
   describe "get messages from pubsub" do
     test "get messages" do
-      argument = %{
-        topic: "test",
-        sub: "fake_sub"
-      }
-
       expect(PubSubMock, :get, fn "fake_sub" -> @two_messages end)
 
-      {:ok, messages} = PubSubClient.get(argument)
+      {:ok, messages} = PubSubClient.get(@argument)
 
       assert messages == [
                %{
                  "attributes" => %{},
                  "payload" => %{"one" => "two"},
-                 "topic" => "test"
+                 "topic" => "test",
+                 "ackId" =>
+                   "ISE-MD5FU0RQBhYsXUZIUTcZCGhRDk9eIz81IChFEAcGTwIoXXkyVSFBXBoHUQ0Zcnxmd2tTGwMKEwUtVVsRDXptXFcnUAwccHxhcm1dEwIBQlJ4W3OK75niloGyYxclSoGxxaxvM7nUxvhMZho9XhJLLD5-MjVFQV5AEkw5AERJUytDCypYEU4E"
                },
                %{
                  "attributes" => %{"att_one" => "one"},
                  "payload" => %{"two" => "three"},
-                 "topic" => "test"
+                 "topic" => "test",
+                 "ackId" =>
+                   "ISE-MD5FU0RQBhYsXUZIUTcZCGhRDk9eIz81IChFEAcGTwIoXXkyVSFBXBoHUQ0Zcnxmd2tTGwMKEwUtVVoRDXptXFcnUAwccHxhcm9eEwQFRFt-XnOK75niloGyYxclSoGxxaxvM7nUxvhMZho9XhJLLD5-MjVFQV5AEkw5AERJUytDCypYEU4E"
                }
              ]
+    end
+  end
+
+  describe "confirm messages from pubsub" do
+    test "confirm messages returns google response when correct ack" do
+      expect(PubSubMock, :confirm, fn ["ackId1", "ackId2"] -> @ack_message end)
+
+      ackIds = ["ackId1", "ackId2"]
+      ack_message = PubSubClient.confirm(ackIds)
+
+      assert ack_message == @ack_message
     end
   end
 end

@@ -14,7 +14,8 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
               |> Poison.decode!()
 
             attributes = message.message.attributes || %{}
-            %{"payload" => payload, "attributes" => attributes, "topic" => topic_name}
+            ackId = message.ackId
+            %{"payload" => payload, "attributes" => attributes, "topic" => topic_name, "ackId" => ackId}
           end)
 
         {:ok, messages}
@@ -24,8 +25,8 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
     end
   end
 
-  def confirm(messages) do
-    {:fake}
+  def confirm(ackIds) do
+    impl().confirm(ackIds)
   end
 
   defp impl do

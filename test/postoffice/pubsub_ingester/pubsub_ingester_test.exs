@@ -40,6 +40,8 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
     }
   }
 
+  @acks_ids ["ISE-MD5FU0RQBhYsXUZIUTcZCGhRDk9eIz81IChFEAcGTwIoXXkyVSFBXBoHUQ0Zcnxmd2tTGwMKEwUtVVsRDXptXFcnUAwccHxhcm1dEwIBQlJ4W3OK75niloGyYxclSoGxxaxvM7nUxvhMZho9XhJLLD5-MjVFQV5AEkw5AERJUytDCypYEU4E", "ISE-MD5FU0RQBhYsXUZIUTcZCGhRDk9eIz81IChFEAcGTwIoXXkyVSFBXBoHUQ0Zcnxmd2tTGwMKEwUtVVoRDXptXFcnUAwccHxhcm9eEwQFRFt-XnOK75niloGyYxclSoGxxaxvM7nUxvhMZho9XhJLLD5-MjVFQV5AEkw5AERJUytDCypYEU4E"]
+
   @without_messages {:ok, %GoogleApi.PubSub.V1.Model.PullResponse{receivedMessages: nil}}
 
   @argument %{
@@ -47,7 +49,21 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
         sub: "fake_sub"
       }
 
+  @ack_message {:ok, %GoogleApi.PubSub.V1.Model.Empty{}}
+
   describe "pubsub ingester" do
+    test "no message created if subscription does not exists" do
+      assert 1 == 2
+    end
+
+
+
+
+
+    test "do not ack message on error" do
+      assert 1 == 2
+    end
+
     test "no message created if no undelivered message found" do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
@@ -64,10 +80,21 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
       Fixtures.create_publisher(topic)
 
       expect(PubSubMock, :get, fn "fake_sub" -> @two_messages end)
+      expect(PubSubMock, :confirm, fn @acks_ids -> @ack_message end)
 
       PubSubIngester.run(@argument)
 
       assert length(Repo.all(PendingMessage)) == 2
+    end
+
+    test "do not ack message when no message received" do
+      topic = Fixtures.create_topic()
+      Fixtures.create_publisher(topic)
+
+      expect(PubSubMock, :get, fn "fake_sub" -> @without_messages end)
+      expect(PubSubMock, :confirm, 0, fn @acks_ids -> @ack_message end)
+
+      PubSubIngester.run(@argument)
     end
   end
 end

@@ -18,10 +18,10 @@ defmodule Postoffice.Application do
       # {Postoffice.Worker, arg},
       {Cluster.Supervisor,
        [Application.get_env(:libcluster, :topologies), [name: Postoffice.ClusterSupervisor]]},
-      Postoffice.PublisherProducer,
-      Postoffice.MessagesProducerSupervisor,
-      Postoffice.Rescuer.Producer,
-      Postoffice.Rescuer.Supervisor
+      # Postoffice.PublisherProducer,
+      # Postoffice.MessagesProducerSupervisor,
+      # Postoffice.Rescuer.Producer,
+      # Postoffice.Rescuer.Supervisor
     ]
 
     :ok =

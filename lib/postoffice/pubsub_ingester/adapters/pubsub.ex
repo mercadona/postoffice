@@ -4,4 +4,8 @@ defmodule Postoffice.PubSubIngester.Adapters.PubSub do
   def get(subscription) do
     {:fake}
   end
+
+  def confirm(ackIds) do
+    {:fake}
+  end
 end
