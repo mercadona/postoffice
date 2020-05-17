@@ -6,23 +6,33 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
 
     case response.receivedMessages != nil do
       true ->
-        messages =
-          Enum.map(response.receivedMessages, fn message ->
-            payload =
-              message.message.data
-              |> Base.decode64!()
-              |> Poison.decode!()
-
-            attributes = message.message.attributes || %{}
-            ackId = message.ackId
-            %{"payload" => payload, "attributes" => attributes, "topic" => topic_name, "ackId" => ackId}
-          end)
-
-        {:ok, messages}
+        build_messages(response.receivedMessages, topic_name)
 
       false ->
         {:ok, :empty}
     end
+  end
+
+  defp build_messages(receivedMessages, topic_name) do
+    messages =
+      Enum.map(receivedMessages, fn message ->
+        payload =
+          message.message.data
+          |> Base.decode64!()
+          |> Poison.decode!()
+
+        attributes = message.message.attributes || %{}
+        ackId = message.ackId
+
+        %{
+          "payload" => payload,
+          "attributes" => attributes,
+          "topic" => topic_name,
+          "ackId" => ackId
+        }
+      end)
+
+    {:ok, messages}
   end
 
   def confirm(ackIds) do
