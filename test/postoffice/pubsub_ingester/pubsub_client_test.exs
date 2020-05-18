@@ -6,6 +6,8 @@ defmodule Postoffice.PubSubIngester.PubSubClientTest do
   alias Postoffice.PubSubIngester.Adapters.PubSubMock
   alias Postoffice.PubSubIngester.PubSubClient
 
+  @without_messages {:ok, %GoogleApi.PubSub.V1.Model.PullResponse{receivedMessages: nil}}
+
   @two_messages {
     :ok,
     %GoogleApi.PubSub.V1.Model.PullResponse{
@@ -42,7 +44,15 @@ defmodule Postoffice.PubSubIngester.PubSubClientTest do
   @ack_message {:ok, %GoogleApi.PubSub.V1.Model.Empty{}}
 
   describe "get messages from pubsub" do
-    test "get messages" do
+    test "get messages when has not messages to receive" do
+      expect(PubSubMock, :get, fn "fake_sub" -> @without_messages end)
+
+        {:ok, messages} = PubSubClient.get(@argument)
+
+        assert messages == []
+    end
+
+    test "get messages when has messages to receive" do
       expect(PubSubMock, :get, fn "fake_sub" -> @two_messages end)
 
       {:ok, messages} = PubSubClient.get(@argument)
