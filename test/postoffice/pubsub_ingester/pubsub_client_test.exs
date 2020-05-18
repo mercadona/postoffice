@@ -7,14 +7,10 @@ defmodule Postoffice.PubSubIngester.PubSubClientTest do
   alias Postoffice.PubSubIngester.PubSubClient
   alias Postoffice.Fixtures
 
-  @without_messages {:ok, %GoogleApi.PubSub.V1.Model.PullResponse{receivedMessages: nil}}
-
-  @argument %{
+  @topic_subscription_relation %{
     topic: "test",
     sub: "fake_sub"
   }
-
-  @ack_message {:ok, %GoogleApi.PubSub.V1.Model.Empty{}}
 
 setup do
     {:ok, pubsub_conn: Fixtures.pubsub_conn()}
@@ -22,9 +18,9 @@ end
 
   describe "get messages from pubsub" do
     test "get messages when has not messages to receive", %{pubsub_conn: pubsub_conn} do
-      expect(PubSubMock, :get, fn pubsub_conn, "fake_sub" -> @without_messages end)
+      expect(PubSubMock, :get, fn pubsub_conn, "fake_sub" -> Fixtures.empty_google_pubsub_messages() end)
 
-      {:ok, messages} = PubSubClient.get(pubsub_conn, @argument)
+      {:ok, messages} = PubSubClient.get(pubsub_conn, @topic_subscription_relation)
 
       assert messages == []
     end
@@ -32,7 +28,7 @@ end
     test "get error from pubsub returns the error", %{pubsub_conn: pubsub_conn} do
       expect(PubSubMock, :get, fn conn, "fake_sub" -> Fixtures.pubsub_error() end)
 
-      error = PubSubClient.get(pubsub_conn, @argument)
+      error = PubSubClient.get(pubsub_conn, @topic_subscription_relation)
 
       assert error == Fixtures.pubsub_error()
     end
@@ -40,7 +36,7 @@ end
     test "get messages when has messages to receive", %{pubsub_conn: pubsub_conn} do
       expect(PubSubMock, :get, fn conn, "fake_sub" -> Fixtures.two_google_pubsub_messages() end)
 
-      {:ok, messages} = PubSubClient.get(pubsub_conn, @argument)
+      {:ok, messages} = PubSubClient.get(pubsub_conn, @topic_subscription_relation)
 
       assert messages == [
                %{
@@ -63,7 +59,7 @@ end
 
   describe "confirm messages from pubsub" do
     test "confirm messages returns google response when correct ack", %{pubsub_conn: pubsub_conn} do
-      expect(PubSubMock, :confirm, fn pubsub_conn, ["ackId1", "ackId2"]-> @ack_message end)
+      expect(PubSubMock, :confirm, fn pubsub_conn, ["ackId1", "ackId2"]-> Fixtures.google_ack_message() end)
 
       ackIds = ["ackId1", "ackId2"]
 
