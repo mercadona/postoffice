@@ -116,7 +116,7 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
 
       expect(PubSubMock, :connect, fn -> @conn end)
       expect(PubSubMock, :get, fn @conn, "fake_sub" -> @pubsub_error end)
-      expect(PubSubMock, :confirm, 0, fn @acks_ids, @conn -> @ack_message end)
+      expect(PubSubMock, :confirm, 0, fn @conn, @acks_ids -> @ack_message end)
 
       PubSubIngester.run(@argument)
 
@@ -129,7 +129,7 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
 
       expect(PubSubMock, :connect, fn -> @conn end)
       expect(PubSubMock, :get, fn @conn, "fake_sub" -> @without_messages end)
-      expect(PubSubMock, :confirm, 0, fn @acks_ids, @conn -> @ack_message end)
+      expect(PubSubMock, :confirm, 0, fn @conn, @acks_ids -> @ack_message end)
 
       PubSubIngester.run(@argument)
 
@@ -142,7 +142,7 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
 
       expect(PubSubMock, :connect, fn -> @conn end)
       expect(PubSubMock, :get, fn @conn, "fake_sub" -> @two_messages end)
-      expect(PubSubMock, :confirm, fn @acks_ids, @conn -> @ack_message end)
+      expect(PubSubMock, :confirm, fn @conn, @acks_ids -> @ack_message end)
 
       PubSubIngester.run(@argument)
 
@@ -152,7 +152,7 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
     test "Do not ack when postoffice topic does not exists" do
       expect(PubSubMock, :connect, fn -> @conn end)
       expect(PubSubMock, :get, fn @conn, "fake_sub" -> @two_messages end)
-      expect(PubSubMock, :confirm, 0, fn @acks_ids, @conn-> @ack_message end)
+      expect(PubSubMock, :confirm, 0, fn @conn, @acks_ids -> @ack_message end)
 
       assert_raise MatchError, fn ->
         PubSubIngester.run(@argument)

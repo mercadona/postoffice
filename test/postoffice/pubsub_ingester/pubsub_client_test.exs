@@ -5,6 +5,7 @@ defmodule Postoffice.PubSubIngester.PubSubClientTest do
 
   alias Postoffice.PubSubIngester.Adapters.PubSubMock
   alias Postoffice.PubSubIngester.PubSubClient
+  alias Postoffice.Fixtures
 
   @without_messages {:ok, %GoogleApi.PubSub.V1.Model.PullResponse{receivedMessages: nil}}
 
@@ -84,25 +85,29 @@ defmodule Postoffice.PubSubIngester.PubSubClientTest do
 
   @ack_message {:ok, %GoogleApi.PubSub.V1.Model.Empty{}}
 
-  describe "get messages from pubsub" do
-    test "get messages when has not messages to receive" do
-      expect(PubSubMock, :get, fn "fake_sub" -> @without_messages end)
+setup do
+    {:ok, pubsub_conn: Fixtures.pubsub_conn()}
+end
 
-      {:ok, messages} = PubSubClient.get(@argument)
+  describe "get messages from pubsub" do
+    test "get messages when has not messages to receive", %{pubsub_conn: pubsub_conn} do
+      expect(PubSubMock, :get, fn pubsub_conn, "fake_sub" -> @without_messages end)
+
+      {:ok, messages} = PubSubClient.get(pubsub_conn, @argument)
 
       assert messages == []
     end
 
-    test "get error from pubsub returns the error" do
-      expect(PubSubMock, :get, fn "fake_sub" -> @pubsub_error end)
+    test "get error from pubsub returns the error", %{pubsub_conn: pubsub_conn} do
+      expect(PubSubMock, :get, fn conn, "fake_sub" -> @pubsub_error end)
 
-      @pubsub_error = PubSubClient.get(@argument)
+      @pubsub_error = PubSubClient.get(pubsub_conn, @argument)
     end
 
-    test "get messages when has messages to receive" do
-      expect(PubSubMock, :get, fn "fake_sub" -> @two_messages end)
+    test "get messages when has messages to receive", %{pubsub_conn: pubsub_conn} do
+      expect(PubSubMock, :get, fn conn, "fake_sub" -> @two_messages end)
 
-      {:ok, messages} = PubSubClient.get(@argument)
+      {:ok, messages} = PubSubClient.get(pubsub_conn, @argument)
 
       assert messages == [
                %{
@@ -124,13 +129,24 @@ defmodule Postoffice.PubSubIngester.PubSubClientTest do
   end
 
   describe "confirm messages from pubsub" do
-    test "confirm messages returns google response when correct ack" do
-      expect(PubSubMock, :confirm, fn ["ackId1", "ackId2"] -> @ack_message end)
+    test "confirm messages returns google response when correct ack", %{pubsub_conn: pubsub_conn} do
+      expect(PubSubMock, :confirm, fn pubsub_conn, ["ackId1", "ackId2"]-> @ack_message end)
 
       ackIds = ["ackId1", "ackId2"]
-      ack_message = PubSubClient.confirm(ackIds)
 
-      assert ack_message == @ack_message
+      ack_message = PubSubClient.confirm(ackIds, pubsub_conn)
+
+      assert ack_message == ack_message
+    end
+  end
+
+  describe "get connection from pubsub" do
+    test "returns google connection", %{pubsub_conn: pubsub_conn} do
+      expect(PubSubMock, :connect, fn -> pubsub_conn end)
+
+      google_connection = PubSubClient.connect()
+
+      assert google_connection == pubsub_conn
     end
   end
 end

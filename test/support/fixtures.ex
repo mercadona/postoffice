@@ -51,4 +51,19 @@ defmodule Postoffice.Fixtures do
     {:ok, _publisher_success} =
       Messaging.create_publisher_failure(%{message_id: message.id, publisher_id: publisher.id})
   end
+
+  def pubsub_conn(), do: %Tesla.Client{
+    adapter: nil,
+    fun: nil,
+    post: [],
+    pre: [
+      {Tesla.Middleware.Headers, :call,
+       [
+         [
+           {"authorization",
+            "Bearer ya29.c.Ko8BywcJmQ044Tz44v_NoMQ03cXByM1rMjKSFKBWpjcCE2RLIDlxlWvlSXC8gSYtQTmdkRi-wA-mzFsSn37l1uV7TlbHq5rIqqdDbr746sECtpT5vF1JEskVLC2VsEBc-ukAT4C8hb-n1xXLw00S2M5kCBANtdSsbkeTG1I57fuIGN3dU3TSKtRzmZ0on5Anlgs"}
+         ]
+       ]}
+    ]
+  }
 end
