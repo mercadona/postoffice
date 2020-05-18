@@ -12,6 +12,20 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
 
   setup [:set_mox_from_context, :verify_on_exit!]
 
+  @conn %Tesla.Client{
+    adapter: nil,
+    fun: nil,
+    post: [],
+    pre: [
+      {Tesla.Middleware.Headers, :call,
+       [
+         [
+           {"authorization",
+            "Bearer ya29.c.Ko8BywcJmQ044Tz44v_NoMQ03cXByM1rMjKSFKBWpjcCE2RLIDlxlWvlSXC8gSYtQTmdkRi-wA-mzFsSn37l1uV7TlbHq5rIqqdDbr746sECtpT5vF1JEskVLC2VsEBc-ukAT4C8hb-n1xXLw00S2M5kCBANtdSsbkeTG1I57fuIGN3dU3TSKtRzmZ0on5Anlgs"}
+         ]
+       ]}
+    ]
+  }
   @two_messages {
     :ok,
     %GoogleApi.PubSub.V1.Model.PullResponse{
@@ -100,8 +114,9 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
 
-      expect(PubSubMock, :get, fn "fake_sub" -> @pubsub_error end)
-      expect(PubSubMock, :confirm, 0, fn @acks_ids -> @ack_message end)
+      expect(PubSubMock, :connect, fn -> @conn end)
+      expect(PubSubMock, :get, fn @conn, "fake_sub" -> @pubsub_error end)
+      expect(PubSubMock, :confirm, 0, fn @acks_ids, @conn -> @ack_message end)
 
       PubSubIngester.run(@argument)
 
@@ -112,8 +127,9 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
 
-      expect(PubSubMock, :get, fn "fake_sub" -> @without_messages end)
-      expect(PubSubMock, :confirm, 0, fn @acks_ids -> @ack_message end)
+      expect(PubSubMock, :connect, fn -> @conn end)
+      expect(PubSubMock, :get, fn @conn, "fake_sub" -> @without_messages end)
+      expect(PubSubMock, :confirm, 0, fn @acks_ids, @conn -> @ack_message end)
 
       PubSubIngester.run(@argument)
 
@@ -124,8 +140,9 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
 
-      expect(PubSubMock, :get, fn "fake_sub" -> @two_messages end)
-      expect(PubSubMock, :confirm, fn @acks_ids -> @ack_message end)
+      expect(PubSubMock, :connect, fn -> @conn end)
+      expect(PubSubMock, :get, fn @conn, "fake_sub" -> @two_messages end)
+      expect(PubSubMock, :confirm, fn @acks_ids, @conn -> @ack_message end)
 
       PubSubIngester.run(@argument)
 
@@ -133,8 +150,9 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
     end
 
     test "Do not ack when postoffice topic does not exists" do
-      expect(PubSubMock, :get, fn "fake_sub" -> @two_messages end)
-      expect(PubSubMock, :confirm, 0, fn @acks_ids -> @ack_message end)
+      expect(PubSubMock, :connect, fn -> @conn end)
+      expect(PubSubMock, :get, fn @conn, "fake_sub" -> @two_messages end)
+      expect(PubSubMock, :confirm, 0, fn @acks_ids, @conn-> @ack_message end)
 
       assert_raise MatchError, fn ->
         PubSubIngester.run(@argument)

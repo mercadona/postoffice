@@ -2,11 +2,12 @@ defmodule Postoffice.PubSubIngester.PubSubIngester do
   alias Postoffice.PubSubIngester.PubSubClient
 
   def run(subscription_to_topic) do
-    PubSubClient.get(subscription_to_topic)
+    conn = PubSubClient.connect()
+    PubSubClient.get(conn, subscription_to_topic)
     |> case do
       {:ok, messages} ->
         ingest_messages({:ok, messages})
-        |> confirm
+        |> confirm(conn)
 
       error ->
         error
@@ -22,7 +23,7 @@ defmodule Postoffice.PubSubIngester.PubSubIngester do
     end)
   end
 
-  defp confirm({:ok, []} = response), do: response
+  defp confirm({:ok, []}, _conn), do: {:ok, []}
 
-  defp confirm(ackIds), do: PubSubClient.confirm(ackIds)
+  defp confirm(ackIds, conn), do: PubSubClient.confirm(ackIds, conn)
 end

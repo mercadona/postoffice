@@ -1,8 +1,10 @@
 defmodule Postoffice.PubSubIngester.PubSubClient do
   alias Postoffice.PubSubIngester.Adapters.PubSub
 
-  def get(%{topic: topic_name, sub: sub_name}) do
-    impl().get(sub_name)
+  def connect(), do: impl().connect()
+
+  def get(conn, %{topic: topic_name, sub: sub_name}) do
+    impl().get(conn, sub_name)
     |> case do
       {:ok, response} ->
         response.receivedMessages
@@ -36,9 +38,7 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
     {:ok, messages}
   end
 
-  def confirm(ackIds), do: impl().confirm(ackIds)
+  def confirm(ackIds, conn), do: impl().confirm(ackIds, conn)
 
-  defp impl do
-    Application.get_env(:postoffice, :pubsub_ingester_client, PubSub)
-  end
+  defp impl, do: Application.get_env(:postoffice, :pubsub_ingester_client, PubSub)
 end
