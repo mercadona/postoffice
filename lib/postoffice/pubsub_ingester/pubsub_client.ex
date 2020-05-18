@@ -12,9 +12,7 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
     end
   end
 
-  defp build_messages(receivedMessages, _topic_name) when receivedMessages == nil do
-    {:ok, []}
-  end
+  defp build_messages(receivedMessages, _topic_name) when receivedMessages == nil, do: {:ok, []}
 
   defp build_messages(receivedMessages, topic_name) when receivedMessages != nil do
     messages =
@@ -38,9 +36,7 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
     {:ok, messages}
   end
 
-  def confirm(ackIds) do
-    impl().confirm(ackIds)
-  end
+  def confirm(ackIds), do: impl().confirm(ackIds)
 
   defp impl do
     Application.get_env(:postoffice, :pubsub_ingester_client, PubSub)
