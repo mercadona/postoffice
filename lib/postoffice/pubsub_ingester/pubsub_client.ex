@@ -2,24 +2,21 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
   alias Postoffice.PubSubIngester.Adapters.PubSub
 
   def get(%{topic: topic_name, sub: sub_name}) do
-    case impl().get(sub_name) do
+    impl().get(sub_name)
+    |> case do
       {:ok, response} ->
-        get_messages(response.receivedMessages, topic_name)
-
-      {:error, reason} ->
-        {:error, reason}
+        response.receivedMessages
+        |> build_messages(topic_name)
+      error ->
+        error
     end
   end
 
-  defp get_messages(receivedMessages, topic_name) when receivedMessages != nil do
-    build_messages(receivedMessages, topic_name)
-  end
-
-  defp get_messages(receivedMessages, _topic_name) when receivedMessages == nil do
+  defp build_messages(receivedMessages, _topic_name) when receivedMessages == nil do
     {:ok, []}
   end
 
-  defp build_messages(receivedMessages, topic_name) do
+  defp build_messages(receivedMessages, topic_name) when receivedMessages != nil do
     messages =
       Enum.map(receivedMessages, fn message ->
         payload =

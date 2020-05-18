@@ -3,11 +3,15 @@ defmodule Postoffice.PubSubIngester.PubSubIngester do
 
   def run(subscription_to_topic) do
     PubSubClient.get(subscription_to_topic)
-    |> ingest_messages
-    |> confirm
-  end
+    |> case do
+      {:error, reason} ->
+        {:error, reason}
 
-  defp ingest_messages({:error, _reason} = response), do: response
+      {:ok, messages} ->
+        ingest_messages({:ok, messages})
+        |> confirm
+    end
+  end
 
   defp ingest_messages({:ok, []} = response), do: response
 
@@ -17,8 +21,6 @@ defmodule Postoffice.PubSubIngester.PubSubIngester do
       message["ackId"]
     end)
   end
-
-  defp confirm({:error, _reason} = response), do: response
 
   defp confirm({:ok, []} = response), do: response
 
