@@ -12,147 +12,64 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
 
   setup [:set_mox_from_context, :verify_on_exit!]
 
-  @conn %Tesla.Client{
-    adapter: nil,
-    fun: nil,
-    post: [],
-    pre: [
-      {Tesla.Middleware.Headers, :call,
-       [
-         [
-           {"authorization",
-            "Bearer ya29.c.Ko8BywcJmQ044Tz44v_NoMQ03cXByM1rMjKSFKBWpjcCE2RLIDlxlWvlSXC8gSYtQTmdkRi-wA-mzFsSn37l1uV7TlbHq5rIqqdDbr746sECtpT5vF1JEskVLC2VsEBc-ukAT4C8hb-n1xXLw00S2M5kCBANtdSsbkeTG1I57fuIGN3dU3TSKtRzmZ0on5Anlgs"}
-         ]
-       ]}
-    ]
-  }
-  @two_messages {
-    :ok,
-    %GoogleApi.PubSub.V1.Model.PullResponse{
-      receivedMessages: [
-        %GoogleApi.PubSub.V1.Model.ReceivedMessage{
-          ackId:
-            "ISE-MD5FU0RQBhYsXUZIUTcZCGhRDk9eIz81IChFEAcGTwIoXXkyVSFBXBoHUQ0Zcnxmd2tTGwMKEwUtVVsRDXptXFcnUAwccHxhcm1dEwIBQlJ4W3OK75niloGyYxclSoGxxaxvM7nUxvhMZho9XhJLLD5-MjVFQV5AEkw5AERJUytDCypYEU4E",
-          message: %GoogleApi.PubSub.V1.Model.PubsubMessage{
-            attributes: nil,
-            data: "eyJvbmUiOiJ0d28ifQ==",
-            messageId: "1152107770337164",
-            publishTime: ~U[2020-05-15 18:04:46.791Z]
-          }
-        },
-        %GoogleApi.PubSub.V1.Model.ReceivedMessage{
-          ackId:
-            "ISE-MD5FU0RQBhYsXUZIUTcZCGhRDk9eIz81IChFEAcGTwIoXXkyVSFBXBoHUQ0Zcnxmd2tTGwMKEwUtVVoRDXptXFcnUAwccHxhcm9eEwQFRFt-XnOK75niloGyYxclSoGxxaxvM7nUxvhMZho9XhJLLD5-MjVFQV5AEkw5AERJUytDCypYEU4E",
-          message: %GoogleApi.PubSub.V1.Model.PubsubMessage{
-            attributes: %{"att_one" => "one"},
-            data: "eyJ0d28iOiJ0aHJlZSJ9",
-            messageId: "1152107540571801",
-            publishTime: ~U[2020-05-15 18:05:30.225Z]
-          }
-        }
-      ]
-    }
-  }
-
-  @pubsub_error {:error,
-                 %Tesla.Env{
-                   __client__: %Tesla.Client{
-                     adapter: nil,
-                     fun: nil,
-                     post: [],
-                     pre: [
-                       {Tesla.Middleware.Headers, :call,
-                        [
-                          [
-                            {"authorization",
-                             "Bearer ya29.c.Ko8BywcP1ge4PXhiA4y9_qgO7P1qDmSwntuVMz0eMZUJKUH5eIezGJ0ZTNqEFFz4jMHwoKH9gFKvwaA9f6ty3hD6wkciYkfvbS74ebxr8usYuMmTi3ZOzGkyv4meYnj5yu37wtbsPtyOCSZSgT4BL9QtbG5_f1T9fFtqklhGkTROfU1F7UZYkXny47fXO53up8c"}
-                          ]
-                        ]}
-                     ]
-                   },
-                   __module__: GoogleApi.PubSub.V1.Connection,
-                   body:
-                     "{\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"Resource not found (resource=supply-test-juan).\",\n    \"status\": \"NOT_FOUND\"\n  }\n}\n",
-                   headers: [
-                     {"cache-control", "private"},
-                     {"date", "Sun, 17 May 2020 19:19:38 GMT"},
-                     {"accept-ranges", "none"},
-                     {"server", "ESF"},
-                     {"vary", "X-Origin"},
-                     {"content-length", "130"},
-                     {"content-type", "application/json; charset=UTF-8"},
-                     {"x-xss-protection", "0"},
-                     {"x-frame-options", "SAMEORIGIN"},
-                     {"x-content-type-options", "nosniff"},
-                     {"alt-svc",
-                      "h3-27=\":443\"; ma=2592000,h3-25=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q049=\":443\"; ma=2592000,h3-Q048=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\""}
-                   ],
-                   method: :post,
-                   opts: [],
-                   query: [],
-                   status: 404,
-                   url:
-                     "https://pubsub.googleapis.com/v1/projects/itg-mimercadona/subscriptions/supply-test-juan:pull"
-                 }}
+  setup do
+    {:ok, pubsub_conn: Fixtures.pubsub_conn()}
+  end
 
   @acks_ids [
     "ISE-MD5FU0RQBhYsXUZIUTcZCGhRDk9eIz81IChFEAcGTwIoXXkyVSFBXBoHUQ0Zcnxmd2tTGwMKEwUtVVsRDXptXFcnUAwccHxhcm1dEwIBQlJ4W3OK75niloGyYxclSoGxxaxvM7nUxvhMZho9XhJLLD5-MjVFQV5AEkw5AERJUytDCypYEU4E",
     "ISE-MD5FU0RQBhYsXUZIUTcZCGhRDk9eIz81IChFEAcGTwIoXXkyVSFBXBoHUQ0Zcnxmd2tTGwMKEwUtVVoRDXptXFcnUAwccHxhcm9eEwQFRFt-XnOK75niloGyYxclSoGxxaxvM7nUxvhMZho9XhJLLD5-MjVFQV5AEkw5AERJUytDCypYEU4E"
   ]
 
-  @without_messages {:ok, %GoogleApi.PubSub.V1.Model.PullResponse{receivedMessages: nil}}
-
   @argument %{
     topic: "test",
     sub: "fake_sub"
   }
 
-  @ack_message {:ok, %GoogleApi.PubSub.V1.Model.Empty{}}
-
   describe "pubsub ingester" do
-    test "no message created on error" do
+    test "no message created on error", %{pubsub_conn: pubsub_conn} do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
 
-      expect(PubSubMock, :connect, fn -> @conn end)
-      expect(PubSubMock, :get, fn @conn, "fake_sub" -> @pubsub_error end)
-      expect(PubSubMock, :confirm, 0, fn @conn, @acks_ids -> @ack_message end)
+      expect(PubSubMock, :connect, fn -> pubsub_conn end)
+      expect(PubSubMock, :get, fn pubsub_conn, "fake_sub" -> Fixtures.pubsub_error() end)
+      expect(PubSubMock, :confirm, 0, fn pubsub_conn, @acks_ids -> Fixtures.google_ack_message() end)
 
       PubSubIngester.run(@argument)
 
       assert Messaging.list_messages() == []
     end
 
-    test "no message created if no undelivered message found" do
+    test "no message created if no undelivered message found", %{pubsub_conn: pubsub_conn} do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
 
-      expect(PubSubMock, :connect, fn -> @conn end)
-      expect(PubSubMock, :get, fn @conn, "fake_sub" -> @without_messages end)
-      expect(PubSubMock, :confirm, 0, fn @conn, @acks_ids -> @ack_message end)
+      expect(PubSubMock, :connect, fn -> pubsub_conn end)
+      expect(PubSubMock, :get, fn pubsub_conn, "fake_sub" -> Fixtures.empty_google_pubsub_messages() end)
+      expect(PubSubMock, :confirm, 0, fn pubsub_conn, @acks_ids -> Fixtures.google_ack_message() end)
 
       PubSubIngester.run(@argument)
 
       assert Messaging.list_messages() == []
     end
 
-    test "create message when is ingested" do
+    test "create message when is ingested", %{pubsub_conn: pubsub_conn} do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
 
-      expect(PubSubMock, :connect, fn -> @conn end)
-      expect(PubSubMock, :get, fn @conn, "fake_sub" -> @two_messages end)
-      expect(PubSubMock, :confirm, fn @conn, @acks_ids -> @ack_message end)
+      expect(PubSubMock, :connect, fn -> pubsub_conn end)
+      expect(PubSubMock, :get, fn pubsub_conn, "fake_sub" -> Fixtures.two_google_pubsub_messages() end)
+      expect(PubSubMock, :confirm, fn pubsub_conn, @acks_ids -> Fixtures.google_ack_message() end)
 
       PubSubIngester.run(@argument)
 
       assert length(Repo.all(PendingMessage)) == 2
     end
 
-    test "Do not ack when postoffice topic does not exists" do
-      expect(PubSubMock, :connect, fn -> @conn end)
-      expect(PubSubMock, :get, fn @conn, "fake_sub" -> @two_messages end)
-      expect(PubSubMock, :confirm, 0, fn @conn, @acks_ids -> @ack_message end)
+    test "Do not ack when postoffice topic does not exists", %{pubsub_conn: pubsub_conn} do
+      expect(PubSubMock, :connect, fn -> pubsub_conn end)
+      expect(PubSubMock, :get, fn pubsub_conn, "fake_sub" -> Fixtures.two_google_pubsub_messages() end)
+      expect(PubSubMock, :confirm, 0, fn pubsub_conn, @acks_ids -> Fixtures.google_ack_message() end)
 
       assert_raise MatchError, fn ->
         PubSubIngester.run(@argument)
