@@ -4,12 +4,12 @@ defmodule Postoffice.PubSubIngester.PubSubIngester do
   def run(subscription_to_topic) do
     PubSubClient.get(subscription_to_topic)
     |> case do
-      {:error, reason} ->
-        {:error, reason}
-
       {:ok, messages} ->
         ingest_messages({:ok, messages})
         |> confirm
+
+      error ->
+        error
     end
   end
 
