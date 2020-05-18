@@ -131,5 +131,14 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
 
       assert length(Repo.all(PendingMessage)) == 2
     end
+
+    test "Do not ack when postoffice topic does not exists" do
+      expect(PubSubMock, :get, fn "fake_sub" -> @two_messages end)
+      expect(PubSubMock, :confirm, 0, fn @acks_ids -> @ack_message end)
+
+      assert_raise MatchError, fn ->
+        PubSubIngester.run(@argument)
+      end
+    end
   end
 end
