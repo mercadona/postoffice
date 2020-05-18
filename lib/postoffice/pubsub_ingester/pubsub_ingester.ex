@@ -25,5 +25,5 @@ defmodule Postoffice.PubSubIngester.PubSubIngester do
 
   defp confirm({:ok, []}, _conn), do: {:ok, []}
 
-  defp confirm(ackIds, conn), do: PubSubClient.confirm(ackIds, conn)
+  defp confirm(ackIds, conn), do: PubSubClient.confirm(conn, ackIds)
 end
