@@ -18,7 +18,7 @@ end
 
   describe "get messages from pubsub" do
     test "get messages when has not messages to receive", %{pubsub_conn: pubsub_conn} do
-      expect(PubSubMock, :get, fn pubsub_conn, "fake_sub" -> Fixtures.empty_google_pubsub_messages() end)
+      expect(PubSubMock, :get, fn _pubsub_conn, "fake_sub" -> Fixtures.empty_google_pubsub_messages() end)
 
       {:ok, messages} = PubSubClient.get(pubsub_conn, @topic_subscription_relation)
 
@@ -26,7 +26,7 @@ end
     end
 
     test "get error from pubsub returns the error", %{pubsub_conn: pubsub_conn} do
-      expect(PubSubMock, :get, fn conn, "fake_sub" -> Fixtures.pubsub_error() end)
+      expect(PubSubMock, :get, fn _pubsub_conn, "fake_sub" -> Fixtures.pubsub_error() end)
 
       error = PubSubClient.get(pubsub_conn, @topic_subscription_relation)
 
@@ -34,7 +34,7 @@ end
     end
 
     test "get messages when has messages to receive", %{pubsub_conn: pubsub_conn} do
-      expect(PubSubMock, :get, fn conn, "fake_sub" -> Fixtures.two_google_pubsub_messages() end)
+      expect(PubSubMock, :get, fn _pubsub_conn, "fake_sub" -> Fixtures.two_google_pubsub_messages() end)
 
       {:ok, messages} = PubSubClient.get(pubsub_conn, @topic_subscription_relation)
 
@@ -59,7 +59,7 @@ end
 
   describe "confirm messages from pubsub" do
     test "confirm messages returns google response when correct ack", %{pubsub_conn: pubsub_conn} do
-      expect(PubSubMock, :confirm, fn pubsub_conn, ["ackId1", "ackId2"]-> Fixtures.google_ack_message() end)
+      expect(PubSubMock, :confirm, fn _pubsub_conn, ["ackId1", "ackId2"]-> Fixtures.google_ack_message() end)
 
       ackIds = ["ackId1", "ackId2"]
 

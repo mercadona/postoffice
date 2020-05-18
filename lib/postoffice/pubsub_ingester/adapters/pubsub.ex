@@ -1,7 +1,7 @@
 defmodule Postoffice.PubSubIngester.Adapters.PubSub do
   @behaviour Postoffice.PubSubIngester.Adapters.Impl
 
-  def get(subscription) do
+  def get(conn, topic_subscription_relation) do
     {:fake}
   end
 
