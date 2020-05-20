@@ -21,6 +21,7 @@ RUN apk add --no-cache --update bash
 
 COPY config/dummy-credentials.json /secrets/dummy-credentials.json
 ENV GOOGLE_APPLICATION_CREDENTIALS /secrets/dummy-credentials.json
+ENV GOOGLE_MAX_MESSAGES_PULL 10
 
 WORKDIR /app
 
