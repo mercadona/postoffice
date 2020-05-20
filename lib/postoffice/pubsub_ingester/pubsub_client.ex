@@ -38,7 +38,7 @@ defmodule Postoffice.PubSubIngester.PubSubClient do
     {:ok, messages}
   end
 
-  def confirm(conn, ackIds), do: impl().confirm(conn, ackIds)
+  def confirm(conn, sub_name, ackIds), do: impl().confirm(conn, sub_name, ackIds)
 
   defp impl, do: Application.get_env(:postoffice, :pubsub_ingester_client, PubSub)
 end
