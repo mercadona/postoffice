@@ -59,11 +59,11 @@ end
 
   describe "confirm messages from pubsub" do
     test "confirm messages returns google response when correct ack", %{pubsub_conn: pubsub_conn} do
-      expect(PubSubMock, :confirm, fn _pubsub_conn, "fake_sub", ["ackId1", "ackId2"]-> Fixtures.google_ack_message() end)
+      expect(PubSubMock, :confirm, fn _pubsub_conn, ["ackId1", "ackId2"], "sub_name" -> Fixtures.google_ack_message() end)
 
       ackIds = ["ackId1", "ackId2"]
 
-      ack_message = PubSubClient.confirm(pubsub_conn, "fake_sub", ackIds)
+      ack_message = PubSubClient.confirm(pubsub_conn, "sub_name", ackIds)
 
       assert ack_message == ack_message
     end

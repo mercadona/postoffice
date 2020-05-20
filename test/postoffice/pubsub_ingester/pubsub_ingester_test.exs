@@ -33,7 +33,7 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
 
       expect(PubSubMock, :connect, fn -> pubsub_conn end)
       expect(PubSubMock, :get, fn  _pubsub_conn, "fake_sub" -> Fixtures.pubsub_error() end)
-      expect(PubSubMock, :confirm, 0, fn  _pubsub_conn, "fake_sub", @acks_ids -> Fixtures.google_ack_message() end)
+      expect(PubSubMock, :confirm, 0, fn  _pubsub_conn, @acks_ids, "fake_sub" -> Fixtures.google_ack_message() end)
 
       PubSubIngester.run(@argument)
 
@@ -46,7 +46,7 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
 
       expect(PubSubMock, :connect, fn -> pubsub_conn end)
       expect(PubSubMock, :get, fn  _pubsub_conn, "fake_sub" -> Fixtures.empty_google_pubsub_messages() end)
-      expect(PubSubMock, :confirm, 0, fn  _pubsub_conn, "fake_sub", @acks_ids -> Fixtures.google_ack_message() end)
+      expect(PubSubMock, :confirm, 0, fn  _pubsub_conn, @acks_ids, "fake_sub" -> Fixtures.google_ack_message() end)
 
       PubSubIngester.run(@argument)
 
@@ -59,7 +59,7 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
 
       expect(PubSubMock, :connect, fn -> pubsub_conn end)
       expect(PubSubMock, :get, fn  _pubsub_conn, "fake_sub" -> Fixtures.two_google_pubsub_messages() end)
-      expect(PubSubMock, :confirm, fn  _pubsub_conn, "fake_sub", @acks_ids -> Fixtures.google_ack_message() end)
+      expect(PubSubMock, :confirm, fn  _pubsub_conn, @acks_ids, "fake_sub" -> Fixtures.google_ack_message() end)
 
       PubSubIngester.run(@argument)
 
@@ -69,7 +69,7 @@ defmodule Postoffice.PubSubIngester.PubSubIngesterTest do
     test "Do not ack when postoffice topic does not exists", %{pubsub_conn: pubsub_conn} do
       expect(PubSubMock, :connect, fn -> pubsub_conn end)
       expect(PubSubMock, :get, fn  _pubsub_conn, "fake_sub" -> Fixtures.two_google_pubsub_messages() end)
-      expect(PubSubMock, :confirm, 0, fn  _pubsub_conn, "fake_sub", @acks_ids -> Fixtures.google_ack_message() end)
+      expect(PubSubMock, :confirm, 0, fn  _pubsub_conn, @acks_ids, "fake_sub" -> Fixtures.google_ack_message() end)
 
       assert_raise MatchError, fn ->
         PubSubIngester.run(@argument)
