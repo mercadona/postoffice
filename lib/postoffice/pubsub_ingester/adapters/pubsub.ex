@@ -29,7 +29,7 @@ defmodule Postoffice.PubSubIngester.Adapters.PubSub do
   end
 
   defp get_project_id,
-    do: Application.get_env(:postoffice, :gcloud_pubsub_project_id, 'test')
+    do: Application.get_env(:postoffice, :pubsub_project_name, "test")
 
   defp get_max_messages,
     do: Application.get_env(:postoffice, :pubsub_max_messages, 10)
