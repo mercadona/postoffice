@@ -14,6 +14,7 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
   @one_message_response "[{\"id\": 1, \"topic\": \"test\", \"payload\": {\"products\": [{\"code\": \"1234\"}, {\"code\": 2345}], \"reference\": 1234}, \"attributes\": {}}]"
   @two_messages_response "[{\"id\": 1, \"topic\": \"test\", \"payload\": {\"products\": [{\"code\": \"1234\"}, {\"code\": 2345}], \"reference\": 1234}, \"attributes\": {}}, {\"id\": 2, \"topic\": \"test\", \"payload\": {\"products\": [{\"code\": \"1234\"}, {\"code\": 2345}], \"reference\": 1234}, \"attributes\": {}}]"
   @wrong_topic_message "[{\"id\": 1, \"topic\": \"test2\", \"payload\": {\"products\": [{\"code\": \"1234\"}, {\"code\": 2345}], \"reference\": 1234}, \"attributes\": {}}]"
+  @bulk_message_response "[{\"id\": 1, \"topic\": \"test\", \"bulk\": true, \"payload\": [{\"topic\": \"test\", \"payload\": {\"product\": 1234}, \"attributes\": {}}, {\"topic\": \"test\", \"payload\": {\"product\": 1234}, \"attributes\": {}}]}]"
 
   setup [:set_mox_from_context, :verify_on_exit!]
 
@@ -43,6 +44,20 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       Fixtures.create_topic()
       MessageRecovery.run(@origin_host)
       assert Kernel.length(Messaging.list_messages()) == 1
+    end
+
+    test "messages created if more than one undelivered message in response" do
+      expect(HttpMock, :list, fn @origin_host ->
+        {:ok, %HTTPoison.Response{status_code: 200, body: @bulk_message_response}}
+      end)
+
+      expect(HttpMock, :delete, fn @origin_host, @first_message_id ->
+        {:ok, %HTTPoison.Response{status_code: 204}}
+      end)
+
+      Fixtures.create_topic()
+      MessageRecovery.run(@origin_host)
+      assert Kernel.length(Messaging.list_messages()) == 2
     end
 
     test "message created as pending if one undelivered message found" do
