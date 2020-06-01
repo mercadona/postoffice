@@ -4,8 +4,8 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
   alias Postoffice.Messaging
 
   @bulk_create_attrs %{
-    payload: [
-        %{
+    _json: [
+      %{
         attributes: %{},
         payload: %{"key" => "test1", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
         topic: "test"
@@ -19,15 +19,14 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
   }
 
   @wrong_topic_create_attrs %{
-    payload: [
-        %{
+    _json: [
+      %{
         attributes: %{},
         payload: %{"key" => "test1", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
         topic: "test2"
       }
     ]
   }
-
 
   setup %{conn: conn} do
     {:ok, _topic} = Messaging.create_topic(%{name: "test", origin_host: "example.com"})
@@ -39,7 +38,7 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
       conn = post(conn, Routes.api_bulk_message_path(conn, :create), @bulk_create_attrs)
 
       assert json_response(conn, 201)
-      assert Kernel.length(Messaging.list_messages) == 2
+      assert Kernel.length(Messaging.list_messages()) == 2
     end
 
     test "returns error in case something wrong happens during insert", %{conn: conn} do
