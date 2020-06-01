@@ -15,9 +15,12 @@ config :postoffice, PostofficeWeb.Endpoint,
   http: [port: 4000],
   secret_key_base: "ltXgZliDmN0mLNWAF5iobiRF6G3q96oWvttpWlqb1hahcxgAwcxOGG9R5khNiWy5",
   render_errors: [view: PostofficeWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Postoffice.PubSub, adapter: Phoenix.PubSub.PG2],
+  pubsub_server: Postoffice.PubSub,
   root: ".",
-  instrumenters: [PostofficeWeb.Metrics.Phoenix]
+  instrumenters: [PostofficeWeb.Metrics.Phoenix],
+  live_view: [
+    signing_salt: "SECRET_SALT"
+  ]
 
 # Configures Elixir's Logger
 config :logger, :console,
