@@ -84,7 +84,7 @@ To start your Phoenix server:
   * `brew update`
   * `brew install elixir`
   * Create the following environmet variables in order to start the application:
-    * `GCLOUD_PUBSUB_CREDENTIALS_PATH` with the absolute path to the pubsub credentials file. We provide `config/dummy-credentials.json` to be able to start the app.
+    * `GOOGLE_APPLICATION_CREDENTIALS` with the absolute path to the pubsub credentials file. We provide `config/dummy-credentials.json` to be able to start the app.
     * `GCLOUD_PUBSUB_PROJECT_ID` with the project_id used.
   * `mix local.hex`
   * `mix archive.install hex phx_new 1.4.11`
