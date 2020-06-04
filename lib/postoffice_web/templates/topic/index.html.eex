@@ -16,9 +16,9 @@
           <td><%= topic.name %></td>
           <td><%= topic.origin_host %></td>
           <%= if topic.recovery_enabled do %>
-            <td><i class="material-icons">toggle_on</i></td>
+            <td><i class="material-icons" style="color:green">toggle_on</i></td>
           <% else %>
-            <td><i class="material-icons">toggle_off</i></td>
+            <td><i class="material-icons" style="color:#cc0000">toggle_off</i></td>
           <% end %>
 
         </tr>
