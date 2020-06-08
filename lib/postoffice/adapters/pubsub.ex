@@ -16,8 +16,8 @@ defmodule Postoffice.Adapters.Pubsub do
     request = %GoogleApi.PubSub.V1.Model.PublishRequest{
       messages: [
         %GoogleApi.PubSub.V1.Model.PubsubMessage{
-          data: Base.encode64(Poison.encode!(payload)),
-          attributes: attributes
+          data: Base.encode64(Poison.encode!(pending_messages.payload)),
+          attributes: pending_messages.attributes
         }
       ]
     }
