@@ -12,7 +12,8 @@ use Mix.Config
 config :postoffice, PostofficeWeb.Endpoint,
   url: [host: {:system, "HOST", default: "localhost"}, port: 4000],
   cache_static_manifest: "priv/static/cache_manifest.json",
-  server: true
+  server: true,
+  check_origin: false
 
 config :logger_json, :backend, metadata: :all
 config :logger, backends: [LoggerJSON]
