@@ -43,7 +43,7 @@ defmodule Postoffice.MessagesProducer do
 
       queue =
         Enum.reduce(pending_messages, queue, fn publisher_message, acc ->
-          :queue.in(%{publisher: publisher, message: pending_messages}, acc)
+          :queue.in(%{publisher: publisher, message: publisher_message.message}, acc)
         end)
 
       {events, demand_state} = Dispatch.dispatch_events(queue, pending_demand, [])
