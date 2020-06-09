@@ -20,17 +20,17 @@ defmodule Postoffice.MessagesConsumerTest do
   describe "MessagesConsumer tests" do
     test "message from messaging context must be valid for this module" do
       topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
+      existing_publisher = Fixtures.create_publisher(topic)
       {_, message} = Messaging.add_message_to_deliver(topic, @message_attrs)
 
-      pending_message =
-        Messaging.list_pending_messages_for_publisher(publisher.id) |> List.first()
+      _pending_message =
+        Messaging.list_pending_messages_for_publisher(existing_publisher.id) |> List.first()
 
-      expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+      expect(HttpMock, :publish, fn ^existing_publisher, ^message ->
         {:ok, %HTTPoison.Response{status_code: 200}}
       end)
 
-      MessagesConsumer.start_link(pending_message)
+      MessagesConsumer.start_link(%{publisher: existing_publisher, message: message})
       Process.sleep(300)
     end
   end

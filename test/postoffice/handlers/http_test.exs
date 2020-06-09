@@ -49,11 +49,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
-    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+    expect(HttpMock, :publish, fn ^publisher, ^message ->
       {:ok, %HTTPoison.Response{status_code: 404}}
     end)
 
-    Http.run(publisher.target, publisher.id, message)
+    Http.run(publisher, message)
     assert [] = Messaging.list_publisher_success(publisher.id)
     message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert message_failure.message_id == message.id
@@ -70,11 +70,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
-    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+    expect(HttpMock, :publish, fn ^publisher, ^message ->
       {:ok, %HTTPoison.Response{status_code: 201}}
     end)
 
-    Http.run(publisher.target, publisher.id, message)
+    Http.run(publisher, message)
     assert [message] = Messaging.list_publisher_success(publisher.id)
   end
 
@@ -85,11 +85,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     assert length(Repo.all(PendingMessage)) == 1
 
-    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+    expect(HttpMock, :publish, fn ^publisher, ^message ->
       {:ok, %HTTPoison.Response{status_code: 201}}
     end)
 
-    Http.run(publisher.target, publisher.id, message)
+    Http.run(publisher, message)
     assert length(Repo.all(PendingMessage)) == 0
   end
 
@@ -101,11 +101,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     assert length(Repo.all(PendingMessage)) == 2
 
-    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+    expect(HttpMock, :publish, fn ^publisher, ^message ->
       {:ok, %HTTPoison.Response{status_code: 201}}
     end)
 
-    Http.run(publisher.target, publisher.id, message)
+    Http.run(publisher, message)
 
     pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id)
     assert Kernel.length(pending_messages) == 1
@@ -138,11 +138,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     assert length(Repo.all(PendingMessage)) == 2
 
-    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+    expect(HttpMock, :publish, fn ^publisher, ^message ->
       {:ok, %HTTPoison.Response{status_code: 201}}
     end)
 
-    Http.run(publisher.target, publisher.id, message)
+    Http.run(publisher, message)
     assert length(Repo.all(PendingMessage)) == 1
 
     pending_message =
@@ -160,11 +160,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
-    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+    expect(HttpMock, :publish, fn ^publisher, ^message ->
       {:error, %HTTPoison.Error{reason: "test error reason"}}
     end)
 
-    Http.run(publisher.target, publisher.id, message)
+    Http.run(publisher, message)
     message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert message_failure.message_id == message.id
 
@@ -178,11 +178,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
-    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+    expect(HttpMock, :publish, fn ^publisher, ^message ->
       {:error, %HTTPoison.Error{reason: "test error reason"}}
     end)
 
-    Http.run(publisher.target, publisher.id, message)
+    Http.run(publisher, message)
     assert length(Repo.all(PendingMessage)) == 1
   end
 
@@ -194,11 +194,11 @@ defmodule Postoffice.Handlers.HttpTest do
 
     {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
-    expect(HttpMock, :publish, fn "http://fake.target", ^message ->
+    expect(HttpMock, :publish, fn ^publisher, ^message ->
       {:ok, %HTTPoison.Response{status_code: 300}}
     end)
 
-    Http.run(publisher.target, publisher.id, message)
+    Http.run(publisher, message)
     message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert message_failure.message_id == message.id
 

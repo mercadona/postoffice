@@ -7,6 +7,21 @@
         </div>
 
         <div class="form-group">
+          <%= label f, :target, class: "control-label" %>
+          <%= textarea f, :target, class: "form-control", rows: 1 %>
+        </div>
+
+        <div class="form-group">
+          <%= label f, :seconds_timeout, class: "control-label" %>
+          <%= textarea f, :seconds_timeout, class: "form-control", rows: 1 %>
+        </div>
+
+        <div class="form-group">
+          <label for="type">Type</label>
+          <%= select f, :type, Postoffice.Messaging.Publisher.types, class: "form-control selectpicker" %>
+        </div>
+
+        <div class="form-group">
           <div class="form-check">
               <label class="form-check-label">
                   Active
@@ -16,16 +31,6 @@
                   </span>
               </label>
           </div>
-        </div>
-
-        <div class="form-group">
-          <%= label f, :target, class: "control-label" %>
-          <%= textarea f, :target, class: "form-control", rows: 1 %>
-        </div>
-
-        <div class="form-group">
-          <label for="type">Type</label>
-          <%= select f, :type, Postoffice.Messaging.Publisher.types, class: "form-control selectpicker" %>
         </div>
 
         <div class="form-group">

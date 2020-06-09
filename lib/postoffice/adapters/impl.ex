@@ -1,7 +1,7 @@
 defmodule Postoffice.Adapters.Impl do
   @moduledoc false
 
-  alias Postoffice.Adapters.Message
+  alias Postoffice.Messaging.Publisher
 
-  @callback publish(String, Message) :: {:ok, Message} | {:error, reason :: String}
+  @callback publish(Publisher, any) :: {:ok, any} | {:error, reason :: String}
 end

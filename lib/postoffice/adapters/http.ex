@@ -5,12 +5,18 @@ defmodule Postoffice.Adapters.Http do
   @behaviour Postoffice.Adapters.Impl
 
   @impl true
-  def publish(target, message) do
-    Logger.info("Dispatching Http message to #{target}")
+  def publish(publisher, message) do
+    Logger.info("Dispatching Http message to #{publisher.target}")
     %{payload: payload} = message
 
-    HTTPoison.post(target, Poison.encode!(payload), [
-      {"content-type", "application/json"}
-    ])
+    HTTPoison.post(
+      publisher.target,
+      Poison.encode!(payload),
+      [
+        {"content-type", "application/json"},
+        {"message-id", message.id}
+      ],
+      recv_timeout: publisher.seconds_timeout * 1_000
+    )
   end
 end
