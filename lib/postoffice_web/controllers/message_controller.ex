@@ -1,8 +1,8 @@
 defmodule PostofficeWeb.MessageController do
   use PostofficeWeb, :controller
 
-  def index(conn, %{"uuid" => uuid}) do
-    case Postoffice.find_message_by_uuid(uuid) do
+  def index(conn, %{"id" => id}) do
+    case Postoffice.find_message_by_id(id) do
       nil ->
         conn
         |> put_flash(:info, "Message not found")

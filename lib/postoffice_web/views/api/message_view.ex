@@ -12,7 +12,7 @@ defmodule PostofficeWeb.Api.MessageView do
 
   def render("message.json", %{message: message}) do
     %{
-      public_id: message.public_id
+      id: message.id
     }
   end
 

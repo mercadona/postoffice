@@ -45,8 +45,8 @@ defmodule Postoffice.Rescuer.MessageRecovery do
     case Postoffice.receive_message(message_params) do
       {:ok, created_message} ->
         Logger.info(
-          "Successfully recovered message for topic #{created_message.topic_id} with public_id #{
-            created_message.public_id
+          "Successfully recovered message for topic #{created_message.topic_id} with id #{
+            created_message.id
           }"
         )
 

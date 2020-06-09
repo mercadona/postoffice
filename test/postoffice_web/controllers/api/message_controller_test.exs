@@ -21,9 +21,9 @@ defmodule PostofficeWeb.Api.MessageControllerTest do
   end
 
   describe "create message" do
-    test "renders message when data is valid", %{conn: conn} do
+    test "returns 201 when data is valid", %{conn: conn} do
       conn = post(conn, Routes.api_message_path(conn, :create), @create_attrs)
-      assert %{"public_id" => id} = json_response(conn, 201)["data"]
+      assert json_response(conn, 201)
     end
 
     test "renders errors when topic does not exists", %{conn: conn} do

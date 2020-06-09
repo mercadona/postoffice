@@ -14,13 +14,11 @@ defmodule Postoffice.Handlers.PubsubTest do
 
   @valid_message_attrs %{
     attributes: %{"attr" => "some_value"},
-    payload: %{"key" => "value"},
-    public_id: "7488a646-e31f-11e4-aace-600308960662"
+    payload: %{"key" => "value"}
   }
   @another_valid_message_attrs %{
     attributes: %{"attr" => "some_value"},
-    payload: %{"key" => "value"},
-    public_id: "7488a646-e31f-11e4-aace-600308960661"
+    payload: %{"key" => "value"}
   }
   @valid_publisher_attrs %{
     active: true,
@@ -49,7 +47,6 @@ defmodule Postoffice.Handlers.PubsubTest do
     message = %Message{
       attributes: %{},
       payload: %{},
-      public_id: "7488a646-e31f-11e4-aace-600308960662",
       topic_id: topic.id
     }
 
