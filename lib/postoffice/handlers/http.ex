@@ -5,13 +5,13 @@ defmodule Postoffice.Handlers.Http do
   alias Postoffice.Messaging
 
   def run(publisher, message) do
-    Logger.info("Processing http message", message_id: message.public_id, target: publisher.target)
+    Logger.info("Processing http message", message_id: message.id, target: publisher.target)
 
     case impl().publish(publisher, message) do
       {:ok, %HTTPoison.Response{status_code: status_code, body: _body}}
       when status_code in 200..299 ->
         Logger.info("Succesfully sent http message",
-          message_id: message.public_id,
+          message_id: message.id,
           target: publisher.target
         )
 

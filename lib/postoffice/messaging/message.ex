@@ -5,7 +5,6 @@ defmodule Postoffice.Messaging.Message do
   schema "messages" do
     field :attributes, :map
     field :payload, :map
-    field :public_id, Ecto.UUID
     belongs_to :topic, Postoffice.Messaging.Topic
 
     has_many :publisher_success, Postoffice.Messaging.PublisherSuccess
@@ -20,7 +19,7 @@ defmodule Postoffice.Messaging.Message do
   @doc false
   def changeset(message, attrs) do
     message
-    |> cast(attrs, [:payload, :attributes, :public_id])
-    |> validate_required([:payload, :attributes, :public_id])
+    |> cast(attrs, [:payload, :attributes])
+    |> validate_required([:payload, :attributes])
   end
 end

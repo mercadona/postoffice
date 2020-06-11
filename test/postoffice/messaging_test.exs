@@ -21,8 +21,7 @@ defmodule Postoffice.MessagingTest do
 
   @message_attrs %{
     attributes: %{},
-    payload: %{},
-    public_id: "7488a646-e31f-11e4-aace-600308960662"
+    payload: %{}
   }
 
   @second_publisher_attrs %{
@@ -32,7 +31,7 @@ defmodule Postoffice.MessagingTest do
     type: "http"
   }
 
-  @invalid_message_attrs %{attributes: nil, payload: nil, public_id: nil, topic: nil}
+  @invalid_message_attrs %{attributes: nil, payload: nil, topic: nil}
 
   describe "messages" do
     test "list_messages/0 returns all messages" do
@@ -50,11 +49,7 @@ defmodule Postoffice.MessagingTest do
       topic = Fixtures.create_topic()
       message = Fixtures.add_message_to_deliver(topic)
 
-      _second_message =
-        Fixtures.add_message_to_deliver(topic, %{
-          @message_attrs
-          | public_id: "7488a646-e31f-11e4-aace-600308960661"
-        })
+      Fixtures.add_message_to_deliver(topic, @message_attrs)
 
       assert Messaging.list_messages(1) == [message]
     end
@@ -73,7 +68,6 @@ defmodule Postoffice.MessagingTest do
       assert {:ok, %Message{} = message} = Messaging.add_message_to_deliver(topic, @message_attrs)
       assert message.attributes == %{}
       assert message.payload == %{}
-      assert message.public_id == "7488a646-e31f-11e4-aace-600308960662"
       assert message.topic_id == topic.id
     end
 
@@ -175,14 +169,6 @@ defmodule Postoffice.MessagingTest do
       assert enabled_publisher.target == listed_publisher.target
       assert enabled_publisher.active == listed_publisher.active
       assert enabled_publisher.type == listed_publisher.type
-    end
-
-    test "get_message_by_uuid returns message is found" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_deliver(topic)
-      searched_message = Messaging.get_message_by_uuid(message.public_id)
-
-      assert message.id == searched_message.id
     end
 
     test "list_pending_messages_for_publisher/2 returns empty if no pending messages for a given publisher" do

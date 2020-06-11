@@ -8,14 +8,14 @@ defmodule Postoffice.Handlers.Pubsub do
 
   def run(publisher, message) do
     Logger.info("Processing pubsub message",
-      message_id: message.public_id,
+      message_id: message.id,
       target: publisher.target
     )
 
     case impl().publish(publisher, message) do
       {:ok, _response = %PublishResponse{}} ->
         Logger.info("Succesfully sent pubsub message",
-          message_id: message.public_id,
+          message_id: message.id,
           target: publisher.target
         )
 

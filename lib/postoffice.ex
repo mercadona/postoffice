@@ -16,10 +16,7 @@ defmodule Postoffice do
         {:relationship_does_not_exists, %{topic: ["is invalid"]}}
 
       topic ->
-        Messaging.add_message_to_deliver(
-          topic,
-          Map.put_new(message_params, "public_id", Ecto.UUID.generate())
-        )
+        Messaging.add_message_to_deliver(topic, message_params)
     end
   end
 
@@ -63,14 +60,8 @@ defmodule Postoffice do
     |> Messaging.create_publisher()
   end
 
-  def find_message_by_uuid(uuid) do
-    case Ecto.UUID.cast(uuid) do
-      :error ->
-        nil
-
-      _ok ->
-        Messaging.get_message_by_uuid(uuid)
-    end
+  def find_message_by_id(id) do
+    Messaging.get_message!(id)
   end
 
   def get_message(id), do: Messaging.get_message!(id)

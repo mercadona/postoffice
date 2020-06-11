@@ -11,8 +11,7 @@ defmodule Postoffice.MessagesConsumerTest do
 
   @message_attrs %{
     attributes: %{},
-    payload: %{},
-    public_id: "7488a646-e31f-11e4-aace-600308960662"
+    payload: %{}
   }
 
   setup [:set_mox_from_context, :verify_on_exit!]

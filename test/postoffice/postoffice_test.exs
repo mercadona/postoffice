@@ -18,10 +18,6 @@ defmodule Postoffice.PostofficeTest do
   }
 
   describe "Postoffice api" do
-    test "Returns nil if tried to find message by invalid UUID" do
-      assert Postoffice.find_message_by_uuid(123) == nil
-    end
-
     test "estimated_messages_count returns 0 if no message exists" do
       assert Postoffice.estimated_messages_count() == 0
     end

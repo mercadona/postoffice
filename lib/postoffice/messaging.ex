@@ -199,11 +199,6 @@ defmodule Postoffice.Messaging do
     |> Repo.all()
   end
 
-  def get_message_by_uuid(message_uuid) do
-    from(m in Message, where: m.public_id == ^message_uuid)
-    |> Repo.one()
-  end
-
   def count_topics do
     Repo.aggregate(from(t in "topics"), :count, :id)
   end
