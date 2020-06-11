@@ -244,17 +244,6 @@ defmodule Postoffice.MessagingTest do
       assert Messaging.count_topics() == 1
     end
 
-    test "count_messages returns 0 if no message exists" do
-      assert Messaging.count_messages() == 0
-    end
-
-    test "count_messages returns number of created messages" do
-      topic = Fixtures.create_topic()
-      _message = Fixtures.add_message_to_deliver(topic)
-
-      assert Messaging.count_messages() == 1
-    end
-
     test "count_publishers returns 0 if no publisher exists" do
       assert Messaging.count_publishers() == 0
     end
@@ -265,19 +254,6 @@ defmodule Postoffice.MessagingTest do
       _publisher = Fixtures.create_publisher(topic, @second_publisher_attrs)
 
       assert Messaging.count_publishers() == 2
-    end
-
-    test "count_published_messages returns 0 if no published message exists" do
-      assert Messaging.count_published_messages() == 0
-    end
-
-    test "count_published_messages returns number of published messages" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_deliver(topic)
-      Fixtures.create_publisher_success(message, publisher)
-
-      assert Messaging.count_published_messages() == 1
     end
 
     test "count_publishers_failures_aggregated returns 0 if no failed message exists" do

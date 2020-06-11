@@ -220,16 +220,8 @@ defmodule Postoffice.Messaging do
     Repo.aggregate(from(t in "topics"), :count, :id)
   end
 
-  def count_messages do
-    Repo.aggregate(from(m in "messages"), :count)
-  end
-
   def count_publishers() do
     Repo.aggregate(from(p in "publishers"), :count)
-  end
-
-  def count_published_messages do
-    Repo.aggregate(from(ps in "publisher_success"), :count)
   end
 
   def count_pending_messages do
