@@ -122,6 +122,21 @@ defmodule Postoffice.MessagingTest do
       assert length(Repo.all(PendingMessage)) == 0
     end
 
+    test "create_publisher_success create multiple rows when passed a list of message ids" do
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+      Messaging.add_message_to_deliver(topic, @message_attrs)
+      Messaging.add_message_to_deliver(topic, @message_attrs)
+
+      message_ids = Messaging.list_messages()
+        |> Enum.map(fn message -> message.id end)
+
+      Messaging.mark_message_as_delivered(%{publisher_id: publisher.id, message_id: message_ids})
+
+      assert Kernel.length(Messaging.list_publisher_success(publisher.id)) == 2
+
+    end
+
     test "create_topic/1 with recovery_enabled" do
       topic_params = %{@second_topic_attrs | recovery_enabled: true}
       {:ok, topic} = Messaging.create_topic(topic_params)
