@@ -127,16 +127,6 @@ defmodule Postoffice.Messaging do
     |> Repo.all()
   end
 
-  def create_publisher_success(%{publisher_id: _publisher_id, message_id: message_id} = attrs)
-      when not is_list(message_id) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-
-    attrs
-    |> Map.put(:inserted_at, now)
-    |> Map.put(:updated_at, now)
-    |> List.wrap()
-  end
-
   def create_publisher_success(%{publisher_id: publisher_id, message_id: message_id} = _attrs)
       when is_list(message_id) do
     now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
@@ -146,6 +136,15 @@ defmodule Postoffice.Messaging do
       |> Map.put(:inserted_at, now)
       |> Map.put(:updated_at, now)
     end)
+  end
+
+  def create_publisher_success(%{publisher_id: _publisher_id, message_id: message_id} = attrs) do
+    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+
+    attrs
+    |> Map.put(:inserted_at, now)
+    |> Map.put(:updated_at, now)
+    |> List.wrap()
   end
 
   def mark_message_as_delivered(message_information) do
@@ -187,11 +186,22 @@ defmodule Postoffice.Messaging do
     |> Repo.all()
   end
 
-  def create_publisher_failure(%{publisher_id: publisher_id, message_id: message_id, reason: reason} = _attrs) when is_list(message_id) do
+  def create_publisher_failure(
+        %{publisher_id: publisher_id, message_id: message_id, reason: reason} = _attrs
+      )
+      when is_list(message_id) do
     now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-    failures = Enum.map(message_id, fn id ->
-      %{publisher_id: publisher_id, message_id: id, reason: reason, inserted_at: now, updated_at: now}
-    end)
+
+    failures =
+      Enum.map(message_id, fn id ->
+        %{
+          publisher_id: publisher_id,
+          message_id: id,
+          reason: reason,
+          inserted_at: now,
+          updated_at: now
+        }
+      end)
 
     Ecto.Multi.new()
     |> Ecto.Multi.insert_all(:failures, PublisherFailures, failures)
@@ -203,7 +213,6 @@ defmodule Postoffice.Messaging do
     |> PublisherFailures.changeset(attrs)
     |> Repo.insert()
   end
-
 
   def create_publisher(attrs \\ %{}) do
     %Publisher{}
