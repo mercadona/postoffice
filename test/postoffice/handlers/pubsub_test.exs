@@ -8,7 +8,6 @@ defmodule Postoffice.Handlers.PubsubTest do
   alias Postoffice.Fixtures
   alias Postoffice.Handlers.Pubsub
   alias Postoffice.Messaging
-  alias Postoffice.Messaging.Message
   alias Postoffice.Messaging.PendingMessage
   alias Postoffice.Repo
 
@@ -70,6 +69,23 @@ defmodule Postoffice.Handlers.PubsubTest do
     assert [message] = Messaging.list_publisher_success(publisher.id)
   end
 
+  test "multiple message success are created for publisher if messages are successfully delivered" do
+    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+
+    {:ok, publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+
+    {:ok, message1} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+    {:ok, message2} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+
+    expect(PubsubMock, :publish, fn ^publisher, [^message1, ^message2] ->
+      {:ok, %PublishResponse{}}
+    end)
+
+    Pubsub.run(publisher, [message1, message2])
+    assert Kernel.length(Messaging.list_publisher_success(publisher.id)) == 2
+  end
+
   test "message failure is created for publisher if we're not able to send to pubsub" do
     {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
 
@@ -88,6 +104,23 @@ defmodule Postoffice.Handlers.PubsubTest do
 
     assert publisher_failure.reason ==
              "Error trying to process message from PubsubConsumer: Not able to deliver"
+  end
+
+  test "multiple message failures are created for publisher if we're not able to send to pubsub" do
+    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+
+    {:ok, publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+
+    {:ok, message1} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+    {:ok, message2} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+
+    expect(PubsubMock, :publish, fn ^publisher, [^message1, ^message2] ->
+      {:error, "Not able to deliver"}
+    end)
+
+    Pubsub.run(publisher, [message1, message2])
+    assert Kernel.length(Messaging.list_publisher_failures(publisher.id)) == 2
   end
 
   test "message is removed from pending messages when is successfully delivered" do
