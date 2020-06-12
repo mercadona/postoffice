@@ -44,8 +44,8 @@ defmodule Postoffice.Fixtures do
   @spec create_publisher_success(atom | %{id: any}, atom | %{id: any}) :: any
   def create_publisher_success(message, publisher) do
     %PublisherSuccess{}
-      |> PublisherSuccess.changeset(%{publisher_id: publisher.id, message_id: message.id})
-      |> Repo.insert()
+    |> PublisherSuccess.changeset(%{publisher_id: publisher.id, message_id: message.id})
+    |> Repo.insert()
   end
 
   def create_publishers_failure(message, publisher) do

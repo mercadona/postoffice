@@ -128,13 +128,13 @@ defmodule Postoffice.MessagingTest do
       Messaging.add_message_to_deliver(topic, @message_attrs)
       Messaging.add_message_to_deliver(topic, @message_attrs)
 
-      message_ids = Messaging.list_messages()
+      message_ids =
+        Messaging.list_messages()
         |> Enum.map(fn message -> message.id end)
 
       Messaging.mark_message_as_delivered(%{publisher_id: publisher.id, message_id: message_ids})
 
       assert Kernel.length(Messaging.list_publisher_success(publisher.id)) == 2
-
     end
 
     test "create_topic/1 with recovery_enabled" do
