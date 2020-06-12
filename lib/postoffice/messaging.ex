@@ -132,13 +132,11 @@ defmodule Postoffice.Messaging do
     now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
     Enum.map(message_id, fn id ->
-      %{publisher_id: publisher_id, message_id: id}
-      |> Map.put(:inserted_at, now)
-      |> Map.put(:updated_at, now)
+      %{publisher_id: publisher_id, message_id: id, inserted_at: now, updated_at: now}
     end)
   end
 
-  def create_publisher_success(%{publisher_id: _publisher_id, message_id: message_id} = attrs) do
+  def create_publisher_success(attrs) do
     now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
     attrs
@@ -147,6 +145,7 @@ defmodule Postoffice.Messaging do
     |> List.wrap()
   end
 
+  @spec mark_message_as_delivered(%{message_id: any, publisher_id: any}) :: {:ok, :finished}
   def mark_message_as_delivered(message_information) do
     Ecto.Multi.new()
     |> Ecto.Multi.insert_all(
@@ -164,20 +163,19 @@ defmodule Postoffice.Messaging do
   end
 
   defp delete_pending_message(%{publisher_id: publisher_id, message_id: message_id})
-       when not is_list(message_id) do
-    from(p in PendingMessage,
-      where:
-        p.publisher_id == ^publisher_id and
-          p.message_id == ^message_id
-    )
-  end
-
-  defp delete_pending_message(%{publisher_id: publisher_id, message_id: message_id})
-       when is_list(message_id) do
+        when is_list(message_id) do
     from(p in PendingMessage,
       where:
         p.publisher_id == ^publisher_id and
           p.message_id in ^message_id
+    )
+  end
+
+  defp delete_pending_message(%{publisher_id: publisher_id, message_id: message_id}) do
+    from(p in PendingMessage,
+      where:
+        p.publisher_id == ^publisher_id and
+          p.message_id == ^message_id
     )
   end
 
