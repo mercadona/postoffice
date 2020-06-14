@@ -12,7 +12,7 @@ defmodule PostofficeWeb.TopicController do
   def new(conn, _params) do
     changeset = Topic.changeset(%Topic{}, %{})
 
-    render(conn, "new.html", changeset: changeset)
+    render(conn, "new.html", changeset: changeset, page_name: "Add topic")
   end
 
   def create(conn, %{"topic" => topic_params}) do
