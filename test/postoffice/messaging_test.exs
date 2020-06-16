@@ -93,6 +93,25 @@ defmodule Postoffice.MessagingTest do
       assert second_pending_message.message.id == message.id
     end
 
+    test "add_messages_to_deliver/2 with 2 messages creates 2 messages entries" do
+      topic = Fixtures.create_topic()
+      _publisher = Fixtures.create_publisher(topic)
+
+      Messaging.add_messages_to_deliver(topic.name, [@message_attrs, @message_attrs])
+
+      assert length(Repo.all(Message)) == 2
+    end
+
+    test "add_messages_to_deliver/2 with 2 messages creates 2 pending messages entries" do
+      topic = Fixtures.create_topic()
+      _publisher = Fixtures.create_publisher(topic)
+      _second_publisher = Fixtures.create_publisher(topic, @second_publisher_attrs)
+
+      Messaging.add_messages_to_deliver(topic.name, [@message_attrs, @message_attrs])
+
+      assert length(Repo.all(PendingMessage)) == 2
+    end
+
     test "add_message_to_deliver/1 with valid data do not create pending message if have not associated publisher" do
       topic = Fixtures.create_topic()
       second_topic = Fixtures.create_topic(@second_topic_attrs)
