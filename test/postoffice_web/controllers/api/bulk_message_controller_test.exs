@@ -11,10 +11,12 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
 
   @create_attrs %{
     attributes: %{},
-    payload: [%{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]}, %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]}],
+    payload: [
+      %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
+      %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]}
+    ],
     topic: "test"
   }
-
 
   setup %{conn: conn} do
     {:ok, _topic} = Messaging.create_topic(%{name: "test", origin_host: "example.com"})

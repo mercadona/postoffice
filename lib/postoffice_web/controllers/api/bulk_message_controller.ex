@@ -9,6 +9,7 @@ defmodule PostofficeWeb.Api.BulkMessageController do
         conn
         |> put_status(:created)
         |> render("show.json")
+
       {:error, _reason} ->
         conn
         |> put_status(:not_acceptable)

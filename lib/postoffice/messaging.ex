@@ -103,21 +103,27 @@ defmodule Postoffice.Messaging do
   end
 
   def add_messages_to_deliver(topic_name, messages_attrs) do
-      case __MODULE__.get_topic(topic_name) |> Repo.preload(:consumers) do
+    case __MODULE__.get_topic(topic_name) |> Repo.preload(:consumers) do
       nil ->
         {:error, "Topic does not exist"}
+
       topic ->
         Ecto.Multi.new()
-          |> Ecto.Multi.insert_all(:message, Message, build_message_changeset(topic, messages_attrs), returning: [:id])
-          |> Ecto.Multi.run(:pending_messages, fn _repo, message ->
-            insert_bulk_pending_messages(topic.consumers, message)
-            {:ok, :multiple_insertion}
-          end)
-          |> Repo.transaction()
-          |> case do
-            {:ok, result} -> {:ok, result.message}
-            {:error, :message, changeset, %{}} -> {:error, changeset}
-          end
+        |> Ecto.Multi.insert_all(
+          :message,
+          Message,
+          build_message_changeset(topic, messages_attrs),
+          returning: [:id]
+        )
+        |> Ecto.Multi.run(:pending_messages, fn _repo, message ->
+          insert_bulk_pending_messages(topic.consumers, message)
+          {:ok, :multiple_insertion}
+        end)
+        |> Repo.transaction()
+        |> case do
+          {:ok, result} -> {:ok, result.message}
+          {:error, :message, changeset, %{}} -> {:error, changeset}
+        end
     end
   end
 
@@ -125,16 +131,18 @@ defmodule Postoffice.Messaging do
     now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
 
     message = data.message |> elem(1)
-    pending_messages = Enum.map(message, fn m ->
-      Enum.map(consumers, fn consumer ->
-        %{publisher_id: consumer.id, message_id: m.id, inserted_at: now, updated_at: now}
+
+    pending_messages =
+      Enum.map(message, fn m ->
+        Enum.map(consumers, fn consumer ->
+          %{publisher_id: consumer.id, message_id: m.id, inserted_at: now, updated_at: now}
+        end)
       end)
-    end)
-    |> List.first()
+      |> List.first()
 
     Ecto.Multi.new()
-      |> Ecto.Multi.insert_all(:pending_messages, PendingMessage, pending_messages)
-      |> Repo.transaction()
+    |> Ecto.Multi.insert_all(:pending_messages, PendingMessage, pending_messages)
+    |> Repo.transaction()
   end
 
   @doc """
