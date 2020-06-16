@@ -73,7 +73,7 @@ defmodule Postoffice.MessagesProducer do
   defp prepare_pending_messages(pending_messages, %{type: type} = _publisher)
        when type == "pubsub" do
     Enum.map(pending_messages, fn pending_message -> pending_message.message end)
-    |> Enum.chunk_every(pending_messages, 100)
+    |> Enum.chunk_every(100)
   end
 
   defp prepare_pending_messages(pending_messages, _publisher) do
