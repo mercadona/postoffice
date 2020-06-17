@@ -3,29 +3,19 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
 
   alias Postoffice.Messaging
 
-  @bulk_create_attrs %{
-    _json: [
-      %{
-        attributes: %{},
-        payload: %{"key" => "test1", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
-        topic: "test"
-      },
-      %{
-        attributes: %{},
-        payload: %{"key" => "test2", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
-        topic: "test"
-      }
-    ]
+  @wrong_topic_create_attrs %{
+    attributes: %{},
+    payload: %{"key" => "test1", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
+    topic: "test2"
   }
 
-  @wrong_topic_create_attrs %{
-    _json: [
-      %{
-        attributes: %{},
-        payload: %{"key" => "test1", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
-        topic: "test2"
-      }
-    ]
+  @create_attrs %{
+    attributes: %{},
+    payload: [
+      %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
+      %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]}
+    ],
+    topic: "test"
   }
 
   setup %{conn: conn} do
@@ -35,7 +25,7 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
 
   describe "create bulk message" do
     test "accept more than one message", %{conn: conn} do
-      conn = post(conn, Routes.api_bulk_message_path(conn, :create), @bulk_create_attrs)
+      conn = post(conn, Routes.api_bulk_message_path(conn, :create), @create_attrs)
 
       assert json_response(conn, 201)
       assert Kernel.length(Messaging.list_messages()) == 2
