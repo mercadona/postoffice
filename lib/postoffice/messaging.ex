@@ -103,7 +103,7 @@ defmodule Postoffice.Messaging do
   end
 
   def add_messages_to_deliver(topic_name, messages_attrs) do
-    case __MODULE__.get_topic(topic_name) |> Repo.preload(:consumers) do
+    case get_topic(topic_name) |> Repo.preload(:consumers) do
       nil ->
         {:error, "Topic does not exist"}
 
@@ -286,7 +286,6 @@ defmodule Postoffice.Messaging do
 
   def get_topic(name) do
     from(t in Topic, where: t.name == ^name)
-    # |> Repo.preload(:consumers)
     |> Repo.one()
   end
 

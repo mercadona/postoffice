@@ -95,7 +95,7 @@ defmodule Postoffice.MessagingTest do
 
     test "add_messages_to_deliver/2 with 2 messages creates 2 messages entries" do
       topic = Fixtures.create_topic()
-      _publisher = Fixtures.create_publisher(topic)
+      Fixtures.create_publisher(topic)
 
       Messaging.add_messages_to_deliver(topic.name, [@message_attrs, @message_attrs])
 
@@ -104,8 +104,8 @@ defmodule Postoffice.MessagingTest do
 
     test "add_messages_to_deliver/2 with 2 messages creates 2 pending messages entries" do
       topic = Fixtures.create_topic()
-      _publisher = Fixtures.create_publisher(topic)
-      _second_publisher = Fixtures.create_publisher(topic, @second_publisher_attrs)
+      Fixtures.create_publisher(topic)
+      Fixtures.create_publisher(topic, @second_publisher_attrs)
 
       Messaging.add_messages_to_deliver(topic.name, [@message_attrs, @message_attrs])
 
@@ -217,8 +217,8 @@ defmodule Postoffice.MessagingTest do
       publisher = Fixtures.create_publisher(topic)
 
       second_topic = Fixtures.create_topic(@second_topic_attrs)
-      _second_publisher = Fixtures.create_publisher(second_topic, @second_publisher_attrs)
-      _message = Fixtures.add_message_to_deliver(second_topic)
+      Fixtures.create_publisher(second_topic, @second_publisher_attrs)
+      Fixtures.add_message_to_deliver(second_topic)
 
       assert Messaging.list_pending_messages_for_publisher(publisher.id) == []
     end
@@ -258,7 +258,7 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "count_topics returns number of created topics" do
-      _topic = Fixtures.create_topic()
+      Fixtures.create_topic()
 
       assert Messaging.count_topics() == 1
     end
@@ -269,8 +269,8 @@ defmodule Postoffice.MessagingTest do
 
     test "count_publishers returns number of created publishers" do
       topic = Fixtures.create_topic()
-      _publisher = Fixtures.create_publisher(topic)
-      _publisher = Fixtures.create_publisher(topic, @second_publisher_attrs)
+      Fixtures.create_publisher(topic)
+      Fixtures.create_publisher(topic, @second_publisher_attrs)
 
       assert Messaging.count_publishers() == 2
     end
@@ -316,7 +316,7 @@ defmodule Postoffice.MessagingTest do
       topic = Fixtures.create_topic()
       message = Fixtures.add_message_to_deliver(topic)
       publisher = Fixtures.create_publisher(topic)
-      _publisher_success = Fixtures.create_publisher_success(message, publisher)
+      Fixtures.create_publisher_success(message, publisher)
 
       loaded_publisher_success = Messaging.get_publisher_success_for_message(message.id)
       assert Kernel.length(loaded_publisher_success) == 1
@@ -337,17 +337,16 @@ defmodule Postoffice.MessagingTest do
       topic = Fixtures.create_topic()
       message = Fixtures.add_message_to_deliver(topic)
       publisher = Fixtures.create_publisher(topic)
-      _publisher_failures = Fixtures.create_publishers_failure(message, publisher)
+      Fixtures.create_publishers_failure(message, publisher)
 
       loaded_publisher_failures = Messaging.get_publisher_failures_for_message(message.id)
       assert Kernel.length(loaded_publisher_failures) == 1
     end
 
     test "get_recovery_hosts returns unique hosts" do
-      _topic = Fixtures.create_topic()
+      Fixtures.create_topic()
 
-      _second_topic =
-        Fixtures.create_topic(%{
+      Fixtures.create_topic(%{
           name: "second_test",
           origin_host: "example.com"
         })
