@@ -37,11 +37,13 @@ defmodule Postoffice.MessagesProducer do
     MessagesConsumerSupervisor.start_link(publisher.id, self())
 
     if :queue.len(queue) < 25 do
-      pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id)
+      pending_messages =
+        Messaging.list_pending_messages_for_publisher(publisher.id)
+        |> prepare_pending_messages(publisher)
 
       queue =
         Enum.reduce(pending_messages, queue, fn publisher_message, acc ->
-          :queue.in(%{publisher: publisher, message: publisher_message.message}, acc)
+          :queue.in(%{publisher: publisher, message: publisher_message}, acc)
         end)
 
       {events, demand_state} = Dispatch.dispatch_events(queue, pending_demand, [])
@@ -64,5 +66,15 @@ defmodule Postoffice.MessagesProducer do
 
   def handle_info(:die, state) do
     {:stop, :normal, state}
+  end
+
+  defp prepare_pending_messages(pending_messages, %{type: type} = _publisher)
+       when type == "pubsub" do
+    Enum.map(pending_messages, fn pending_message -> pending_message.message end)
+    |> Enum.chunk_every(100)
+  end
+
+  defp prepare_pending_messages(pending_messages, _publisher) do
+    pending_messages
   end
 end

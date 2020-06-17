@@ -8,7 +8,6 @@ defmodule Postoffice.Handlers.PubsubTest do
   alias Postoffice.Fixtures
   alias Postoffice.Handlers.Pubsub
   alias Postoffice.Messaging
-  alias Postoffice.Messaging.Message
   alias Postoffice.Messaging.PendingMessage
   alias Postoffice.Repo
 
@@ -44,17 +43,13 @@ defmodule Postoffice.Handlers.PubsubTest do
     {:ok, publisher} =
       Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
 
-    message = %Message{
-      attributes: %{},
-      payload: %{},
-      topic_id: topic.id
-    }
+    {_, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
-    expect(PubsubMock, :publish, fn ^publisher, ^message ->
+    expect(PubsubMock, :publish, fn ^publisher, [^message] ->
       {:error, "test error"}
     end)
 
-    Pubsub.run(publisher, message)
+    Pubsub.run(publisher, [message])
     assert [] = Messaging.list_publisher_success(publisher.id)
   end
 
@@ -66,12 +61,29 @@ defmodule Postoffice.Handlers.PubsubTest do
 
     {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
-    expect(PubsubMock, :publish, fn ^publisher, ^message ->
+    expect(PubsubMock, :publish, fn ^publisher, [^message] ->
       {:ok, %PublishResponse{}}
     end)
 
-    Pubsub.run(publisher, message)
+    Pubsub.run(publisher, [message])
     assert [message] = Messaging.list_publisher_success(publisher.id)
+  end
+
+  test "multiple message success are created for publisher if messages are successfully delivered" do
+    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+
+    {:ok, publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+
+    {:ok, message1} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+    {:ok, message2} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+
+    expect(PubsubMock, :publish, fn ^publisher, [^message1, ^message2] ->
+      {:ok, %PublishResponse{}}
+    end)
+
+    Pubsub.run(publisher, [message1, message2])
+    assert Kernel.length(Messaging.list_publisher_success(publisher.id)) == 2
   end
 
   test "message failure is created for publisher if we're not able to send to pubsub" do
@@ -82,16 +94,33 @@ defmodule Postoffice.Handlers.PubsubTest do
 
     {:ok, message} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
 
-    expect(PubsubMock, :publish, fn ^publisher, ^message ->
+    expect(PubsubMock, :publish, fn ^publisher, [^message] ->
       {:error, "Not able to deliver"}
     end)
 
-    Pubsub.run(publisher, message)
+    Pubsub.run(publisher, [message])
     publisher_failure = List.first(Messaging.list_publisher_failures(publisher.id))
     assert publisher_failure.message_id == message.id
 
     assert publisher_failure.reason ==
              "Error trying to process message from PubsubConsumer: Not able to deliver"
+  end
+
+  test "multiple message failures are created for publisher if we're not able to send to pubsub" do
+    {:ok, topic} = Messaging.create_topic(@valid_topic_attrs)
+
+    {:ok, publisher} =
+      Messaging.create_publisher(Map.put(@valid_publisher_attrs, :topic_id, topic.id))
+
+    {:ok, message1} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+    {:ok, message2} = Messaging.add_message_to_deliver(topic, @valid_message_attrs)
+
+    expect(PubsubMock, :publish, fn ^publisher, [^message1, ^message2] ->
+      {:error, "Not able to deliver"}
+    end)
+
+    Pubsub.run(publisher, [message1, message2])
+    assert Kernel.length(Messaging.list_publisher_failures(publisher.id)) == 2
   end
 
   test "message is removed from pending messages when is successfully delivered" do
@@ -103,11 +132,11 @@ defmodule Postoffice.Handlers.PubsubTest do
 
     assert length(Repo.all(PendingMessage)) == 1
 
-    expect(PubsubMock, :publish, fn ^publisher, ^message ->
+    expect(PubsubMock, :publish, fn ^publisher, [^message] ->
       {:ok, %PublishResponse{}}
     end)
 
-    Pubsub.run(publisher, message)
+    Pubsub.run(publisher, [message])
     assert length(Repo.all(PendingMessage)) == 0
   end
 
@@ -128,11 +157,11 @@ defmodule Postoffice.Handlers.PubsubTest do
 
     assert length(Repo.all(PendingMessage)) == 2
 
-    expect(PubsubMock, :publish, fn ^publisher, ^message ->
+    expect(PubsubMock, :publish, fn ^publisher, [^message] ->
       {:ok, %PublishResponse{}}
     end)
 
-    Pubsub.run(publisher, message)
+    Pubsub.run(publisher, [message])
     assert length(Repo.all(PendingMessage)) == 1
 
     pending_message =
@@ -150,11 +179,11 @@ defmodule Postoffice.Handlers.PubsubTest do
 
     assert length(Repo.all(PendingMessage)) == 2
 
-    expect(PubsubMock, :publish, fn ^publisher, ^message ->
+    expect(PubsubMock, :publish, fn ^publisher, [^message] ->
       {:ok, %PublishResponse{}}
     end)
 
-    Pubsub.run(publisher, message)
+    Pubsub.run(publisher, [message])
     assert length(Repo.all(PendingMessage)) == 1
 
     pending_message =
@@ -169,11 +198,11 @@ defmodule Postoffice.Handlers.PubsubTest do
     publisher = Fixtures.create_publisher(topic, @valid_publisher_attrs)
     message = Fixtures.add_message_to_deliver(topic, @valid_message_attrs)
 
-    expect(PubsubMock, :publish, fn ^publisher, ^message ->
+    expect(PubsubMock, :publish, fn ^publisher, [^message] ->
       {:error, "Not able to deliver"}
     end)
 
-    Pubsub.run(publisher, message)
+    Pubsub.run(publisher, [message])
     assert length(Repo.all(PendingMessage)) == 1
   end
 end

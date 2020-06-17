@@ -1,3 +1,4 @@
+<%= link "Add new", to: Routes.topic_path(@conn, :new), class: "btn btn-primary btn-round" %>
 <div class="row">
   <div class="col-md-12">
     <table class="table">
@@ -20,7 +21,6 @@
           <% else %>
             <td><i class="material-icons" style="color:#cc0000">toggle_off</i></td>
           <% end %>
-
         </tr>
         <% end %>
       </tbody>

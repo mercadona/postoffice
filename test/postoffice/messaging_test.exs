@@ -122,6 +122,21 @@ defmodule Postoffice.MessagingTest do
       assert length(Repo.all(PendingMessage)) == 0
     end
 
+    test "create_publisher_success create multiple rows when passed a list of message ids" do
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+      Messaging.add_message_to_deliver(topic, @message_attrs)
+      Messaging.add_message_to_deliver(topic, @message_attrs)
+
+      message_ids =
+        Messaging.list_messages()
+        |> Enum.map(fn message -> message.id end)
+
+      Messaging.mark_message_as_delivered(%{publisher_id: publisher.id, message_id: message_ids})
+
+      assert Kernel.length(Messaging.list_publisher_success(publisher.id)) == 2
+    end
+
     test "create_topic/1 with recovery_enabled" do
       topic_params = %{@second_topic_attrs | recovery_enabled: true}
       {:ok, topic} = Messaging.create_topic(topic_params)
@@ -229,17 +244,6 @@ defmodule Postoffice.MessagingTest do
       assert Messaging.count_topics() == 1
     end
 
-    test "count_messages returns 0 if no message exists" do
-      assert Messaging.count_messages() == 0
-    end
-
-    test "count_messages returns number of created messages" do
-      topic = Fixtures.create_topic()
-      _message = Fixtures.add_message_to_deliver(topic)
-
-      assert Messaging.count_messages() == 1
-    end
-
     test "count_publishers returns 0 if no publisher exists" do
       assert Messaging.count_publishers() == 0
     end
@@ -250,19 +254,6 @@ defmodule Postoffice.MessagingTest do
       _publisher = Fixtures.create_publisher(topic, @second_publisher_attrs)
 
       assert Messaging.count_publishers() == 2
-    end
-
-    test "count_published_messages returns 0 if no published message exists" do
-      assert Messaging.count_published_messages() == 0
-    end
-
-    test "count_published_messages returns number of published messages" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_deliver(topic)
-      Fixtures.create_publisher_success(message, publisher)
-
-      assert Messaging.count_published_messages() == 1
     end
 
     test "count_publishers_failures_aggregated returns 0 if no failed message exists" do

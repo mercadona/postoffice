@@ -4,6 +4,7 @@ defmodule Postoffice.Fixtures do
   """
   alias Postoffice
   alias Postoffice.Messaging
+  alias Postoffice.Messaging.PublisherSuccess
   alias Postoffice.Repo
 
   @topic_attrs %{
@@ -40,10 +41,11 @@ defmodule Postoffice.Fixtures do
     publisher
   end
 
+  @spec create_publisher_success(atom | %{id: any}, atom | %{id: any}) :: any
   def create_publisher_success(message, publisher) do
-    {:ok, _publisher_success} =
-      Messaging.create_publisher_success(%{message_id: message.id, publisher_id: publisher.id})
-      |> Repo.insert()
+    %PublisherSuccess{}
+    |> PublisherSuccess.changeset(%{publisher_id: publisher.id, message_id: message.id})
+    |> Repo.insert()
   end
 
   def create_publishers_failure(message, publisher) do

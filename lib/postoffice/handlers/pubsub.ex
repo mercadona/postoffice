@@ -7,22 +7,23 @@ defmodule Postoffice.Handlers.Pubsub do
   alias Postoffice.Messaging
 
   def run(publisher, message) do
+    messages_ids = Enum.reduce(message, [], fn m, acc -> [m.id | acc] end)
+
     Logger.info("Processing pubsub message",
-      message_id: message.id,
+      messages_ids: messages_ids,
       target: publisher.target
     )
 
     case impl().publish(publisher, message) do
       {:ok, _response = %PublishResponse{}} ->
         Logger.info("Succesfully sent pubsub message",
-          message_id: message.id,
           target: publisher.target
         )
 
         {:ok, _} =
           Messaging.mark_message_as_delivered(%{
             publisher_id: publisher.id,
-            message_id: message.id
+            message_id: messages_ids
           })
 
         {:ok, :sent}
@@ -33,7 +34,7 @@ defmodule Postoffice.Handlers.Pubsub do
 
         Messaging.create_publisher_failure(%{
           publisher_id: publisher.id,
-          message_id: message.id,
+          message_id: messages_ids,
           reason: error_reason
         })
 
