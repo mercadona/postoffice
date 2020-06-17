@@ -14,12 +14,7 @@ defmodule Postoffice.Adapters.Pubsub do
     conn = GoogleApi.PubSub.V1.Connection.new(token.token)
 
     request = %GoogleApi.PubSub.V1.Model.PublishRequest{
-      messages: [
-        %GoogleApi.PubSub.V1.Model.PubsubMessage{
-          data: Base.encode64(Poison.encode!(pending_messages.payload)),
-          attributes: pending_messages.attributes
-        }
-      ]
+      messages: generate_messages(pending_messages)
     }
 
     # Make the API request.
@@ -29,5 +24,15 @@ defmodule Postoffice.Adapters.Pubsub do
       publisher.target,
       body: request
     )
+  end
+
+  defp generate_messages(pending_messages) do
+    pending_messages
+    |> Enum.map(fn message ->
+      %GoogleApi.PubSub.V1.Model.PubsubMessage{
+        data: Base.encode64(Poison.encode!(message.payload)),
+        attributes: message.attributes
+      }
+    end)
   end
 end

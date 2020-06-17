@@ -39,3 +39,5 @@ rel/
 .idea/
 
 Makefile
+
+.DS_Store
