@@ -54,11 +54,11 @@ defmodule Postoffice.MessagesProducer do
     end
   end
 
-  def handle_info(:maybe_die, %{demand_state: {queue, _pending_demand}} = state) do
+  def handle_info(:maybe_die, %{demand_state: {queue, _pending_demand}, publisher: publisher} = state) do
     if :queue.len(queue) == 0 do
       Process.send_after(self(), :die, 1000)
     else
-      Process.send_after(self(), :maybe_die, @check_empty_queue_time)
+      Process.send_after(self(), :maybe_die, publisher.seconds_timeout * 1_000)
     end
 
     {:noreply, [], state}
@@ -75,6 +75,6 @@ defmodule Postoffice.MessagesProducer do
   end
 
   defp prepare_pending_messages(pending_messages, _publisher) do
-    pending_messages
+    Enum.map(pending_messages, fn pending_message -> pending_message.message end)
   end
 end
