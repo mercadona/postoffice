@@ -78,6 +78,14 @@ defmodule Postoffice.Messaging do
     end
   end
 
+  defp build_message_changeset(topic, message) when is_list(message) do
+    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+
+    Enum.map(message, fn message_attrs ->
+      Map.merge(message_attrs, %{topic_id: topic.id, inserted_at: now, updated_at: now})
+    end)
+  end
+
   defp build_message_changeset(topic, message) do
     Ecto.build_assoc(topic, :messages, message)
     |> Message.changeset(message)
@@ -92,6 +100,49 @@ defmodule Postoffice.Messaging do
       |> PendingMessage.changeset(%{})
       |> Repo.insert!()
     end)
+  end
+
+  def add_messages_to_deliver(topic_name, messages_attrs) do
+    case get_topic(topic_name) |> Repo.preload(:consumers) do
+      nil ->
+        {:error, "Topic does not exist"}
+
+      topic ->
+        Ecto.Multi.new()
+        |> Ecto.Multi.insert_all(
+          :message,
+          Message,
+          build_message_changeset(topic, messages_attrs),
+          returning: [:id]
+        )
+        |> Ecto.Multi.run(:pending_messages, fn _repo, message ->
+          insert_bulk_pending_messages(topic.consumers, message)
+          {:ok, :multiple_insertion}
+        end)
+        |> Repo.transaction()
+        |> case do
+          {:ok, result} -> {:ok, result.message}
+          {:error, :message, changeset, %{}} -> {:error, changeset}
+        end
+    end
+  end
+
+  defp insert_bulk_pending_messages(consumers, data) do
+    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+
+    message = data.message |> elem(1)
+
+    pending_messages =
+      Enum.map(message, fn m ->
+        Enum.map(consumers, fn consumer ->
+          %{publisher_id: consumer.id, message_id: m.id, inserted_at: now, updated_at: now}
+        end)
+      end)
+      |> List.first()
+
+    Ecto.Multi.new()
+    |> Ecto.Multi.insert_all(:pending_messages, PendingMessage, pending_messages)
+    |> Repo.transaction()
   end
 
   @doc """
