@@ -16,7 +16,9 @@ defmodule Postoffice.Adapters.Http do
         {"content-type", "application/json"},
         {"message-id", message.id}
       ],
-      recv_timeout: publisher.seconds_timeout * 1_000
+      [
+        recv_timeout: publisher.seconds_timeout * 1_000
+      ]
     )
   end
 end

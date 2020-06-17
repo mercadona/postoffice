@@ -7,8 +7,6 @@ defmodule Postoffice.MessagesProducer do
 
   require Logger
 
-  @check_empty_queue_time 1000 * 4
-
   def start_link(publisher) do
     Logger.info("Starting messages producer for publisher", publisher_id: publisher.id)
 
@@ -18,7 +16,7 @@ defmodule Postoffice.MessagesProducer do
   def init(publisher) do
     send(self(), {:fetch_publisher_messages, publisher})
 
-    Process.send_after(self(), :maybe_die, @check_empty_queue_time)
+    Process.send_after(self(), :maybe_die, publisher.seconds_timeout * 1_000)
     {:producer, %{demand_state: {:queue.new(), 0}, publisher: publisher}}
   end
 
