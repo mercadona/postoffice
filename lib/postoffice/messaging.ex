@@ -138,7 +138,7 @@ defmodule Postoffice.Messaging do
           %{publisher_id: consumer.id, message_id: m.id, inserted_at: now, updated_at: now}
         end)
       end)
-      |> List.first()
+      |> Enum.concat()
 
     Ecto.Multi.new()
     |> Ecto.Multi.insert_all(:pending_messages, PendingMessage, pending_messages)
