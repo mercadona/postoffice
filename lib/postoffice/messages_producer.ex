@@ -56,7 +56,7 @@ defmodule Postoffice.MessagesProducer do
 
   def handle_info(:maybe_die, %{demand_state: {queue, _pending_demand}, publisher: publisher} = state) do
     if :queue.len(queue) == 0 do
-      Process.send_after(self(), :die, 1000)
+      Process.send_after(self(), :die, 500)
     else
       Process.send_after(self(), :maybe_die, publisher.seconds_timeout * 1_000)
     end

@@ -5,6 +5,7 @@ defmodule Postoffice.MessagesConsumerSupervisor do
 
   def start_link(publisher_id, pid_to_subscribe) do
     name = name(publisher_id)
+    Logger.info("Trying to start message consumer supervisor for publisher #{publisher_id}")
     ConsumerSupervisor.start_link(__MODULE__, {pid_to_subscribe, publisher_id}, name: name)
   end
 
