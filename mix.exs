@@ -4,7 +4,7 @@ defmodule Postoffice.MixProject do
   def project do
     [
       app: :postoffice,
-      version: "0.10.1",
+      version: "0.12.0",
       elixir: "~> 1.9",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -81,7 +81,8 @@ defmodule Postoffice.MixProject do
       {:prometheus_ecto, "~> 1.4.1"},
       {:phoenix_live_view, "~> 0.12.0"},
       {:floki, ">= 0.0.0", only: :test},
-      {:phoenix_live_dashboard, "~> 0.2.2"}
+      {:phoenix_live_dashboard, "~> 0.2.2"},
+      {:hackney, "~> 1.16"}
     ]
   end
 
