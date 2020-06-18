@@ -109,7 +109,7 @@ defmodule Postoffice.MessagingTest do
 
       Messaging.add_messages_to_deliver(topic.name, [@message_attrs, @message_attrs])
 
-      assert length(Repo.all(PendingMessage)) == 2
+      assert length(Repo.all(PendingMessage)) == 4
     end
 
     test "add_message_to_deliver/1 with valid data do not create pending message if have not associated publisher" do
