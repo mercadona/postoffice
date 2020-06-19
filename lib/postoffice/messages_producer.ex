@@ -38,7 +38,7 @@ defmodule Postoffice.MessagesProducer do
 
     if :queue.len(queue) < 25 do
       pending_messages =
-        Messaging.list_pending_messages_for_publisher(publisher.id)
+        Messaging.list_pending_messages_for_publisher(publisher.id, messages_quantity(publisher.type))
         |> prepare_pending_messages(publisher)
 
       queue =
@@ -77,4 +77,13 @@ defmodule Postoffice.MessagesProducer do
   defp prepare_pending_messages(pending_messages, _publisher) do
     Enum.map(pending_messages, fn pending_message -> pending_message.message end)
   end
+
+  defp messages_quantity(type) when type == "pubsub" do
+    1000
+  end
+
+  defp messages_quantity(_type)do
+    300
+  end
+
 end
