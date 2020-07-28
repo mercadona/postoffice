@@ -38,7 +38,10 @@ defmodule Postoffice.MessagesProducer do
 
     if :queue.len(queue) < 25 do
       pending_messages =
-        Messaging.list_pending_messages_for_publisher(publisher.id, messages_quantity(publisher.type))
+        Messaging.list_pending_messages_for_publisher(
+          publisher.id,
+          messages_quantity(publisher.type)
+        )
         |> prepare_pending_messages(publisher)
 
       queue =
@@ -54,7 +57,10 @@ defmodule Postoffice.MessagesProducer do
     end
   end
 
-  def handle_info(:maybe_die, %{demand_state: {queue, _pending_demand}, publisher: publisher} = state) do
+  def handle_info(
+        :maybe_die,
+        %{demand_state: {queue, _pending_demand}, publisher: publisher} = state
+      ) do
     if :queue.len(queue) == 0 do
       Process.send_after(self(), :die, 500)
     else
@@ -82,8 +88,7 @@ defmodule Postoffice.MessagesProducer do
     1000
   end
 
-  defp messages_quantity(_type)do
+  defp messages_quantity(_type) do
     300
   end
-
 end

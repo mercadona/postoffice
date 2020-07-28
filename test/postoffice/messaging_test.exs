@@ -347,9 +347,9 @@ defmodule Postoffice.MessagingTest do
       Fixtures.create_topic()
 
       Fixtures.create_topic(%{
-          name: "second_test",
-          origin_host: "example.com"
-        })
+        name: "second_test",
+        origin_host: "example.com"
+      })
 
       hosts = Messaging.get_recovery_hosts()
 

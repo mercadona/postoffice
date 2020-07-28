@@ -21,7 +21,7 @@ defmodule Postoffice do
   end
 
   def receive_messages(
-        %{"topic" => topic, "attributes" => attributes, "payload" => payload} = params
+        %{"topic" => topic, "attributes" => attributes, "payload" => payload} = _params
       ) do
     messages_params =
       Enum.map(payload, fn message_payload ->

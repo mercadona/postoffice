@@ -12,7 +12,11 @@ defmodule Postoffice.MessagesProducerSupervisor do
       worker(Postoffice.MessagesProducer, [], restart: :transient)
     ]
 
-    opts = [strategy: :one_for_one, subscribe_to: [{:publisher_producer, max_demand: 25, min_demand: 1}]]
+    opts = [
+      strategy: :one_for_one,
+      subscribe_to: [{:publisher_producer, max_demand: 25, min_demand: 1}]
+    ]
+
     ConsumerSupervisor.init(children, opts)
   end
 end

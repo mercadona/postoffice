@@ -214,7 +214,7 @@ defmodule Postoffice.Messaging do
   end
 
   defp delete_pending_message(%{publisher_id: publisher_id, message_id: message_id})
-        when is_list(message_id) do
+       when is_list(message_id) do
     from(p in PendingMessage,
       where:
         p.publisher_id == ^publisher_id and
