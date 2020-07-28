@@ -9,6 +9,7 @@ defmodule Postoffice.Messaging.Publisher do
     field :initial_message, :integer
     belongs_to :topic, Postoffice.Messaging.Topic
     field :seconds_timeout, :integer, default: 5
+    field :seconds_retry, :integer, default: 5
 
     has_many :publisher_success, Postoffice.Messaging.PublisherSuccess
 
