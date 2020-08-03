@@ -84,7 +84,8 @@ defmodule Postoffice.MixProject do
       {:floki, ">= 0.0.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.2.2"},
       {:hackney, "~> 1.16"},
-      {:cachex, "~> 3.2"}
+      {:cachex, "~> 3.2"},
+      {:number, "~> 1.0.1"}
     ]
   end
 
