@@ -12,7 +12,8 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
     target: "http://fake.target",
     topic: "test",
     type: "http",
-    initial_message: 0
+    seconds_timeout: 15,
+    seconds_retry: 10
   }
 
   @valid_pubsub_publisher_payload %{
@@ -20,31 +21,29 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
     target: "test",
     topic: "test",
     type: "pubsub",
-    initial_message: 0
+    seconds_timeout: 15,
+    seconds_retry: 10
   }
 
   @invalid_http_publisher_payload %{
     active: true,
     target: "http://fake.target",
     topic: "fake_topic",
-    type: "http",
-    initial_message: 0
+    type: "http"
   }
 
   @invalid_publisher_target_payload %{
     active: true,
     target: "",
     topic: "test",
-    type: "http",
-    initial_message: 0
+    type: "http"
   }
 
   @invalid_publisher_type_payload %{
     active: true,
     target: "http://fake.target",
     topic: "test",
-    type: "false_type",
-    initial_message: 0
+    type: "false_type"
   }
 
   @valid_topic_attrs %{
@@ -72,9 +71,10 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
       created_publisher = get_last_publisher()
       assert created_publisher.active == true
       assert created_publisher.target == "http://fake.target"
-      assert created_publisher.initial_message == 0
       assert created_publisher.topic_id == topic.id
       assert created_publisher.type == "http"
+      assert created_publisher.seconds_timeout == 15
+      assert created_publisher.seconds_retry == 10
     end
 
     test "create pubsub publisher when data is valid", %{conn: conn} do
@@ -88,9 +88,10 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
       created_publisher = get_last_publisher()
       assert created_publisher.active == true
       assert created_publisher.target == topic.name
-      assert created_publisher.initial_message == 0
       assert created_publisher.topic_id == topic.id
       assert created_publisher.type == "pubsub"
+      assert created_publisher.seconds_timeout == 15
+      assert created_publisher.seconds_retry == 10
     end
 
     test "renders errors when topic does not exists", %{conn: conn} do
