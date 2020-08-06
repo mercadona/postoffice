@@ -4,7 +4,8 @@ defmodule Postoffice.Handlers.Http do
 
   alias Postoffice.Messaging
 
-  def run(publisher, message) do
+  def run(publisher, pending_message) do
+    message = pending_message.message
     Logger.info("Processing http message", message_id: message.id, target: publisher.target)
 
     case impl().publish(publisher, message) do
@@ -31,6 +32,8 @@ defmodule Postoffice.Handlers.Http do
 
         Logger.info(error_reason)
 
+        cache_failed_message(publisher, pending_message)
+
         Messaging.create_publisher_failure(%{
           publisher_id: publisher.id,
           message_id: message.id,
@@ -42,6 +45,8 @@ defmodule Postoffice.Handlers.Http do
       {:error, %HTTPoison.Error{reason: reason}} ->
         error_reason = "Error trying to process message from HttpConsumer: #{reason}"
         Logger.info(error_reason)
+
+        cache_failed_message(publisher, pending_message)
 
         Messaging.create_publisher_failure(%{
           publisher_id: publisher.id,
@@ -55,5 +60,11 @@ defmodule Postoffice.Handlers.Http do
 
   defp impl do
     Application.get_env(:postoffice, :http_consumer_impl, Postoffice.Adapters.Http)
+  end
+
+  defp cache_failed_message(publisher, pending_message) do
+    Cachex.put(:retry_cache, {publisher.id, pending_message.id}, 1,
+      ttl: :timer.seconds(publisher.seconds_retry)
+    )
   end
 end

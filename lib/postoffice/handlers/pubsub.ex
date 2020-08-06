@@ -6,15 +6,16 @@ defmodule Postoffice.Handlers.Pubsub do
   alias GoogleApi.PubSub.V1.Model.PublishResponse
   alias Postoffice.Messaging
 
-  def run(publisher, message) do
-    messages_ids = Enum.reduce(message, [], fn m, acc -> [m.id | acc] end)
+  def run(publisher, pending_messages) do
+    messages = Enum.reduce(pending_messages, [], fn pm, acc -> [pm.message | acc] end)
+    messages_ids = Enum.reduce(messages, [], fn m, acc -> [m.id | acc] end)
 
     Logger.info("Processing pubsub message",
       messages_ids: messages_ids,
       target: publisher.target
     )
 
-    case impl().publish(publisher, message) do
+    case impl().publish(publisher, messages) do
       {:ok, _response = %PublishResponse{}} ->
         Logger.info("Succesfully sent pubsub message",
           target: publisher.target
@@ -38,11 +39,23 @@ defmodule Postoffice.Handlers.Pubsub do
           reason: error_reason
         })
 
+        pending_messages_ids = Enum.reduce(pending_messages, [], fn pm, acc -> [pm.id | acc] end)
+        cache_failed_message(publisher, pending_messages_ids)
+
         {:error, :nosent}
     end
   end
 
   defp impl do
     Application.get_env(:postoffice, :pubsub_consumer_impl, Postoffice.Adapters.Pubsub)
+  end
+
+  defp cache_failed_message(publisher, pending_messages_ids) do
+    values =
+      Enum.map(pending_messages_ids, fn pending_message_id ->
+        {{publisher.id, pending_message_id}, 1}
+      end)
+
+    Cachex.put_many(:retry_cache, values, ttl: :timer.seconds(publisher.seconds_retry))
   end
 end

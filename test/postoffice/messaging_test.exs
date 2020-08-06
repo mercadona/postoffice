@@ -236,6 +236,18 @@ defmodule Postoffice.MessagingTest do
       assert pending_message.message.topic_id == topic.id
     end
 
+    test "list_pending_messages_for_publisher/2 doesnt return messages for a given publisher if they are cached as failure" do
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+      _message = Fixtures.add_message_to_deliver(topic)
+      pending_message = Messaging.list_pending_messages_for_publisher(publisher.id) |> hd
+      Cachex.put(:retry_cache, {publisher.id, pending_message.id}, 1, ttl: :timer.seconds(10))
+
+      pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id)
+
+      assert Kernel.length(pending_messages) == 0
+    end
+
     test "list_pending_messages_for_publisher/2 returns messages for a given publisher when there are pending messages for other publishers" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
@@ -347,9 +359,9 @@ defmodule Postoffice.MessagingTest do
       Fixtures.create_topic()
 
       Fixtures.create_topic(%{
-          name: "second_test",
-          origin_host: "example.com"
-        })
+        name: "second_test",
+        origin_host: "example.com"
+      })
 
       hosts = Messaging.get_recovery_hosts()
 

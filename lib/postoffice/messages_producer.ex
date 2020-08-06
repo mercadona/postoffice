@@ -38,12 +38,15 @@ defmodule Postoffice.MessagesProducer do
 
     if :queue.len(queue) < 25 do
       pending_messages =
-        Messaging.list_pending_messages_for_publisher(publisher.id, messages_quantity(publisher.type))
+        Messaging.list_pending_messages_for_publisher(
+          publisher.id,
+          messages_quantity(publisher.type)
+        )
         |> prepare_pending_messages(publisher)
 
       queue =
-        Enum.reduce(pending_messages, queue, fn publisher_message, acc ->
-          :queue.in(%{publisher: publisher, message: publisher_message}, acc)
+        Enum.reduce(pending_messages, queue, fn pending_message, acc ->
+          :queue.in(%{publisher: publisher, pending_message: pending_message}, acc)
         end)
 
       {events, demand_state} = Dispatch.dispatch_events(queue, pending_demand, [])
@@ -54,7 +57,10 @@ defmodule Postoffice.MessagesProducer do
     end
   end
 
-  def handle_info(:maybe_die, %{demand_state: {queue, _pending_demand}, publisher: publisher} = state) do
+  def handle_info(
+        :maybe_die,
+        %{demand_state: {queue, _pending_demand}, publisher: publisher} = state
+      ) do
     if :queue.len(queue) == 0 do
       Process.send_after(self(), :die, 500)
     else
@@ -70,20 +76,19 @@ defmodule Postoffice.MessagesProducer do
 
   defp prepare_pending_messages(pending_messages, %{type: type} = _publisher)
        when type == "pubsub" do
-    Enum.map(pending_messages, fn pending_message -> pending_message.message end)
+    pending_messages
     |> Enum.chunk_every(100)
   end
 
   defp prepare_pending_messages(pending_messages, _publisher) do
-    Enum.map(pending_messages, fn pending_message -> pending_message.message end)
+    pending_messages
   end
 
   defp messages_quantity(type) when type == "pubsub" do
     1000
   end
 
-  defp messages_quantity(_type)do
+  defp messages_quantity(_type) do
     300
   end
-
 end

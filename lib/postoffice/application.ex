@@ -22,7 +22,8 @@ defmodule Postoffice.Application do
       Postoffice.PublisherProducer,
       Postoffice.MessagesProducerSupervisor,
       Postoffice.Rescuer.Producer,
-      Postoffice.Rescuer.Supervisor
+      Postoffice.Rescuer.Supervisor,
+      {Cachex, :retry_cache}
     ]
 
     :ok =

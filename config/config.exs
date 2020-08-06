@@ -17,7 +17,6 @@ config :postoffice, PostofficeWeb.Endpoint,
   render_errors: [view: PostofficeWeb.ErrorView, accepts: ~w(json)],
   pubsub_server: Postoffice.PubSub,
   root: ".",
-  instrumenters: [PostofficeWeb.Metrics.Phoenix],
   live_view: [
     signing_salt: "SECRET_SALT"
   ]

@@ -146,7 +146,7 @@ defmodule Postoffice.Messaging do
   end
 
   @doc """
-  Returns the list of pending messages to be consumed for a topic for a consumer.
+  Returns the list of pending messages to be consumed for a consumer.
 
   ## Examples
 
@@ -155,8 +155,19 @@ defmodule Postoffice.Messaging do
 
   """
   def list_pending_messages_for_publisher(publisher_id, limit \\ 300) do
+    {:ok, keys} = Cachex.keys(:retry_cache)
+
+    failed_messages =
+      keys
+      |> Enum.reduce([], fn {publisher_id, pending_message_id}, acc ->
+        if publisher_id == publisher_id do
+          [pending_message_id | acc]
+        end
+      end)
+
     from(pm in PendingMessage,
       where: pm.publisher_id == ^publisher_id,
+      where: pm.id not in ^failed_messages,
       limit: ^limit,
       preload: [:message, :publisher]
     )
@@ -214,7 +225,7 @@ defmodule Postoffice.Messaging do
   end
 
   defp delete_pending_message(%{publisher_id: publisher_id, message_id: message_id})
-        when is_list(message_id) do
+       when is_list(message_id) do
     from(p in PendingMessage,
       where:
         p.publisher_id == ^publisher_id and

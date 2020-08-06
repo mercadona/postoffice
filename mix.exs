@@ -40,7 +40,8 @@ defmodule Postoffice.MixProject do
         :logger_json,
         :prometheus_phoenix,
         :prometheus_ecto,
-        :os_mon
+        :os_mon,
+        :cachex
       ]
     ]
   end
@@ -82,7 +83,8 @@ defmodule Postoffice.MixProject do
       {:phoenix_live_view, "~> 0.12.0"},
       {:floki, ">= 0.0.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.2.2"},
-      {:hackney, "~> 1.16"}
+      {:hackney, "~> 1.16"},
+      {:cachex, "~> 3.2"}
     ]
   end
 

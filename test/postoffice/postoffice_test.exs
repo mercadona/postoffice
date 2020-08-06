@@ -7,14 +7,7 @@ defmodule Postoffice.PostofficeTest do
   @publisher_attrs %{
     active: true,
     target: "http://fake.target2",
-    initial_message: 0,
     type: "http"
-  }
-
-  @external_publisher_attrs %{
-    "active" => false,
-    "target" => "http://fake.target2",
-    "type" => "pubsub"
   }
 
   describe "Postoffice api" do
@@ -63,24 +56,6 @@ defmodule Postoffice.PostofficeTest do
 
     test "ping postoffice application" do
       assert Postoffice.ping() == :ok
-    end
-
-    test "create_publisher to consume messages from_now" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_deliver(topic)
-      external_publisher_attrs = Map.put(@external_publisher_attrs, "topic_id", topic.id)
-      external_publisher_attrs = Map.put(external_publisher_attrs, "from_now", "true")
-
-      {:ok, saved_publisher} = Postoffice.create_publisher(external_publisher_attrs)
-      assert saved_publisher.initial_message == message.id
-    end
-
-    test "create_publisher to consume messages from first message" do
-      topic = Fixtures.create_topic()
-      external_publisher_attrs = Map.put(@external_publisher_attrs, "topic_id", topic.id)
-
-      {:ok, saved_publisher} = Postoffice.create_publisher(external_publisher_attrs)
-      assert saved_publisher.initial_message == 0
     end
 
     test "get_message by id returns asked message" do

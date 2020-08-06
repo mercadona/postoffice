@@ -5,7 +5,7 @@ defmodule Postoffice.MessagesConsumer do
   alias Postoffice.Handlers.Http
   alias Postoffice.Handlers.Pubsub
 
-  def start_link(%{publisher: publisher, message: message}) do
+  def start_link(%{publisher: publisher, pending_message: message}) do
     Task.start_link(MessagesConsumer.get_handler_module(publisher.type), :run, [
       publisher,
       message
