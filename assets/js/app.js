@@ -1,5 +1,8 @@
 import css from "../css/app.css";
 import "phoenix_html"
+import "../node_modules/jquery/dist/jquery"
+import Popper from "popper.js";
+import "./bootstrap-material-design"
 import "./material-dashboard"
 
 import {Socket} from "phoenix"
