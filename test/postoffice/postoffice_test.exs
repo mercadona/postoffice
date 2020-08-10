@@ -20,14 +20,17 @@ defmodule Postoffice.PostofficeTest do
     end
 
     test "count_publishers_failures returns 0 if no failed message exists" do
+      Cachex.reset!(:retry_cache)
       assert Postoffice.count_publishers_failures() == 0
     end
 
     test "count_publishers_failures returns number of failed messages" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_deliver(topic)
-      Fixtures.create_publishers_failure(message, publisher)
+      Cachex.reset!(:retry_cache)
+      publisher_id = 1
+      message_id = 2
+      Cachex.put(:retry_cache, {publisher_id, message_id}, 1,
+        ttl: :timer.seconds(1)
+      )
 
       assert Postoffice.count_publishers_failures() == 1
     end

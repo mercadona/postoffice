@@ -88,7 +88,10 @@ defmodule Postoffice do
 
   def estimated_published_messages_count, do: Messaging.get_estimated_count("publisher_success")
 
-  def count_publishers_failures, do: Messaging.count_publishers_failures_aggregated()
+  def count_publishers_failures do
+    {:ok, keys} = Cachex.keys(:retry_cache)
+    Kernel.length(keys)
+  end
 
   def count_publishers, do: Messaging.count_publishers()
 
