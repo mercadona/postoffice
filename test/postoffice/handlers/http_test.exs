@@ -299,6 +299,7 @@ defmodule Postoffice.Handlers.HttpTest do
     end)
 
     Http.run(publisher, pending_message)
+    :timer.sleep(100)
     {:ok, keys} = Cachex.keys(:retry_cache)
     assert {publisher.id, pending_message.id} in keys
   end
@@ -326,6 +327,7 @@ defmodule Postoffice.Handlers.HttpTest do
 
     Http.run(publisher, pending_message)
     _message_failure = List.first(Messaging.list_publisher_failures(publisher.id))
+    :timer.sleep(100)
     {:ok, keys} = Cachex.keys(:retry_cache)
     assert {publisher.id, pending_message.id} in keys
   end

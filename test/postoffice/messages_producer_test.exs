@@ -14,7 +14,10 @@ defmodule Postoffice.MessagesProducerTest do
       existing_publisher = Fixtures.create_publisher(topic)
 
       {:noreply, messages, %{demand_state: {queue, pending_demand}, publisher: _publisher}} =
-        MessagesProducer.handle_demand(1, %{demand_state: {:queue.new(), 0}, publisher: existing_publisher})
+        MessagesProducer.handle_demand(1, %{
+          demand_state: {:queue.new(), 0},
+          publisher: existing_publisher
+        })
 
       assert messages == []
       assert pending_demand == 1
@@ -30,7 +33,10 @@ defmodule Postoffice.MessagesProducerTest do
       state_queue = :queue.in(message, state_queue)
 
       {:noreply, events, %{demand_state: {queue, pending_demand}, publisher: _publisher}} =
-        MessagesProducer.handle_demand(1, %{demand_state: {state_queue, 0}, publisher: existing_publisher})
+        MessagesProducer.handle_demand(1, %{
+          demand_state: {state_queue, 0},
+          publisher: existing_publisher
+        })
 
       assert pending_demand == 0
       assert :queue.len(queue) == 1

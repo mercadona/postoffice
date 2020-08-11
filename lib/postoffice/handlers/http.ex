@@ -3,6 +3,7 @@ defmodule Postoffice.Handlers.Http do
   require Logger
 
   alias Postoffice.Messaging
+  alias Postoffice.PubSub
 
   def run(publisher, pending_message) do
     message = pending_message.message
@@ -63,8 +64,10 @@ defmodule Postoffice.Handlers.Http do
   end
 
   defp cache_failed_message(publisher, pending_message) do
-    Cachex.put(:retry_cache, {publisher.id, pending_message.id}, 1,
-      ttl: :timer.seconds(publisher.seconds_retry)
+    Phoenix.PubSub.broadcast(
+      Postoffice.PubSub,
+      "messages",
+      {:message_failure, {publisher.id, pending_message.id, publisher.seconds_retry}}
     )
   end
 end
