@@ -56,6 +56,10 @@ defmodule Postoffice.Handlers.Pubsub do
         {{publisher.id, pending_message_id}, 1}
       end)
 
-    Cachex.put_many(:retry_cache, values, ttl: :timer.seconds(publisher.seconds_retry))
+    Phoenix.PubSub.broadcast(
+      Postoffice.PubSub,
+      "messages",
+      {:message_failure, {values, publisher.seconds_retry}}
+    )
   end
 end

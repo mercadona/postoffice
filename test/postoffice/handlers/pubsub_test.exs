@@ -226,6 +226,7 @@ defmodule Postoffice.Handlers.PubsubTest do
     end)
 
     Pubsub.run(publisher, pending_messages)
+    :timer.sleep(100)
     {:ok, keys} = Cachex.keys(:retry_cache)
 
     Enum.each(pending_messages, fn pending_message ->

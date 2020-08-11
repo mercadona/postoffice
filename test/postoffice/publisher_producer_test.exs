@@ -20,7 +20,7 @@ defmodule Postoffice.PublisherProducerTest do
 
     test "active publisher loaded on internal state and ready to be consumed" do
       topic = Fixtures.create_topic()
-      existing_publisher = Fixtures.create_publisher(topic)
+      _existing_publisher = Fixtures.create_publisher(topic)
 
       {:noreply, publishers, {queue, pending_demand}} =
         PublisherProducer.handle_info(:populate_state, {:queue.new(), 0})
