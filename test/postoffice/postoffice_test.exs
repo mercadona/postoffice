@@ -28,9 +28,7 @@ defmodule Postoffice.PostofficeTest do
       Cachex.reset!(:retry_cache)
       publisher_id = 1
       message_id = 2
-      Cachex.put(:retry_cache, {publisher_id, message_id}, 1,
-        ttl: :timer.seconds(1)
-      )
+      Cachex.put(:retry_cache, {publisher_id, message_id}, 1, ttl: :timer.seconds(1))
 
       assert Postoffice.count_publishers_failures() == 1
     end

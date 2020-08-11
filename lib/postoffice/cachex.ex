@@ -22,7 +22,6 @@ defmodule Postoffice.Cachex do
     {:noreply, state}
   end
 
-
   @impl true
   def handle_info({:message_failure, {values, seconds_retry}}, state) when is_list(values) do
     Cachex.put_many(:retry_cache, values, ttl: :timer.seconds(seconds_retry))
@@ -34,6 +33,7 @@ defmodule Postoffice.Cachex do
     Cachex.put(:retry_cache, {publisher_id, pending_message_id}, 1,
       ttl: :timer.seconds(seconds_retry)
     )
+
     {:noreply, state}
   end
 end
