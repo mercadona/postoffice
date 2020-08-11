@@ -1,6 +1,8 @@
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
+
 
 module.exports = {
   entry: './js/app.js',
@@ -38,6 +40,7 @@ module.exports = {
   },
   plugins: [
     new ExtractTextPlugin('../css/app.css'),
-    new CopyWebpackPlugin([{ from: 'static/', to: '../' }])
+    new CopyWebpackPlugin([{ from: 'static/', to: '../' }]),
+    new webpack.ProvidePlugin({$: "jquery", jQuery: "jquery", Popper: ['popper.js', 'default']})
   ]
 };
