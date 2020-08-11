@@ -97,7 +97,7 @@
         <div class="card-icon">
           <i class="material-icons">sms_failed</i>
         </div>
-        <p class="card-category">Failed messages</p>
+        <p class="card-category">Failing messages</p>
         <h3 class="card-title"><%= @publishers_failures %>
         </h3>
       </div>
