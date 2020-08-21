@@ -45,7 +45,7 @@ defmodule Postoffice.Messaging.Publisher do
   def calculate_chunk_size(publisher) do
     case publisher.chunk_size do
       nil ->
-        1
+        100
 
       value ->
         value

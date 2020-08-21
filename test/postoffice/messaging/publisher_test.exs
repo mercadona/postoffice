@@ -26,11 +26,11 @@ defmodule Postoffice.Messaging.PublisherTest do
       assert Publisher.calculate_chunk_size(publisher) == 1
     end
 
-    test "calculate_chunk_size/1 returns 1 when publisher's type is pubsub and no chunk specified" do
+    test "calculate_chunk_size/1 returns 100 when publisher's type is pubsub and no chunk specified" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic, @pubsub_publisher_attrs)
 
-      assert Publisher.calculate_chunk_size(publisher) == 1
+      assert Publisher.calculate_chunk_size(publisher) == 100
     end
 
     test "calculate_chunk_size/1 returns publishers chunk_size when publisher's type is pubsub" do
