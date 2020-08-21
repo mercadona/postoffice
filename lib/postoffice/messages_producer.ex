@@ -3,6 +3,7 @@ defmodule Postoffice.MessagesProducer do
 
   alias Postoffice.Dispatch
   alias Postoffice.Messaging
+  alias Postoffice.Messaging.Publisher
   alias Postoffice.MessagesConsumerSupervisor
 
   require Logger
@@ -74,10 +75,12 @@ defmodule Postoffice.MessagesProducer do
     {:stop, :normal, state}
   end
 
-  defp prepare_pending_messages(pending_messages, %{type: type} = _publisher)
+  defp prepare_pending_messages(pending_messages, %{type: type} = publisher)
        when type == "pubsub" do
+    chunk_size = Publisher.calculate_chunk_size(publisher)
+
     pending_messages
-    |> Enum.chunk_every(100)
+    |> Enum.chunk_every(chunk_size)
   end
 
   defp prepare_pending_messages(pending_messages, _publisher) do
