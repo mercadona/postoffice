@@ -20,6 +20,29 @@ defmodule Postoffice do
     end
   end
 
+  def receive_messages(
+        %{"topic" => topic, "attributes" => attributes, "payload" => payload} = _params
+      ) do
+    messages_number = Enum.count(payload)
+
+    cond do
+      messages_number >= get_bulk_messages_limit() ->
+        {:error, "Exceed max messages to ingest in bulk"}
+
+      true ->
+        messages_params =
+          Enum.map(payload, fn message_payload ->
+            %{attributes: attributes, payload: message_payload}
+          end)
+
+        Messaging.add_messages_to_deliver(topic, messages_params)
+    end
+  end
+
+  defp get_bulk_messages_limit do
+    Application.get_env(:postoffice, :max_bulk_messages, 3000)
+  end
+
   def create_topic(topic_params) do
     Messaging.create_topic(topic_params)
   end

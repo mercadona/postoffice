@@ -20,6 +20,16 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
     topic: "test"
   }
 
+  @exceed_max_ingestion_messages_attrs %{
+    attributes: %{},
+    payload: [
+      %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
+      %{"key" => "test", "key_list" => [%{"letter" => "c"}, %{"letter" => "d"}]},
+      %{"key" => "test", "key_list" => [%{"letter" => "e"}, %{"letter" => "f"}]}
+    ],
+    topic: "test"
+  }
+
   setup %{conn: conn} do
     {:ok, topic} = Messaging.create_topic(%{name: "test", origin_host: "example.com"})
     Fixtures.create_publisher(topic)
@@ -38,6 +48,13 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
       conn = post(conn, Routes.api_bulk_message_path(conn, :create), @wrong_topic_create_attrs)
 
       assert json_response(conn, 406)
+    end
+
+    test "returns error when ingest more messages than max_bulk_messages", %{conn: conn} do
+      conn = post(conn, Routes.api_bulk_message_path(conn, :create), @exceed_max_ingestion_messages_attrs)
+
+      assert json_response(conn, 406)
+      assert Kernel.length(Messaging.list_messages()) == 0
     end
   end
 end
