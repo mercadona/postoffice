@@ -10,7 +10,7 @@ defmodule Postoffice.HttpWorker do
   alias Postoffice.Workers.Http
 
   @impl Oban.Worker
-  def perform(%Oban.Job{attempt: attempt, id: id, args: args}) when attempt == 99 do
+  def perform(%Oban.Job{attempt: attempt, id: id, args: args}) when attempt == 100 do
     Logger.warn("Last retry for task", id: id, args: args)
     Http.run(id, args)
   end

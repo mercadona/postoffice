@@ -1,8 +1,6 @@
 defmodule PostofficeWeb.Api.MessageController do
   use PostofficeWeb, :controller
 
-  alias Postoffice.Messaging.Message
-
   action_fallback PostofficeWeb.Api.FallbackController
 
   def create(conn, message_params) do

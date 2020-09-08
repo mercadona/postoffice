@@ -123,4 +123,22 @@ defmodule Postoffice.HttpWorkerTest do
       assert Kernel.length(HistoricalData.list_failed_messages()) == 1
     end
   end
+
+  test "We have 100 attempts for an http job" do
+    topic = Fixtures.create_topic()
+    publisher = Fixtures.create_publisher(topic)
+
+    args = %{
+      "consumer_id" => publisher.id,
+      "target" => publisher.target,
+      "payload" => %{"action" => "test"},
+      "attributes" => %{"hive_id" => "vlc"}
+    }
+
+    expect(HttpMock, :publish, fn _id, ^args ->
+      {:ok, %HTTPoison.Response{status_code: 201}}
+    end)
+
+    perform_job(HttpWorker, args, attempt: 100)
+  end
 end
