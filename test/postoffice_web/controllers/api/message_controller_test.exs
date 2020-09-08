@@ -8,7 +8,7 @@ defmodule PostofficeWeb.Api.MessageControllerTest do
     payload: %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
     topic: "test"
   }
-  @invalid_attrs %{attributes: nil, payload: nil, topic: "test"}
+
   @bad_message_payload_by_topic %{
     attributes: %{},
     payload: %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
@@ -29,15 +29,6 @@ defmodule PostofficeWeb.Api.MessageControllerTest do
     test "renders errors when topic does not exists", %{conn: conn} do
       conn = post(conn, Routes.api_message_path(conn, :create), @bad_message_payload_by_topic)
       assert json_response(conn, 400)["data"]["errors"] == %{"topic" => ["is invalid"]}
-    end
-
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.api_message_path(conn, :create), @invalid_attrs)
-
-      assert json_response(conn, 400)["data"]["errors"] == %{
-               "attributes" => ["can't be blank"],
-               "payload" => ["can't be blank"]
-             }
     end
   end
 end
