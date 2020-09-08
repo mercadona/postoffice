@@ -136,11 +136,6 @@ defmodule Postoffice.Messaging do
     |> Repo.all()
   end
 
-  def list_enabled_publishers do
-    from(p in Publisher, where: p.active == true, preload: [:topic])
-    |> Repo.all()
-  end
-
   def list_publishers do
     from(p in Publisher, preload: [:topic])
     |> Repo.all()

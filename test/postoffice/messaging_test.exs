@@ -1,22 +1,14 @@
 defmodule Postoffice.MessagingTest do
   use Postoffice.DataCase, async: true
+  use Oban.Testing, repo: Postoffice.Repo
 
   alias Postoffice.Messaging
-  alias Postoffice.Messaging.Message
-  alias Postoffice.Messaging.PendingMessage
   alias Postoffice.Fixtures
 
   @second_topic_attrs %{
     name: "test2",
     origin_host: "example2.com",
     recovery_enabled: false
-  }
-
-  @disabled_publisher_attrs %{
-    active: false,
-    target: "http://fake.target/disabled",
-    initial_message: 0,
-    type: "http"
   }
 
   @message_attrs %{
@@ -31,129 +23,35 @@ defmodule Postoffice.MessagingTest do
     type: "http"
   }
 
-  @invalid_message_attrs %{attributes: nil, payload: nil, topic: nil}
-
   describe "messages" do
-    test "list_messages/0 returns all messages" do
+    test "add_message_to_deliver/1 without publisher created for this topics doesnt create any job" do
       topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_deliver(topic)
+      Messaging.add_message_to_deliver(topic, @message_attrs)
 
-      assert Messaging.list_messages() == [message]
+      assert Kernel.length(all_enqueued(queue: :http)) == 0
     end
 
-    test "list_messages/0 returns empty list in case no message exists" do
-      assert Messaging.list_messages() == []
-    end
-
-    test "list_messages/1 returns limited messages list" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_deliver(topic)
-
-      Fixtures.add_message_to_deliver(topic, @message_attrs)
-
-      assert Messaging.list_messages(1) == [message]
-    end
-
-    test "get_message!/1 returns the message with given id" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_deliver(topic)
-      message_found = Messaging.get_message!(message.id)
-
-      assert message.id == message_found.id
-    end
-
-    test "add_message_to_deliver/1 with valid data creates a message" do
-      topic = Fixtures.create_topic()
-
-      assert {:ok, %Message{} = message} = Messaging.add_message_to_deliver(topic, @message_attrs)
-      assert message.attributes == %{}
-      assert message.payload == %{}
-      assert message.topic_id == topic.id
-    end
-
-    test "add_message_to_deliver/1 with valid data creates a pending message" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      second_publisher = Fixtures.create_publisher(topic, @second_publisher_attrs)
-
-      {_, message} = Messaging.add_message_to_deliver(topic, @message_attrs)
-
-      assert length(Repo.all(PendingMessage)) == 2
-
-      first_pending_message =
-        Messaging.list_pending_messages_for_publisher(publisher.id)
-        |> List.first()
-
-      assert first_pending_message.message.id == message.id
-
-      second_pending_message =
-        Messaging.list_pending_messages_for_publisher(second_publisher.id)
-        |> List.first()
-
-      assert second_pending_message.message.id == message.id
-    end
-
-    test "add_messages_to_deliver/2 with 2 messages creates 2 messages entries" do
+    test "add_message_to_deliver/1 with valid data creates one job" do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
 
-      Messaging.add_messages_to_deliver(topic.name, [@message_attrs, @message_attrs])
+      Messaging.add_message_to_deliver(topic, @message_attrs)
 
-      assert length(Repo.all(Message)) == 2
+      assert Kernel.length(all_enqueued(queue: :http)) == 1
     end
 
-    test "add_messages_to_deliver/2 with 2 messages creates 2 pending messages entries" do
+    test "add_messages_to_deliver/2 with 2 messages and 2 publishers creates 4 jobs" do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
       Fixtures.create_publisher(topic, @second_publisher_attrs)
 
       Messaging.add_messages_to_deliver(topic.name, [@message_attrs, @message_attrs])
 
-      assert length(Repo.all(PendingMessage)) == 4
+      assert Kernel.length(all_enqueued(queue: :http)) == 4
     end
 
-    test "add_message_to_deliver/1 with valid data do not create pending message if have not associated publisher" do
-      topic = Fixtures.create_topic()
-      second_topic = Fixtures.create_topic(@second_topic_attrs)
-      Fixtures.create_publisher(second_topic, @second_publisher_attrs)
-
-      Messaging.add_message_to_deliver(topic, @message_attrs)
-
-      assert length(Repo.all(PendingMessage)) == 0
-    end
-
-    test "add_message_to_deliver/1 with valid data do not create pending message if do not exists any publisher" do
-      topic = Fixtures.create_topic()
-
-      Messaging.add_message_to_deliver(topic, @message_attrs)
-
-      assert length(Repo.all(PendingMessage)) == 0
-    end
-
-    test "add_message_to_deliver/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} =
-               Messaging.add_message_to_deliver(Fixtures.create_topic(), @invalid_message_attrs)
-    end
-
-    test "add_message_to_deliver/1 with invalid data do not create pending message" do
-      Messaging.add_message_to_deliver(Fixtures.create_topic(), @invalid_message_attrs)
-
-      assert length(Repo.all(PendingMessage)) == 0
-    end
-
-    test "create_publisher_success create multiple rows when passed a list of message ids" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      Messaging.add_message_to_deliver(topic, @message_attrs)
-      Messaging.add_message_to_deliver(topic, @message_attrs)
-
-      message_ids =
-        Messaging.list_messages()
-        |> Enum.map(fn message -> message.id end)
-
-      Messaging.mark_message_as_delivered(%{publisher_id: publisher.id, message_id: message_ids})
-
-      assert Kernel.length(Messaging.list_publisher_success(publisher.id)) == 2
+    test "add_messages_to_deliver/2 with invalid topic returns error" do
+      assert {:error, _reason} = Messaging.add_messages_to_deliver("invalid_topic", [@message_attrs, @message_attrs])
     end
 
     test "create_topic/1 with recovery_enabled" do
@@ -193,74 +91,37 @@ defmodule Postoffice.MessagingTest do
       assert publisher.type == listed_publisher.type
     end
 
-    test "list_enabled_publishers/0 returns only enabled publishers" do
-      topic = Fixtures.create_topic()
-      _ = Fixtures.create_publisher(topic, @disabled_publisher_attrs)
-      enabled_publisher = Fixtures.create_publisher(topic)
-      listed_publisher = List.first(Messaging.list_enabled_publishers())
 
-      assert enabled_publisher.id == listed_publisher.id
-      assert enabled_publisher.target == listed_publisher.target
-      assert enabled_publisher.active == listed_publisher.active
-      assert enabled_publisher.type == listed_publisher.type
+    test "get_publisher! returns asked publisher data" do
+      topic = Fixtures.create_topic()
+      fixture_publisher = Fixtures.create_publisher(topic)
+
+      publisher = Messaging.get_publisher!(fixture_publisher.id)
+      assert publisher.id == fixture_publisher.id
+      assert publisher.target == fixture_publisher.target
+      assert publisher.active == fixture_publisher.active
+      assert publisher.type == fixture_publisher.type
     end
 
-    test "list_pending_messages_for_publisher/2 returns empty if no pending messages for a given publisher" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
+    test "get_recovery_hosts returns unique hosts" do
+      Fixtures.create_topic()
 
-      assert Messaging.list_pending_messages_for_publisher(publisher.id) == []
+      Fixtures.create_topic(%{
+        name: "second_test",
+        origin_host: "example.com"
+      })
+
+      hosts = Messaging.get_recovery_hosts()
+
+      assert Kernel.length(hosts) == 1
     end
 
-    test "list_pending_messages_for_publisher/2 returns empty if no pending messages for a given publisher but we have pending messages for other publisher" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
+    test "get_recovery_hosts returns empty list if no topic has recovery enabled" do
+      Messaging.create_topic(@second_topic_attrs)
 
-      second_topic = Fixtures.create_topic(@second_topic_attrs)
-      Fixtures.create_publisher(second_topic, @second_publisher_attrs)
-      Fixtures.add_message_to_deliver(second_topic)
+      hosts = Messaging.get_recovery_hosts()
 
-      assert Messaging.list_pending_messages_for_publisher(publisher.id) == []
-    end
-
-    test "list_pending_messages_for_publisher/2 returns messages for a given publisher" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_deliver(topic)
-
-      pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id)
-
-      assert Kernel.length(pending_messages) == 1
-      pending_message = List.first(pending_messages)
-      assert pending_message.message.id == message.id
-      assert pending_message.message.topic_id == topic.id
-    end
-
-    test "list_pending_messages_for_publisher/2 doesnt return messages for a given publisher if they are cached as failure" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      _message = Fixtures.add_message_to_deliver(topic)
-      pending_message = Messaging.list_pending_messages_for_publisher(publisher.id) |> hd
-      Cachex.put(:retry_cache, {publisher.id, pending_message.id}, 1, ttl: :timer.seconds(10))
-
-      pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id)
-
-      assert Kernel.length(pending_messages) == 0
-    end
-
-    test "list_pending_messages_for_publisher/2 returns messages for a given publisher when there are pending messages for other publishers" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_deliver(topic)
-
-      Fixtures.create_publisher(topic, @second_publisher_attrs)
-
-      pending_messages = Messaging.list_pending_messages_for_publisher(publisher.id)
-
-      assert Kernel.length(pending_messages) == 1
-      pending_message = List.first(pending_messages)
-      assert pending_message.message.id == message.id
-      assert pending_message.message.topic_id == topic.id
+      assert hosts == []
     end
   end
 
@@ -287,97 +148,12 @@ defmodule Postoffice.MessagingTest do
       assert Messaging.count_publishers() == 2
     end
 
-    test "count_publishers_failures_aggregated returns 0 if no failed message exists" do
-      assert Messaging.count_publishers_failures_aggregated() == 0
-    end
-
-    test "count_publishers_failures_aggregated returns number of failed messages aggregated by publisher and message" do
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      message = Fixtures.add_message_to_deliver(topic)
-      Fixtures.create_publishers_failure(message, publisher)
-      Fixtures.create_publishers_failure(message, publisher)
-      Fixtures.create_publishers_failure(message, publisher)
-
-      assert Messaging.count_publishers_failures_aggregated() == 1
-    end
-
-    test "get_publisher! returns asked publisher data" do
-      topic = Fixtures.create_topic()
-      fixture_publisher = Fixtures.create_publisher(topic)
-
-      publisher = Messaging.get_publisher!(fixture_publisher.id)
-      assert publisher.id == fixture_publisher.id
-      assert publisher.target == fixture_publisher.target
-      assert publisher.active == fixture_publisher.active
-      assert publisher.type == fixture_publisher.type
-    end
-
-    test "no publisher_success is returned for a non existing message" do
-      assert Messaging.get_publisher_success_for_message(1) == []
-    end
-
-    test "no publisher_success is returned for a non processed message" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_deliver(topic)
-
-      assert Messaging.get_publisher_success_for_message(message.id) == []
-    end
-
-    test "publisher_success for a processed messaged is returned" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_deliver(topic)
-      publisher = Fixtures.create_publisher(topic)
-      Fixtures.create_publisher_success(message, publisher)
-
-      loaded_publisher_success = Messaging.get_publisher_success_for_message(message.id)
-      assert Kernel.length(loaded_publisher_success) == 1
-    end
-
-    test "no publisher_failures is returned for a non existing message" do
-      assert Messaging.get_publisher_failures_for_message(1) == []
-    end
-
-    test "no publisher_failures is returned for a non processed message" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_deliver(topic)
-
-      assert Messaging.get_publisher_failures_for_message(message.id) == []
-    end
-
-    test "publisher_failures for a processed messaged is returned" do
-      topic = Fixtures.create_topic()
-      message = Fixtures.add_message_to_deliver(topic)
-      publisher = Fixtures.create_publisher(topic)
-      Fixtures.create_publishers_failure(message, publisher)
-
-      loaded_publisher_failures = Messaging.get_publisher_failures_for_message(message.id)
-      assert Kernel.length(loaded_publisher_failures) == 1
-    end
-
-    test "get_recovery_hosts returns unique hosts" do
-      Fixtures.create_topic()
-
-      Fixtures.create_topic(%{
-        name: "second_test",
-        origin_host: "example.com"
-      })
-
-      hosts = Messaging.get_recovery_hosts()
-
-      assert Kernel.length(hosts) == 1
-    end
-
-    test "get_recovery_hosts returns empty list if no topic has recovery enabled" do
-      Messaging.create_topic(@second_topic_attrs)
-
-      hosts = Messaging.get_recovery_hosts()
-
-      assert hosts == []
-    end
-
     test "get_estimate_count returns 0 when no topic exists" do
       assert Messaging.get_estimated_count("topics") == 0
+    end
+
+    test "count_failing_jobs/0 returns 0 if no retryable job exists" do
+      assert Messaging.count_failing_jobs() == 0
     end
   end
 end
