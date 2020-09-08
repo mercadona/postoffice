@@ -5,10 +5,10 @@ defmodule PostofficeWeb.Api.BulkMessageController do
 
   def create(conn, message_params) do
     case Postoffice.receive_messages(message_params) do
-      {:ok, _res} ->
+      {:ok, ids} ->
         conn
         |> put_status(:created)
-        |> render("show.json")
+        |> render("show.json", message_ids: ids)
 
       {:error, _reason} ->
         conn
