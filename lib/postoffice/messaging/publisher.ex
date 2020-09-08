@@ -37,18 +37,4 @@ defmodule Postoffice.Messaging.Publisher do
   def types do
     [Http: "http", PubSub: "pubsub"]
   end
-
-  def calculate_chunk_size(%{type: type} = publisher) when type == "http" do
-    1
-  end
-
-  def calculate_chunk_size(publisher) do
-    case publisher.chunk_size do
-      nil ->
-        100
-
-      value ->
-        value
-    end
-  end
 end
