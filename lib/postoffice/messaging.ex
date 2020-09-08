@@ -10,10 +10,7 @@ defmodule Postoffice.Messaging do
   alias Postoffice.HttpWorker
   alias Postoffice.PubsubWorker
   alias Postoffice.Messaging.Message
-  alias Postoffice.Messaging.PendingMessage
   alias Postoffice.Messaging.Publisher
-  alias Postoffice.Messaging.PublisherSuccess
-  alias Postoffice.Messaging.PublisherFailures
   alias Postoffice.Messaging.Topic
 
   @doc """
@@ -102,35 +99,6 @@ defmodule Postoffice.Messaging do
     Enum.reduce(jobs[:jobs], [], fn job, acc -> [job.id | acc] end)
   end
 
-  @doc """
-  Returns the list of pending messages to be consumed for a consumer.
-
-  ## Examples
-
-      iex> list_pending_messages_for_publisher(publisher_id,)
-      [%Message{}, ...]
-
-  """
-  def list_pending_messages_for_publisher(publisher_id, limit \\ 300) do
-    {:ok, keys} = Cachex.keys(:retry_cache)
-
-    failed_messages =
-      keys
-      |> Enum.reduce([], fn {publisher_id, pending_message_id}, acc ->
-        if publisher_id == publisher_id do
-          [pending_message_id | acc]
-        end
-      end)
-
-    from(pm in PendingMessage,
-      where: pm.publisher_id == ^publisher_id,
-      where: pm.id not in ^failed_messages,
-      limit: ^limit,
-      preload: [:message, :publisher]
-    )
-    |> Repo.all()
-  end
-
   def list_topics do
     from(t in Topic)
     |> Repo.all()
@@ -139,90 +107,6 @@ defmodule Postoffice.Messaging do
   def list_publishers do
     from(p in Publisher, preload: [:topic])
     |> Repo.all()
-  end
-
-  def create_publisher_success(%{publisher_id: publisher_id, message_id: message_id} = _attrs)
-      when is_list(message_id) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-
-    Enum.map(message_id, fn id ->
-      %{publisher_id: publisher_id, message_id: id, inserted_at: now, updated_at: now}
-    end)
-  end
-
-  def create_publisher_success(attrs) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-
-    attrs
-    |> Map.put(:inserted_at, now)
-    |> Map.put(:updated_at, now)
-    |> List.wrap()
-  end
-
-  def mark_message_as_delivered(message_information) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert_all(
-      :publisher_success,
-      PublisherSuccess,
-      create_publisher_success(message_information)
-    )
-    |> Ecto.Multi.delete_all(
-      :pending_messages,
-      delete_pending_message(message_information)
-    )
-    |> Repo.transaction()
-
-    {:ok, :finished}
-  end
-
-  defp delete_pending_message(%{publisher_id: publisher_id, message_id: message_id})
-       when is_list(message_id) do
-    from(p in PendingMessage,
-      where:
-        p.publisher_id == ^publisher_id and
-          p.message_id in ^message_id
-    )
-  end
-
-  defp delete_pending_message(%{publisher_id: publisher_id, message_id: message_id}) do
-    from(p in PendingMessage,
-      where:
-        p.publisher_id == ^publisher_id and
-          p.message_id == ^message_id
-    )
-  end
-
-  def list_publisher_success(publisher_id) do
-    from(p in PublisherSuccess, where: p.publisher_id == ^publisher_id)
-    |> Repo.all()
-  end
-
-  def create_publisher_failure(
-        %{publisher_id: publisher_id, message_id: message_id, reason: reason} = _attrs
-      )
-      when is_list(message_id) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-
-    failures =
-      Enum.map(message_id, fn id ->
-        %{
-          publisher_id: publisher_id,
-          message_id: id,
-          reason: reason,
-          inserted_at: now,
-          updated_at: now
-        }
-      end)
-
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert_all(:failures, PublisherFailures, failures)
-    |> Repo.transaction()
-  end
-
-  def create_publisher_failure(attrs) do
-    %PublisherFailures{}
-    |> PublisherFailures.changeset(attrs)
-    |> Repo.insert()
   end
 
   def create_publisher(attrs \\ %{}) do
@@ -256,11 +140,6 @@ defmodule Postoffice.Messaging do
     |> Repo.one()
   end
 
-  def list_publisher_failures(publisher_id) do
-    from(p in PublisherFailures, where: p.publisher_id == ^publisher_id)
-    |> Repo.all()
-  end
-
   def count_topics do
     Repo.aggregate(from(t in "topics"), :count, :id)
   end
@@ -275,16 +154,6 @@ defmodule Postoffice.Messaging do
 
   def count_publishers_failures do
     Repo.aggregate(from(ps in "publisher_failures"), :count)
-  end
-
-  def get_publisher_success_for_message(message_id) do
-    from(p in PublisherSuccess, where: p.message_id == ^message_id, preload: [:publisher])
-    |> Repo.all()
-  end
-
-  def get_publisher_failures_for_message(message_id) do
-    from(p in PublisherFailures, where: p.message_id == ^message_id)
-    |> Repo.all()
   end
 
   def get_recovery_hosts() do

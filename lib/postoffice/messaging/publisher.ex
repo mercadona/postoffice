@@ -11,9 +11,6 @@ defmodule Postoffice.Messaging.Publisher do
     field :chunk_size, :integer
     field :seconds_retry, :integer, default: 30
 
-    has_many :publisher_success, Postoffice.Messaging.PublisherSuccess
-    has_many :publisher_failure, Postoffice.Messaging.PublisherFailures
-
     timestamps()
   end
 

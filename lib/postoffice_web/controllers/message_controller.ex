@@ -20,8 +20,8 @@ defmodule PostofficeWeb.MessageController do
   def show(conn, %{"id" => id}) do
     render(conn, "show.html",
       message: "message",
-      message_success: HistoricalData.get_sent_messages!(id),
-      message_failures: HistoricalData.get_failed_messages!(id),
+      message_success: HistoricalData.get_sent_message_by_message_id!(id),
+      message_failures: HistoricalData.list_failed_messages_by_message_id(id),
       page_name: "Message detail"
     )
   end

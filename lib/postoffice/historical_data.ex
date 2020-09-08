@@ -107,10 +107,10 @@ defmodule Postoffice.HistoricalData do
 
   ## Examples
 
-      iex> get_failed_messages!(123)
+      iex> list_failed_messages_by_message_id(123)
       %FailedMessages{}
 
-      iex> get_failed_messages!(456)
+      iex> list_failed_messages_by_message_id(456)
       []
 
   """

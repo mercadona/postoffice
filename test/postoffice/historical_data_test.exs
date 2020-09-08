@@ -103,7 +103,7 @@ defmodule Postoffice.HistoricalDataTest do
       assert HistoricalData.list_failed_messages() == [failed_messages]
     end
 
-    test "get_failed_messages!/1 returns the failed_messages with given id" do
+    test "list_failed_messages_by_message_id/1 returns the failed_messages with given id" do
       failed_messages = failed_messages_fixture()
 
       assert HistoricalData.list_failed_messages_by_message_id(failed_messages.message_id) == [
