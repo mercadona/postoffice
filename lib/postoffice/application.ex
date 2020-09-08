@@ -23,8 +23,9 @@ defmodule Postoffice.Application do
       Postoffice.MessagesProducerSupervisor,
       Postoffice.Rescuer.Producer,
       Postoffice.Rescuer.Supervisor,
-      {Cachex, :retry_cache},
-      Postoffice.Cachex
+      {Cachex, :pubsub_token},
+      Postoffice.Cachex,
+      {Oban, oban_config()}
     ]
 
     :ok =
@@ -46,5 +47,10 @@ defmodule Postoffice.Application do
   def config_change(changed, _new, removed) do
     PostofficeWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  # Conditionally disable crontab, queues, or plugins here.
+  defp oban_config do
+    Application.get_env(:postoffice, Oban)
   end
 end

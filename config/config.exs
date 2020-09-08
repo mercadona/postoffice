@@ -33,6 +33,11 @@ config :phoenix, :template_engines, leex: Phoenix.LiveView.Engine
 config :libcluster,
   topologies: []
 
+config :postoffice, Oban,
+  repo: Postoffice.Repo,
+  plugins: [Oban.Plugins.Pruner],
+  queues: [default: 10, http: 100, pubsub: 30]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
