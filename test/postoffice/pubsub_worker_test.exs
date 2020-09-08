@@ -86,5 +86,23 @@ defmodule Postoffice.PubsubWorkerTest do
       perform_job(PubsubWorker, args)
       assert Kernel.length(HistoricalData.list_failed_messages()) == 1
     end
+
+    test "we have 100 attempts for an http job" do
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      expect(PubsubMock, :publish, fn _id, ^args ->
+        {:ok, %PublishResponse{}}
+      end)
+
+      assert {:ok, sent} = perform_job(PubsubWorker, args, attempt: 100)
+    end
   end
 end
