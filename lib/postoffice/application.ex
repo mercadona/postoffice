@@ -19,8 +19,6 @@ defmodule Postoffice.Application do
       {Phoenix.PubSub, [name: Postoffice.PubSub, adapter: Phoenix.PubSub.PG2]},
       {Cluster.Supervisor,
        [Application.get_env(:libcluster, :topologies), [name: Postoffice.ClusterSupervisor]]},
-      Postoffice.PublisherProducer,
-      Postoffice.MessagesProducerSupervisor,
       Postoffice.Rescuer.Producer,
       Postoffice.Rescuer.Supervisor,
       {Cachex, :pubsub_token},
