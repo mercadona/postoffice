@@ -11,13 +11,17 @@ defmodule Postoffice.HttpWorkerTest do
 
   setup [:set_mox_from_context, :verify_on_exit!]
 
-
-
   describe "HttpWorker tests" do
     test "message is successfully sent" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      args = %{"consumer_id" => publisher.id, "target" => publisher.target, "payload" => %{"action" => "test"}, "attributes" => %{"hive_id" => "vlc"}}
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
 
       expect(HttpMock, :publish, fn _id, ^args ->
         {:ok, %HTTPoison.Response{status_code: 201}}
@@ -29,7 +33,13 @@ defmodule Postoffice.HttpWorkerTest do
     test "historical data is created when message is sent" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      args = %{"consumer_id" => publisher.id, "target" => publisher.target, "payload" => %{"action" => "test"}, "attributes" => %{"hive_id" => "vlc"}}
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
 
       expect(HttpMock, :publish, fn _id, ^args ->
         {:ok, %HTTPoison.Response{status_code: 201}}
@@ -42,7 +52,13 @@ defmodule Postoffice.HttpWorkerTest do
     test "message is not send if response code is out of 2xx range" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      args = %{"consumer_id" => publisher.id, "target" => publisher.target, "payload" => %{"action" => "test"}, "attributes" => %{"hive_id" => "vlc"}}
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
 
       expect(HttpMock, :publish, fn _id, ^args ->
         {:ok, %HTTPoison.Response{status_code: 302}}
@@ -54,7 +70,13 @@ defmodule Postoffice.HttpWorkerTest do
     test "historical data is created when message response is out of 2xx range" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      args = %{"consumer_id" => publisher.id, "target" => publisher.target, "payload" => %{"action" => "test"}, "attributes" => %{"hive_id" => "vlc"}}
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
 
       expect(HttpMock, :publish, fn _id, ^args ->
         {:ok, %HTTPoison.Response{status_code: 302}}
@@ -67,7 +89,13 @@ defmodule Postoffice.HttpWorkerTest do
     test "message is not send if there is any error on the request" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      args = %{"consumer_id" => publisher.id, "target" => publisher.target, "payload" => %{"action" => "test"}, "attributes" => %{"hive_id" => "vlc"}}
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
 
       expect(HttpMock, :publish, fn _id, ^args ->
         {:error, %HTTPoison.Error{reason: "Fake error"}}
@@ -79,7 +107,13 @@ defmodule Postoffice.HttpWorkerTest do
     test "historical data is created when message response if there is any error on the request" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      args = %{"consumer_id" => publisher.id, "target" => publisher.target, "payload" => %{"action" => "test"}, "attributes" => %{"hive_id" => "vlc"}}
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
 
       expect(HttpMock, :publish, fn _id, ^args ->
         {:error, %HTTPoison.Error{reason: "Fake error"}}

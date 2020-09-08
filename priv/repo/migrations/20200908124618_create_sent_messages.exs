@@ -10,6 +10,5 @@ defmodule Postoffice.Repo.Migrations.CreateSentMessages do
 
       timestamps()
     end
-
   end
 end

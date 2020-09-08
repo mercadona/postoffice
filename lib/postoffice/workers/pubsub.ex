@@ -4,16 +4,20 @@ defmodule Postoffice.Workers.Pubsub do
   alias GoogleApi.PubSub.V1.Model.PublishResponse
   alias Postoffice.HistoricalData
 
-  def run(id, %{
-    "attributes" => attributes,
-    "consumer_id" => consumer_id,
-    "payload" => payload,
-    "target" => target
-  } = args) do
+  def run(
+        id,
+        %{
+          "attributes" => attributes,
+          "consumer_id" => consumer_id,
+          "payload" => payload,
+          "target" => target
+        } = args
+      ) do
     Logger.info("Processing pubsub message",
       messages_ids: id,
       target: target
     )
+
     message_id = id || 0
 
     case impl().publish(id, args) do
@@ -22,12 +26,13 @@ defmodule Postoffice.Workers.Pubsub do
           target: target
         )
 
-        {:ok, _data} = HistoricalData.create_sent_messages(%{
-          message_id: message_id,
-          consumer_id: consumer_id,
-          payload: payload,
-          attributes: attributes
-        })
+        {:ok, _data} =
+          HistoricalData.create_sent_messages(%{
+            message_id: message_id,
+            consumer_id: consumer_id,
+            payload: payload,
+            attributes: attributes
+          })
 
         {:ok, :sent}
 

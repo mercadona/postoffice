@@ -35,7 +35,8 @@ defmodule Postoffice.HistoricalData do
       ** (Ecto.NoResultsError)
 
   """
-  def get_sent_message_by_message_id!(message_id), do: Repo.get_by!(SentMessages, message_id: message_id)
+  def get_sent_message_by_message_id!(message_id),
+    do: Repo.get_by!(SentMessages, message_id: message_id)
 
   @doc """
   Creates a sent_messages.
@@ -117,7 +118,8 @@ defmodule Postoffice.HistoricalData do
     from(fm in FailedMessages, where: fm.message_id == ^message_id)
     |> Repo.all()
   end
- @doc """
+
+  @doc """
   Creates a failed_messages.
 
   ## Examples

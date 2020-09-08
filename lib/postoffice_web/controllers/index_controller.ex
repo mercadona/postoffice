@@ -11,7 +11,9 @@ defmodule PostofficeWeb.IndexController do
       messages_received:
         Delimit.number_to_delimited(Messaging.get_estimated_count("messages"), precision: 0),
       messages_published:
-        Delimit.number_to_delimited(Messaging.get_estimated_count("publisher_success"), precision: 0),
+        Delimit.number_to_delimited(Messaging.get_estimated_count("publisher_success"),
+          precision: 0
+        ),
       publishers_failures:
         Delimit.number_to_delimited(Messaging.count_failing_jobs(), precision: 0),
       publishers: Delimit.number_to_delimited(Messaging.count_publishers(), precision: 0),

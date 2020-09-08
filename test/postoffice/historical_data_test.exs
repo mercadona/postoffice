@@ -6,7 +6,12 @@ defmodule Postoffice.HistoricalDataTest do
   describe "sent_messages" do
     alias Postoffice.HistoricalData.SentMessages
 
-    @valid_attrs %{attributes: %{"key" => "some attributes"}, consumer_id: 42, message_id: 42, payload: %{"key" => "some payload"}}
+    @valid_attrs %{
+      attributes: %{"key" => "some attributes"},
+      consumer_id: 42,
+      message_id: 42,
+      payload: %{"key" => "some payload"}
+    }
     @invalid_attrs %{attributes: nil, consumer_id: nil, message_id: nil, payload: nil}
 
     def sent_messages_fixture(attrs \\ %{}) do
@@ -25,20 +30,26 @@ defmodule Postoffice.HistoricalDataTest do
 
     test "get_sent_messages!/1 returns the sent_messages with given id" do
       sent_messages = sent_messages_fixture()
-      assert HistoricalData.get_sent_message_by_message_id!(sent_messages.message_id) == sent_messages
+
+      assert HistoricalData.get_sent_message_by_message_id!(sent_messages.message_id) ==
+               sent_messages
     end
 
     test "get_sent_message_by_message_id!/1 returns the sent_messages with given message_id" do
       sent_messages = sent_messages_fixture()
-      assert HistoricalData.get_sent_message_by_message_id!(sent_messages.message_id) == sent_messages
+
+      assert HistoricalData.get_sent_message_by_message_id!(sent_messages.message_id) ==
+               sent_messages
     end
 
     test "create_sent_messages/1 with valid data creates a sent_messages" do
-      assert {:ok, %SentMessages{} = sent_messages} = HistoricalData.create_sent_messages(@valid_attrs)
-      assert sent_messages.attributes ==  %{"key" => "some attributes"}
+      assert {:ok, %SentMessages{} = sent_messages} =
+               HistoricalData.create_sent_messages(@valid_attrs)
+
+      assert sent_messages.attributes == %{"key" => "some attributes"}
       assert sent_messages.consumer_id == 42
       assert sent_messages.message_id == 42
-      assert sent_messages.payload ==  %{"key" => "some payload"}
+      assert sent_messages.payload == %{"key" => "some payload"}
     end
 
     test "create_sent_messages/1 with invalid data returns error changeset" do
@@ -48,7 +59,10 @@ defmodule Postoffice.HistoricalDataTest do
     test "delete_sent_messages/1 deletes the sent_messages" do
       sent_messages = sent_messages_fixture()
       assert {:ok, %SentMessages{}} = HistoricalData.delete_sent_messages(sent_messages)
-      assert_raise Ecto.NoResultsError, fn -> HistoricalData.get_sent_message_by_message_id!(sent_messages.message_id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        HistoricalData.get_sent_message_by_message_id!(sent_messages.message_id)
+      end
     end
 
     test "change_sent_messages/1 returns a sent_messages changeset" do
@@ -60,8 +74,20 @@ defmodule Postoffice.HistoricalDataTest do
   describe "failed_messages" do
     alias Postoffice.HistoricalData.FailedMessages
 
-    @valid_attrs %{attributes: %{}, consumer_id: 42, message_id: 42, payload: %{}, reason: "some reason"}
-    @invalid_attrs %{attributes: nil, consumer_id: nil, message_id: nil, payload: nil, reason: nil}
+    @valid_attrs %{
+      attributes: %{},
+      consumer_id: 42,
+      message_id: 42,
+      payload: %{},
+      reason: "some reason"
+    }
+    @invalid_attrs %{
+      attributes: nil,
+      consumer_id: nil,
+      message_id: nil,
+      payload: nil,
+      reason: nil
+    }
 
     def failed_messages_fixture(attrs \\ %{}) do
       {:ok, failed_messages} =
@@ -79,11 +105,16 @@ defmodule Postoffice.HistoricalDataTest do
 
     test "get_failed_messages!/1 returns the failed_messages with given id" do
       failed_messages = failed_messages_fixture()
-      assert HistoricalData.list_failed_messages_by_message_id(failed_messages.message_id) == [failed_messages]
+
+      assert HistoricalData.list_failed_messages_by_message_id(failed_messages.message_id) == [
+               failed_messages
+             ]
     end
 
     test "create_failed_messages/1 with valid data creates a failed_messages" do
-      assert {:ok, %FailedMessages{} = failed_messages} = HistoricalData.create_failed_messages(@valid_attrs)
+      assert {:ok, %FailedMessages{} = failed_messages} =
+               HistoricalData.create_failed_messages(@valid_attrs)
+
       assert failed_messages.attributes == %{}
       assert failed_messages.consumer_id == 42
       assert failed_messages.message_id == 42

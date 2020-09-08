@@ -3,13 +3,15 @@ defmodule Postoffice.Workers.Http do
 
   alias Postoffice.HistoricalData
 
-  def run(id, %{
-    "attributes" => attributes,
-    "consumer_id" => consumer_id,
-    "payload" => payload,
-    "target" => target
-  } = args) do
-
+  def run(
+        id,
+        %{
+          "attributes" => attributes,
+          "consumer_id" => consumer_id,
+          "payload" => payload,
+          "target" => target
+        } = args
+      ) do
     message_id = id || 0
 
     case impl().publish(id, args) do

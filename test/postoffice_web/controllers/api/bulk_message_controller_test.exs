@@ -5,7 +5,6 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
   alias Postoffice.Messaging
   alias Postoffice.Fixtures
 
-
   @wrong_topic_create_attrs %{
     attributes: %{},
     payload: %{"key" => "test1", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},

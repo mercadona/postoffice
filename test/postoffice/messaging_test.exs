@@ -51,7 +51,8 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "add_messages_to_deliver/2 with invalid topic returns error" do
-      assert {:error, _reason} = Messaging.add_messages_to_deliver("invalid_topic", [@message_attrs, @message_attrs])
+      assert {:error, _reason} =
+               Messaging.add_messages_to_deliver("invalid_topic", [@message_attrs, @message_attrs])
     end
 
     test "create_topic/1 with recovery_enabled" do
@@ -90,7 +91,6 @@ defmodule Postoffice.MessagingTest do
       assert publisher.active == listed_publisher.active
       assert publisher.type == listed_publisher.type
     end
-
 
     test "get_publisher! returns asked publisher data" do
       topic = Fixtures.create_topic()

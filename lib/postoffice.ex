@@ -70,5 +70,6 @@ defmodule Postoffice do
     Map.put(publisher_params, "initial_message", initial_message_id)
     |> Messaging.create_publisher()
   end
+
   def ping, do: Application.ensure_started(:postoffice)
 end

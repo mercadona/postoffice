@@ -40,6 +40,7 @@ defmodule Postoffice.Adapters.Pubsub do
         Logger.info("successfully generated token for pubsub")
         Cachex.put(:pubsub_token, "token", token.token, ttl: :timer.seconds(60 * 59))
         token.token
+
       {:ok, value} ->
         Logger.info("Using PubSub token from cache")
         value

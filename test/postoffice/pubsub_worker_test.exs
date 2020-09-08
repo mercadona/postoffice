@@ -16,7 +16,13 @@ defmodule Postoffice.PubsubWorkerTest do
     test "message is successfully sent" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      args = %{"consumer_id" => publisher.id, "target" => publisher.target, "payload" => %{"action" => "test"}, "attributes" => %{"hive_id" => "vlc"}}
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
 
       expect(PubsubMock, :publish, fn _id, ^args ->
         {:ok, %PublishResponse{}}
@@ -28,7 +34,13 @@ defmodule Postoffice.PubsubWorkerTest do
     test "historical data is created if message is successfully sent" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      args = %{"consumer_id" => publisher.id, "target" => publisher.target, "payload" => %{"action" => "test"}, "attributes" => %{"hive_id" => "vlc"}}
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
 
       expect(PubsubMock, :publish, fn _id, ^args ->
         {:ok, %PublishResponse{}}
@@ -41,7 +53,13 @@ defmodule Postoffice.PubsubWorkerTest do
     test "message is not send if there is any error on the request" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      args = %{"consumer_id" => publisher.id, "target" => publisher.target, "payload" => %{"action" => "test"}, "attributes" => %{"hive_id" => "vlc"}}
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
 
       expect(PubsubMock, :publish, fn _id, ^args ->
         {:error, "fake error"}
@@ -53,7 +71,13 @@ defmodule Postoffice.PubsubWorkerTest do
     test "historical data is created if message is not send" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      args = %{"consumer_id" => publisher.id, "target" => publisher.target, "payload" => %{"action" => "test"}, "attributes" => %{"hive_id" => "vlc"}}
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
 
       expect(PubsubMock, :publish, fn _id, ^args ->
         {:error, "fake error"}

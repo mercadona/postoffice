@@ -11,6 +11,5 @@ defmodule Postoffice.Repo.Migrations.CreateFailedMessages do
 
       timestamps()
     end
-
   end
 end
