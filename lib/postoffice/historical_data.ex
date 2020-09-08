@@ -134,24 +134,6 @@ defmodule Postoffice.HistoricalData do
   end
 
   @doc """
-  Updates a failed_messages.
-
-  ## Examples
-
-      iex> update_failed_messages(failed_messages, %{field: new_value})
-      {:ok, %FailedMessages{}}
-
-      iex> update_failed_messages(failed_messages, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_failed_messages(%FailedMessages{} = failed_messages, attrs) do
-    failed_messages
-    |> FailedMessages.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
   Deletes a failed_messages.
 
   ## Examples
