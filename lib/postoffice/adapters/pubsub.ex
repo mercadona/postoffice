@@ -5,34 +5,44 @@ defmodule Postoffice.Adapters.Pubsub do
   @behaviour Postoffice.Adapters.Impl
 
   @impl true
-  def publish(publisher, pending_messages) do
-    Logger.info("Publishing PubSub message to #{publisher.target}")
-
-    # Authenticate
-    {:ok, token} = Goth.Token.for_scope("https://www.googleapis.com/auth/cloud-platform")
-    Logger.info("successfully generated token for pubsub")
-    conn = GoogleApi.PubSub.V1.Connection.new(token.token)
-
-    request = %GoogleApi.PubSub.V1.Model.PublishRequest{
-      messages: generate_messages(pending_messages)
-    }
+  def publish(
+        id,
+        %{
+          "attributes" => attributes,
+          "consumer_id" => consumer_id,
+          "payload" => payload,
+          "target" => target
+        } = _args
+      ) do
+    Logger.info("Publishing PubSub message to #{target}", id: id, publisher_id: consumer_id)
 
     # Make the API request.
     GoogleApi.PubSub.V1.Api.Projects.pubsub_projects_topics_publish(
-      conn,
+      GoogleApi.PubSub.V1.Connection.new(get_token()),
       Application.get_env(:postoffice, :pubsub_project_name),
-      publisher.target,
-      body: request
+      target,
+      body: %GoogleApi.PubSub.V1.Model.PublishRequest{
+        messages: [
+          %GoogleApi.PubSub.V1.Model.PubsubMessage{
+            data: Base.encode64(Poison.encode!(payload)),
+            attributes: attributes
+          }
+        ]
+      }
     )
   end
 
-  defp generate_messages(pending_messages) do
-    pending_messages
-    |> Enum.map(fn message ->
-      %GoogleApi.PubSub.V1.Model.PubsubMessage{
-        data: Base.encode64(Poison.encode!(message.payload)),
-        attributes: message.attributes
-      }
-    end)
+  defp get_token() do
+    case Cachex.get(:pubsub_token, "token") do
+      {:ok, nil} ->
+        # Authenticate
+        {:ok, token} = Goth.Token.for_scope("https://www.googleapis.com/auth/cloud-platform")
+        Logger.info("successfully generated token for pubsub")
+        Cachex.put(:pubsub_token, "token", token.token, ttl: :timer.seconds(60 * 59))
+        token.token
+      {:ok, value} ->
+        Logger.info("Using PubSub token from cache")
+        value
+    end
   end
 end
