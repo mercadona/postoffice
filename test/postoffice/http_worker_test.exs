@@ -139,6 +139,6 @@ defmodule Postoffice.HttpWorkerTest do
       {:ok, %HTTPoison.Response{status_code: 201}}
     end)
 
-    assert {:ok, sent} = perform_job(HttpWorker, args)
+    assert {:ok, sent} = perform_job(HttpWorker, args, attempt: 100)
   end
 end
