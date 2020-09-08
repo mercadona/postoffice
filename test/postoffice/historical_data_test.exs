@@ -25,7 +25,12 @@ defmodule Postoffice.HistoricalDataTest do
 
     test "get_sent_messages!/1 returns the sent_messages with given id" do
       sent_messages = sent_messages_fixture()
-      assert HistoricalData.get_sent_messages!(sent_messages.id) == sent_messages
+      assert HistoricalData.get_sent_message_by_message_id!(sent_messages.message_id) == sent_messages
+    end
+
+    test "get_sent_message_by_message_id!/1 returns the sent_messages with given message_id" do
+      sent_messages = sent_messages_fixture()
+      assert HistoricalData.get_sent_message_by_message_id!(sent_messages.message_id) == sent_messages
     end
 
     test "create_sent_messages/1 with valid data creates a sent_messages" do
@@ -43,7 +48,7 @@ defmodule Postoffice.HistoricalDataTest do
     test "delete_sent_messages/1 deletes the sent_messages" do
       sent_messages = sent_messages_fixture()
       assert {:ok, %SentMessages{}} = HistoricalData.delete_sent_messages(sent_messages)
-      assert_raise Ecto.NoResultsError, fn -> HistoricalData.get_sent_messages!(sent_messages.id) end
+      assert_raise Ecto.NoResultsError, fn -> HistoricalData.get_sent_message_by_message_id!(sent_messages.message_id) end
     end
 
     test "change_sent_messages/1 returns a sent_messages changeset" do
@@ -74,7 +79,7 @@ defmodule Postoffice.HistoricalDataTest do
 
     test "get_failed_messages!/1 returns the failed_messages with given id" do
       failed_messages = failed_messages_fixture()
-      assert HistoricalData.get_failed_messages!(failed_messages.id) == failed_messages
+      assert HistoricalData.list_failed_messages_by_message_id(failed_messages.message_id) == [failed_messages]
     end
 
     test "create_failed_messages/1 with valid data creates a failed_messages" do
@@ -93,7 +98,7 @@ defmodule Postoffice.HistoricalDataTest do
     test "delete_failed_messages/1 deletes the failed_messages" do
       failed_messages = failed_messages_fixture()
       assert {:ok, %FailedMessages{}} = HistoricalData.delete_failed_messages(failed_messages)
-      assert_raise Ecto.NoResultsError, fn -> HistoricalData.get_failed_messages!(failed_messages.id) end
+      assert HistoricalData.list_failed_messages_by_message_id(failed_messages.message_id) == []
     end
 
     test "change_failed_messages/1 returns a failed_messages changeset" do
