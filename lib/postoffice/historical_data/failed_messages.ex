@@ -6,7 +6,7 @@ defmodule Postoffice.HistoricalData.FailedMessages do
     field :attributes, :map
     field :consumer_id, :integer
     field :message_id, :integer
-    field :payload, :map
+    field :payload, {:array, :map}
     field :reason, :string
 
     timestamps()

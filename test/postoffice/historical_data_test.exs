@@ -10,7 +10,7 @@ defmodule Postoffice.HistoricalDataTest do
       attributes: %{"key" => "some attributes"},
       consumer_id: 42,
       message_id: 42,
-      payload: %{"key" => "some payload"}
+      payload: [%{"key" => "some payload"}]
     }
     @invalid_attrs %{attributes: nil, consumer_id: nil, message_id: nil, payload: nil}
 
@@ -49,7 +49,7 @@ defmodule Postoffice.HistoricalDataTest do
       assert sent_messages.attributes == %{"key" => "some attributes"}
       assert sent_messages.consumer_id == 42
       assert sent_messages.message_id == 42
-      assert sent_messages.payload == %{"key" => "some payload"}
+      assert sent_messages.payload == [%{"key" => "some payload"}]
     end
 
     test "create_sent_messages/1 with invalid data returns error changeset" do
@@ -78,7 +78,7 @@ defmodule Postoffice.HistoricalDataTest do
       attributes: %{},
       consumer_id: 42,
       message_id: 42,
-      payload: %{},
+      payload: [%{}],
       reason: "some reason"
     }
     @invalid_attrs %{
@@ -118,7 +118,7 @@ defmodule Postoffice.HistoricalDataTest do
       assert failed_messages.attributes == %{}
       assert failed_messages.consumer_id == 42
       assert failed_messages.message_id == 42
-      assert failed_messages.payload == %{}
+      assert failed_messages.payload == [%{}]
       assert failed_messages.reason == "some reason"
     end
 

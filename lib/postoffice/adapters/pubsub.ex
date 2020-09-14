@@ -22,27 +22,40 @@ defmodule Postoffice.Adapters.Pubsub do
       Application.get_env(:postoffice, :pubsub_project_name),
       target,
       body: %GoogleApi.PubSub.V1.Model.PublishRequest{
-        messages: [
-          %GoogleApi.PubSub.V1.Model.PubsubMessage{
-            data: Base.encode64(Poison.encode!(payload)),
-            attributes: attributes
-          }
-        ]
+        messages: generate_messages(payload, attributes)
       }
     )
   end
 
+  defp generate_messages(payload, attributes) when is_list(payload) do
+    Enum.map(payload, fn message_payload ->
+      %GoogleApi.PubSub.V1.Model.PubsubMessage{
+        data: Base.encode64(Poison.encode!(message_payload)),
+        attributes: attributes
+      }
+    end)
+  end
+
+  defp generate_messages(payload, attributes) do
+    [
+      %GoogleApi.PubSub.V1.Model.PubsubMessage{
+        data: Base.encode64(Poison.encode!(payload)),
+        attributes: attributes
+      }
+    ]
+  end
+
   defp get_token() do
-    case Cachex.get(:pubsub_token, "token") do
+    case Cachex.get(:postoffice, "token") do
       {:ok, nil} ->
         # Authenticate
         {:ok, token} = Goth.Token.for_scope("https://www.googleapis.com/auth/cloud-platform")
         Logger.info("successfully generated token for pubsub")
-        Cachex.put(:pubsub_token, "token", token.token, ttl: :timer.seconds(60 * 59))
+        Cachex.put(:postoffice, "token", token.token, ttl: :timer.seconds(60 * 59))
         token.token
 
       {:ok, value} ->
-        Logger.info("Using PubSub token from cache")
+        Logger.info("Using PubSub token from cache #{value}")
         value
     end
   end

@@ -35,8 +35,11 @@ config :libcluster,
 
 config :postoffice, Oban,
   repo: Postoffice.Repo,
-  plugins: [Oban.Plugins.Pruner],
-  queues: [default: 10, http: 100, pubsub: 30]
+  plugins: [
+    {Oban.Plugins.Pruner, max_age: 86400},
+    {Postoffice.Plugin.QueueLength, interval: :timer.seconds(10)}
+  ],
+  queues: [default: 10, http: 100, pubsub: 15]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

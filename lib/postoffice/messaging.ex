@@ -52,19 +52,48 @@ defmodule Postoffice.Messaging do
     )
   end
 
-  def add_messages_to_deliver(topic_name, messages_attrs) do
-    case get_topic(topic_name) |> Repo.preload(:consumers) do
+  def add_messages_to_deliver(%{"topic" => topic} = params) do
+    case get_topic(topic) |> Repo.preload(:consumers) do
       nil ->
         {:error, "Topic does not exist"}
 
       topic ->
-        Enum.map(messages_attrs, fn attrs ->
-          Enum.map(topic.consumers, fn consumer ->
-            generate_job_changeset(consumer, attrs)
-          end)
+        Enum.map(topic.consumers, fn consumer ->
+          generate_jobs_for_messages(consumer, params)
         end)
         |> Enum.flat_map(fn elem -> elem end)
         |> insert_job_changesets()
+    end
+  end
+
+  defp generate_jobs_for_messages(
+         consumer,
+         %{"topic" => topic, "attributes" => attributes, "payload" => payloads} = _messages_attrs
+       ) do
+    attrs = %{
+      "topic" => topic,
+      "attributes" => attributes,
+      "consumer_id" => consumer.id,
+      "target" => consumer.target
+    }
+
+    case consumer.type do
+      "http" ->
+        Enum.map(payloads, fn payload ->
+          attrs
+          |> Map.put("payload", payload)
+          |> Map.put("timeout", consumer.seconds_timeout || 30)
+          |> HttpWorker.new()
+        end)
+
+      "pubsub" ->
+        chunk_size = consumer.chunk_size || 200
+        Enum.chunk_every(payloads, chunk_size)
+        |> Enum.map(fn payload ->
+          attrs
+          |> Map.put("payload", payload)
+          |> PubsubWorker.new()
+        end)
     end
   end
 
@@ -74,8 +103,8 @@ defmodule Postoffice.Messaging do
 
     case consumer.type do
       "http" ->
-        attrs = Map.put_new(attrs, "timeout", consumer.seconds_timeout)
-        HttpWorker.new(attrs)
+        Map.put(attrs, "timeout", consumer.seconds_timeout || 30)
+        |> HttpWorker.new()
 
       "pubsub" ->
         PubsubWorker.new(attrs)
@@ -109,10 +138,20 @@ defmodule Postoffice.Messaging do
     |> Repo.all()
   end
 
+  @spec list_disabled_publishers :: any
+  def list_disabled_publishers do
+    from(p in Publisher, where: p.active == false)
+    |> Repo.all()
+  end
+
   def create_publisher(attrs \\ %{}) do
-    %Publisher{}
+    publisher = %Publisher{}
     |> Publisher.changeset(attrs)
     |> Repo.insert()
+
+    broadcast_publisher({:ok, publisher}, :publisher_updated)
+
+    publisher
   end
 
   def create_topic(attrs \\ %{}) do
@@ -128,6 +167,11 @@ defmodule Postoffice.Messaging do
 
   def change_publisher(%Publisher{} = publisher) do
     Publisher.changeset(publisher, %{})
+  end
+
+  def update_publisher(changeset) do
+    Repo.update(changeset)
+    |> broadcast_publisher(:publisher_updated)
   end
 
   def get_topic(name) do
@@ -187,5 +231,15 @@ defmodule Postoffice.Messaging do
     ).rows
     |> List.first()
     |> List.first()
+  end
+
+  defp broadcast_publisher({:ok, publisher}, event) do
+    Phoenix.PubSub.broadcast(
+      Postoffice.PubSub,
+      "publishers",
+      {event, publisher}
+    )
+
+    {:ok, publisher}
   end
 end

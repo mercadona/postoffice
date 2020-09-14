@@ -5,7 +5,7 @@ defmodule Postoffice.HistoricalData.SentMessages do
   schema "sent_messages" do
     field :message_id, :integer
     field :consumer_id, :integer
-    field :payload, :map
+    field :payload, {:array, :map}
     field :attributes, :map
 
     timestamps()

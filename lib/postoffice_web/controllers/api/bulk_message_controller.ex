@@ -3,8 +3,10 @@ defmodule PostofficeWeb.Api.BulkMessageController do
 
   action_fallback PostofficeWeb.Api.FallbackController
 
+  alias Postoffice.Messaging
+
   def create(conn, message_params) do
-    case Postoffice.receive_messages(message_params) do
+    case Messaging.add_messages_to_deliver(message_params) do
       {:ok, ids} ->
         conn
         |> put_status(:created)

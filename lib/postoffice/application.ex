@@ -21,8 +21,7 @@ defmodule Postoffice.Application do
        [Application.get_env(:libcluster, :topologies), [name: Postoffice.ClusterSupervisor]]},
       Postoffice.Rescuer.Producer,
       Postoffice.Rescuer.Supervisor,
-      {Cachex, :pubsub_token},
-      Postoffice.Cachex,
+      Postoffice.Cache,
       {Oban, oban_config()}
     ]
 

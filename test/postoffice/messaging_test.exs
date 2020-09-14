@@ -11,6 +11,18 @@ defmodule Postoffice.MessagingTest do
     recovery_enabled: false
   }
 
+  @invalid_message_attrs %{
+    "topic" => "invalid_topic",
+    "attributes" => %{},
+    "payload" => %{}
+  }
+
+  @valid_message_attrs %{
+    "topic" => "test",
+    "attributes" => %{},
+    "payload" => [%{"id" => "message1"}, %{"id" => "message2"}]
+  }
+
   @message_attrs %{
     attributes: %{},
     payload: %{}
@@ -21,6 +33,13 @@ defmodule Postoffice.MessagingTest do
     target: "http://fake.target2",
     initial_message: 0,
     type: "http"
+  }
+
+  @pubsub_publisher_attrs %{
+    active: true,
+    target: "test-publisher",
+    initial_message: 0,
+    type: "pubsub"
   }
 
   describe "messages" do
@@ -45,14 +64,13 @@ defmodule Postoffice.MessagingTest do
       Fixtures.create_publisher(topic)
       Fixtures.create_publisher(topic, @second_publisher_attrs)
 
-      Messaging.add_messages_to_deliver(topic.name, [@message_attrs, @message_attrs])
+      Messaging.add_messages_to_deliver(@valid_message_attrs)
 
       assert Kernel.length(all_enqueued(queue: :http)) == 4
     end
 
     test "add_messages_to_deliver/2 with invalid topic returns error" do
-      assert {:error, _reason} =
-               Messaging.add_messages_to_deliver("invalid_topic", [@message_attrs, @message_attrs])
+      assert {:error, _reason} = Messaging.add_messages_to_deliver(@invalid_message_attrs)
     end
 
     test "create_topic/1 with recovery_enabled" do
@@ -60,6 +78,15 @@ defmodule Postoffice.MessagingTest do
       {:ok, topic} = Messaging.create_topic(topic_params)
 
       assert topic.recovery_enabled == true
+    end
+
+    test "add_messages_to_deliver/2 for pubsub publisher creates jobs with multiple payloads" do
+      topic = Fixtures.create_topic()
+      Fixtures.create_publisher(topic, @pubsub_publisher_attrs)
+
+      Messaging.add_messages_to_deliver(@valid_message_attrs)
+
+      assert Kernel.length(all_enqueued(queue: :pubsub)) == 1
     end
 
     test "create_topic/1 with disabled recovery_enabled" do

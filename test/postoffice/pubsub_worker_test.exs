@@ -50,6 +50,24 @@ defmodule Postoffice.PubsubWorkerTest do
       assert Kernel.length(HistoricalData.list_sent_messages()) == 1
     end
 
+    test "messages can be sent in bulk" do
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => [%{"action" => "test"}, %{"action" => "test"}],
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      expect(PubsubMock, :publish, fn _id, ^args ->
+        {:ok, %PublishResponse{}}
+      end)
+
+      assert {:ok, sent} = perform_job(PubsubWorker, args)
+    end
+
     test "message is not send if there is any error on the request" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
