@@ -51,7 +51,7 @@ defmodule Postoffice.Adapters.Pubsub do
         # Authenticate
         {:ok, token} = Goth.Token.for_scope("https://www.googleapis.com/auth/cloud-platform")
         Logger.info("successfully generated token for pubsub")
-        Cachex.put(:postoffice, "token", token.token, ttl: :timer.seconds(60 * 59))
+        Cachex.put(:postoffice, "token", token.token, ttl: :timer.seconds(60))
         token.token
 
       {:ok, value} ->
