@@ -87,7 +87,7 @@ defmodule Postoffice.Messaging do
         end)
 
       "pubsub" ->
-        chunk_size = consumer.chunk_size || 200
+        chunk_size = consumer.chunk_size || 20
         Enum.chunk_every(payloads, chunk_size)
         |> Enum.map(fn payload ->
           attrs

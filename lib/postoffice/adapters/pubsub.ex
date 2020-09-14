@@ -55,7 +55,7 @@ defmodule Postoffice.Adapters.Pubsub do
         token.token
 
       {:ok, value} ->
-        Logger.info("Using PubSub token from cache #{value}")
+        Logger.info("Using PubSub token from cache")
         value
     end
   end
