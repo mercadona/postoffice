@@ -145,13 +145,19 @@ defmodule Postoffice.Messaging do
   end
 
   def create_publisher(attrs \\ %{}) do
-    publisher = %Publisher{}
-    |> Publisher.changeset(attrs)
-    |> Repo.insert()
+    case insert_publisher(attrs) do
+      {:ok, publisher} ->
+        broadcast_publisher({:ok, publisher}, :publisher_updated)
+        {:ok, publisher}
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
 
-    broadcast_publisher({:ok, publisher}, :publisher_updated)
-
-    publisher
+  defp insert_publisher(attrs) do
+    %Publisher{}
+      |> Publisher.changeset(attrs)
+      |> Repo.insert()
   end
 
   def create_topic(attrs \\ %{}) do
