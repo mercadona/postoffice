@@ -27,3 +27,5 @@ config :libcluster,
       config: [polling_interval: 5_000, query: "my-app.example.com", node_basename: "my-app"]
     ]
   ]
+
+config :postoffice, Oban, crontab: false, queues: false, plugins: false

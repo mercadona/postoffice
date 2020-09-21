@@ -5,6 +5,7 @@ defmodule PostofficeWeb.PublisherControllerTest do
   alias Postoffice.Messaging
 
   setup do
+    Ecto.Adapters.SQL.Sandbox.mode(Postoffice.Repo, {:shared, self()})
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 

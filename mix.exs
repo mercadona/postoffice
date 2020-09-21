@@ -85,7 +85,8 @@ defmodule Postoffice.MixProject do
       {:phoenix_live_dashboard, "~> 0.2.2"},
       {:hackney, "~> 1.16"},
       {:cachex, "~> 3.2"},
-      {:number, "~> 1.0.1"}
+      {:number, "~> 1.0.1"},
+      {:oban, "~> 2.1"}
     ]
   end
 

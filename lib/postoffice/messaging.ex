@@ -7,27 +7,11 @@ defmodule Postoffice.Messaging do
 
   alias Postoffice.Repo
 
+  alias Postoffice.HttpWorker
+  alias Postoffice.PubsubWorker
   alias Postoffice.Messaging.Message
-  alias Postoffice.Messaging.PendingMessage
   alias Postoffice.Messaging.Publisher
-  alias Postoffice.Messaging.PublisherSuccess
-  alias Postoffice.Messaging.PublisherFailures
   alias Postoffice.Messaging.Topic
-
-  @doc """
-  Returns the list of messages.
-
-  ## Examples
-
-      iex> list_messages()
-      [%Message{}, ...]
-
-  """
-  def list_messages(messages_limit \\ 100) do
-    Message
-    |> limit(^messages_limit)
-    |> Repo.all()
-  end
 
   @doc """
   Gets a single message.
@@ -61,126 +45,91 @@ defmodule Postoffice.Messaging do
 
   """
   def add_message_to_deliver(topic, attrs \\ %{}) do
-    topic =
-      topic
-      |> Repo.preload(:consumers)
+    topic = topic |> Repo.preload(:consumers)
 
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert(:message, build_message_changeset(topic, attrs))
-    |> Ecto.Multi.run(:pending_messages, fn _repo, %{message: message} ->
-      insert_pending_messages(topic.consumers, message)
-      {:ok, :multiple_insertion}
-    end)
-    |> Repo.transaction()
-    |> case do
-      {:ok, result} -> {:ok, result.message}
-      {:error, :message, changeset, %{}} -> {:error, changeset}
-    end
+    insert_job_changesets(
+      for consumer <- topic.consumers, do: generate_job_changeset(consumer, attrs)
+    )
   end
 
-  defp build_message_changeset(topic, message) when is_list(message) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-
-    Enum.map(message, fn message_attrs ->
-      Map.merge(message_attrs, %{topic_id: topic.id, inserted_at: now, updated_at: now})
-    end)
-  end
-
-  defp build_message_changeset(topic, message) do
-    Ecto.build_assoc(topic, :messages, message)
-    |> Message.changeset(message)
-  end
-
-  defp insert_pending_messages(consumers, message) do
-    Enum.each(consumers, fn consumer ->
-      %PendingMessage{publisher_id: consumer.id, message_id: message.id}
-      |> Ecto.Changeset.change()
-      |> Ecto.Changeset.put_assoc(:publisher, consumer)
-      |> Ecto.Changeset.put_assoc(:message, message)
-      |> PendingMessage.changeset(%{})
-      |> Repo.insert!()
-    end)
-  end
-
-  def add_messages_to_deliver(topic_name, messages_attrs) do
-    case get_topic(topic_name) |> Repo.preload(:consumers) do
+  def add_messages_to_deliver(%{"topic" => topic} = params) do
+    case get_topic(topic) |> Repo.preload(:consumers) do
       nil ->
         {:error, "Topic does not exist"}
 
       topic ->
-        Ecto.Multi.new()
-        |> Ecto.Multi.insert_all(
-          :message,
-          Message,
-          build_message_changeset(topic, messages_attrs),
-          returning: [:id]
-        )
-        |> Ecto.Multi.run(:pending_messages, fn _repo, message ->
-          insert_bulk_pending_messages(topic.consumers, message)
-          {:ok, :multiple_insertion}
+        Enum.map(topic.consumers, fn consumer ->
+          generate_jobs_for_messages(consumer, params)
         end)
-        |> Repo.transaction()
-        |> case do
-          {:ok, result} -> {:ok, result.message}
-          {:error, :message, changeset, %{}} -> {:error, changeset}
-        end
+        |> Enum.flat_map(fn elem -> elem end)
+        |> insert_job_changesets()
     end
   end
 
-  defp insert_bulk_pending_messages(consumers, data) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
+  defp generate_jobs_for_messages(
+         consumer,
+         %{"topic" => topic, "attributes" => attributes, "payload" => payloads} = _messages_attrs
+       ) do
+    attrs = %{
+      "topic" => topic,
+      "attributes" => attributes,
+      "consumer_id" => consumer.id,
+      "target" => consumer.target
+    }
 
-    message = data.message |> elem(1)
-
-    pending_messages =
-      Enum.map(message, fn m ->
-        Enum.map(consumers, fn consumer ->
-          %{publisher_id: consumer.id, message_id: m.id, inserted_at: now, updated_at: now}
+    case consumer.type do
+      "http" ->
+        Enum.map(payloads, fn payload ->
+          attrs
+          |> Map.put("payload", payload)
+          |> Map.put("timeout", consumer.seconds_timeout || 30)
+          |> HttpWorker.new()
         end)
-      end)
-      |> Enum.concat()
 
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert_all(:pending_messages, PendingMessage, pending_messages)
-    |> Repo.transaction()
+      "pubsub" ->
+        chunk_size = consumer.chunk_size || 20
+        Enum.chunk_every(payloads, chunk_size)
+        |> Enum.map(fn payload ->
+          attrs
+          |> Map.put("payload", payload)
+          |> PubsubWorker.new()
+        end)
+    end
   end
 
-  @doc """
-  Returns the list of pending messages to be consumed for a consumer.
+  defp generate_job_changeset(consumer, job_attrs) do
+    attrs =
+      Map.put_new(job_attrs, "target", consumer.target) |> Map.put_new("consumer_id", consumer.id)
 
-  ## Examples
+    case consumer.type do
+      "http" ->
+        Map.put(attrs, "timeout", consumer.seconds_timeout || 30)
+        |> HttpWorker.new()
 
-      iex> list_pending_messages_for_publisher(publisher_id,)
-      [%Message{}, ...]
+      "pubsub" ->
+        PubsubWorker.new(attrs)
+    end
+  end
 
-  """
-  def list_pending_messages_for_publisher(publisher_id, limit \\ 300) do
-    {:ok, keys} = Cachex.keys(:retry_cache)
+  defp insert_job_changesets(changesets) do
+    Ecto.Multi.new()
+    |> Oban.insert_all(:jobs, changesets)
+    |> Repo.transaction()
+    |> case do
+      {:ok, result} ->
+        {:ok, extract_job_ids(result)}
 
-    failed_messages =
-      keys
-      |> Enum.reduce([], fn {publisher_id, pending_message_id}, acc ->
-        if publisher_id == publisher_id do
-          [pending_message_id | acc]
-        end
-      end)
+      {:error, :message, changeset, %{}} ->
+        {:error, changeset}
+    end
+  end
 
-    from(pm in PendingMessage,
-      where: pm.publisher_id == ^publisher_id,
-      where: pm.id not in ^failed_messages,
-      limit: ^limit,
-      preload: [:message, :publisher]
-    )
-    |> Repo.all()
+  defp extract_job_ids(jobs) do
+    Enum.reduce(jobs[:jobs], [], fn job, acc -> [job.id | acc] end)
   end
 
   def list_topics do
     from(t in Topic)
-    |> Repo.all()
-  end
-
-  def list_enabled_publishers do
-    from(p in Publisher, where: p.active == true, preload: [:topic])
     |> Repo.all()
   end
 
@@ -189,95 +138,26 @@ defmodule Postoffice.Messaging do
     |> Repo.all()
   end
 
-  def create_publisher_success(%{publisher_id: publisher_id, message_id: message_id} = _attrs)
-      when is_list(message_id) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-
-    Enum.map(message_id, fn id ->
-      %{publisher_id: publisher_id, message_id: id, inserted_at: now, updated_at: now}
-    end)
-  end
-
-  def create_publisher_success(attrs) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-
-    attrs
-    |> Map.put(:inserted_at, now)
-    |> Map.put(:updated_at, now)
-    |> List.wrap()
-  end
-
-  @spec mark_message_as_delivered(%{message_id: any, publisher_id: any}) :: {:ok, :finished}
-  def mark_message_as_delivered(message_information) do
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert_all(
-      :publisher_success,
-      PublisherSuccess,
-      create_publisher_success(message_information)
-    )
-    |> Ecto.Multi.delete_all(
-      :pending_messages,
-      delete_pending_message(message_information)
-    )
-    |> Repo.transaction()
-
-    {:ok, :finished}
-  end
-
-  defp delete_pending_message(%{publisher_id: publisher_id, message_id: message_id})
-       when is_list(message_id) do
-    from(p in PendingMessage,
-      where:
-        p.publisher_id == ^publisher_id and
-          p.message_id in ^message_id
-    )
-  end
-
-  defp delete_pending_message(%{publisher_id: publisher_id, message_id: message_id}) do
-    from(p in PendingMessage,
-      where:
-        p.publisher_id == ^publisher_id and
-          p.message_id == ^message_id
-    )
-  end
-
-  def list_publisher_success(publisher_id) do
-    from(p in PublisherSuccess, where: p.publisher_id == ^publisher_id)
+  @spec list_disabled_publishers :: any
+  def list_disabled_publishers do
+    from(p in Publisher, where: p.active == false)
     |> Repo.all()
   end
 
-  def create_publisher_failure(
-        %{publisher_id: publisher_id, message_id: message_id, reason: reason} = _attrs
-      )
-      when is_list(message_id) do
-    now = NaiveDateTime.utc_now() |> NaiveDateTime.truncate(:second)
-
-    failures =
-      Enum.map(message_id, fn id ->
-        %{
-          publisher_id: publisher_id,
-          message_id: id,
-          reason: reason,
-          inserted_at: now,
-          updated_at: now
-        }
-      end)
-
-    Ecto.Multi.new()
-    |> Ecto.Multi.insert_all(:failures, PublisherFailures, failures)
-    |> Repo.transaction()
-  end
-
-  def create_publisher_failure(attrs) do
-    %PublisherFailures{}
-    |> PublisherFailures.changeset(attrs)
-    |> Repo.insert()
-  end
-
   def create_publisher(attrs \\ %{}) do
+    case insert_publisher(attrs) do
+      {:ok, publisher} ->
+        broadcast_publisher({:ok, publisher}, :publisher_updated)
+        {:ok, publisher}
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
+
+  defp insert_publisher(attrs) do
     %Publisher{}
-    |> Publisher.changeset(attrs)
-    |> Repo.insert()
+      |> Publisher.changeset(attrs)
+      |> Repo.insert()
   end
 
   def create_topic(attrs \\ %{}) do
@@ -295,6 +175,11 @@ defmodule Postoffice.Messaging do
     Publisher.changeset(publisher, %{})
   end
 
+  def update_publisher(changeset) do
+    Repo.update(changeset)
+    |> broadcast_publisher(:publisher_updated)
+  end
+
   def get_topic(name) do
     from(t in Topic, where: t.name == ^name)
     |> Repo.one()
@@ -303,11 +188,6 @@ defmodule Postoffice.Messaging do
   def get_last_message do
     from(m in Message, order_by: [desc: :id], limit: 1)
     |> Repo.one()
-  end
-
-  def list_publisher_failures(publisher_id) do
-    from(p in PublisherFailures, where: p.publisher_id == ^publisher_id)
-    |> Repo.all()
   end
 
   def count_topics do
@@ -324,16 +204,6 @@ defmodule Postoffice.Messaging do
 
   def count_publishers_failures do
     Repo.aggregate(from(ps in "publisher_failures"), :count)
-  end
-
-  def get_publisher_success_for_message(message_id) do
-    from(p in PublisherSuccess, where: p.message_id == ^message_id, preload: [:publisher])
-    |> Repo.all()
-  end
-
-  def get_publisher_failures_for_message(message_id) do
-    from(p in PublisherFailures, where: p.message_id == ^message_id)
-    |> Repo.all()
   end
 
   def get_recovery_hosts() do
@@ -360,19 +230,22 @@ defmodule Postoffice.Messaging do
     |> List.first()
   end
 
-  @doc """
-  Returns an integer representing a count of publisher failures. This value is agregated by publisher and message.
-
-  ## Examples
-
-      iex> count_publishers_failures_aggregated()
-      10
-
-  """
-  def count_publishers_failures_aggregated() do
+  def count_failing_jobs() do
     Ecto.Adapters.SQL.query!(
       Postoffice.Repo,
-      "select COUNT(*) from publisher_failures group by publisher_id, message_id;"
-    ).num_rows
+      "SELECT COUNT(*) from oban_jobs where state = 'retryable'"
+    ).rows
+    |> List.first()
+    |> List.first()
+  end
+
+  defp broadcast_publisher({:ok, publisher}, event) do
+    Phoenix.PubSub.broadcast(
+      Postoffice.PubSub,
+      "publishers",
+      {event, publisher}
+    )
+
+    {:ok, publisher}
   end
 end

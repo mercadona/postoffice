@@ -7,8 +7,6 @@ defmodule Postoffice.Messaging.Message do
     field :payload, :map
     belongs_to :topic, Postoffice.Messaging.Topic
 
-    has_many :publisher_success, Postoffice.Messaging.PublisherSuccess
-
     timestamps()
 
     field :publisher_id, :string, virtual: true

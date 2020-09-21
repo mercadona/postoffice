@@ -2,8 +2,8 @@ defmodule PostofficeWeb.Api.BulkMessageView do
   use PostofficeWeb, :view
   alias PostofficeWeb.Api.MessageView
 
-  def render("show.json", _mess) do
-    %{result: "bulk messages processed"}
+  def render("show.json", %{message_ids: message_ids}) do
+    %{result: message_ids}
   end
 
   def render("error.json", %{changeset: changeset}) do
