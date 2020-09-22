@@ -66,6 +66,26 @@ defmodule Postoffice.Messaging do
     end
   end
 
+  def schedule_message(
+        %{
+          "topic" => topic_name,
+          "attributes" => attributes,
+          "payload" => payload,
+          "scheduled_at" => scheduled_at
+        } = _message_params
+      ) do
+    case get_topic(topic_name) |> Repo.preload(:consumers) do
+      nil ->
+        {:relationship_does_not_exists, %{topic: ["is invalid"]}}
+
+      topic ->
+        insert_job_changesets(
+          for consumer <- topic.consumers,
+              do: schedule_job_changeset(consumer, payload, attributes, scheduled_at)
+        )
+    end
+  end
+
   defp generate_jobs_for_messages(
          consumer,
          %{"topic" => topic, "attributes" => attributes, "payload" => payloads} = _messages_attrs
@@ -88,6 +108,7 @@ defmodule Postoffice.Messaging do
 
       "pubsub" ->
         chunk_size = consumer.chunk_size || 20
+
         Enum.chunk_every(payloads, chunk_size)
         |> Enum.map(fn payload ->
           attrs
@@ -108,6 +129,26 @@ defmodule Postoffice.Messaging do
 
       "pubsub" ->
         PubsubWorker.new(attrs)
+    end
+  end
+
+  defp schedule_job_changeset(consumer, payload, attributes, scheduled_at) do
+    attrs = %{
+      "payload" => payload,
+      "attributes" => attributes,
+      "target" => consumer.target,
+      "consumer_id" => consumer.id
+    }
+
+    {:ok, schedule, _offset} = DateTime.from_iso8601("#{scheduled_at}Z")
+
+    case consumer.type do
+      "http" ->
+        Map.put(attrs, "timeout", consumer.seconds_timeout || 30)
+        |> HttpWorker.new(scheduled_at: schedule)
+
+      "pubsub" ->
+        PubsubWorker.new(attrs, scheduled_at: schedule)
     end
   end
 
@@ -149,6 +190,7 @@ defmodule Postoffice.Messaging do
       {:ok, publisher} ->
         broadcast_publisher({:ok, publisher}, :publisher_updated)
         {:ok, publisher}
+
       {:error, changeset} ->
         {:error, changeset}
     end
@@ -156,8 +198,8 @@ defmodule Postoffice.Messaging do
 
   defp insert_publisher(attrs) do
     %Publisher{}
-      |> Publisher.changeset(attrs)
-      |> Repo.insert()
+    |> Publisher.changeset(attrs)
+    |> Repo.insert()
   end
 
   def create_topic(attrs \\ %{}) do
