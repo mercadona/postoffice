@@ -71,7 +71,7 @@ defmodule Postoffice.Messaging do
           "topic" => topic_name,
           "attributes" => attributes,
           "payload" => payload,
-          "scheduled_at" => scheduled_at
+          "schedule_at" => schedule_at
         } = _message_params
       ) do
     case get_topic(topic_name) |> Repo.preload(:consumers) do
@@ -81,7 +81,7 @@ defmodule Postoffice.Messaging do
       topic ->
         insert_job_changesets(
           for consumer <- topic.consumers,
-              do: schedule_job_changeset(consumer, payload, attributes, scheduled_at)
+              do: schedule_job_changeset(consumer, payload, attributes, schedule_at)
         )
     end
   end
@@ -132,7 +132,7 @@ defmodule Postoffice.Messaging do
     end
   end
 
-  defp schedule_job_changeset(consumer, payload, attributes, scheduled_at) do
+  defp schedule_job_changeset(consumer, payload, attributes, schedule_at) do
     attrs = %{
       "payload" => payload,
       "attributes" => attributes,
@@ -140,7 +140,7 @@ defmodule Postoffice.Messaging do
       "consumer_id" => consumer.id
     }
 
-    {:ok, schedule, _offset} = DateTime.from_iso8601("#{scheduled_at}Z")
+    {:ok, schedule, _offset} = DateTime.from_iso8601(schedule_at)
 
     case consumer.type do
       "http" ->
