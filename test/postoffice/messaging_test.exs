@@ -28,6 +28,13 @@ defmodule Postoffice.MessagingTest do
     payload: %{}
   }
 
+  @future_message_attrs %{
+    "attributes" => %{"attribute_key" => "test"},
+    "payload" => %{"value" => "test"},
+    "scheduled_at" => "2100-12-31 10:11:12.131415",
+    "topic" => "test"
+  }
+
   @second_publisher_attrs %{
     active: true,
     target: "http://fake.target2",
@@ -67,6 +74,18 @@ defmodule Postoffice.MessagingTest do
       Messaging.add_messages_to_deliver(@valid_message_attrs)
 
       assert Kernel.length(all_enqueued(queue: :http)) == 4
+    end
+
+    test "schedule_message set the correct scheduled_at" do
+      topic = Fixtures.create_topic()
+      Fixtures.create_publisher(topic)
+
+      Messaging.schedule_message(@future_message_attrs)
+
+      assert Kernel.length(all_enqueued(queue: :http)) == 1
+      job = Oban.Job |> Repo.one()
+      assert job.state == "scheduled"
+      assert job.scheduled_at == ~U[2100-12-31 10:11:12.131415Z]
     end
 
     test "add_messages_to_deliver/2 with invalid topic returns error" do
