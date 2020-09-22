@@ -7,19 +7,13 @@ defmodule PostofficeWeb.Api.ScheduleMessageControllerTest do
     attributes: %{},
     payload: %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
     topic: "test",
-    scheduled_at: "2100-12-31 10:11:12.131415"
-  }
-
-  @wrong_payload_without_scheduled_at %{
-    attributes: %{},
-    payload: %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
-    topic: "test"
+    schedule_at: "2100-12-31 10:11:12.131415"
   }
 
   @wrong_payload_without_topic %{
     attributes: %{},
     payload: %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
-    scheduled_at: "2100-12-31 10:11:12.131415",
+    schedule_at: "2100-12-31 10:11:12.131415",
     topic: "wrong_topic"
   }
 
