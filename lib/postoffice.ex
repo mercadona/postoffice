@@ -20,17 +20,6 @@ defmodule Postoffice do
     end
   end
 
-  def receive_messages(
-        %{"topic" => topic, "attributes" => attributes, "payload" => payload} = _params
-      ) do
-    messages_params =
-      Enum.map(payload, fn message_payload ->
-        %{attributes: attributes, payload: message_payload}
-      end)
-
-    Messaging.add_messages_to_deliver(topic, messages_params)
-  end
-
   def create_topic(topic_params) do
     Messaging.create_topic(topic_params)
   end
@@ -70,31 +59,6 @@ defmodule Postoffice do
     Map.put(publisher_params, "initial_message", initial_message_id)
     |> Messaging.create_publisher()
   end
-
-  def find_message_by_id(id) do
-    Messaging.get_message!(id)
-  end
-
-  def get_message(id), do: Messaging.get_message!(id)
-
-  def get_message_success(message_id), do: Messaging.get_publisher_success_for_message(message_id)
-
-  def get_message_failures(message_id),
-    do: Messaging.get_publisher_failures_for_message(message_id)
-
-  def get_last_messages(limit \\ 10), do: Messaging.list_messages(limit)
-
-  def estimated_messages_count, do: Messaging.get_estimated_count("messages")
-
-  def estimated_published_messages_count, do: Messaging.get_estimated_count("publisher_success")
-
-  def count_publishers_failures, do: Messaging.count_publishers_failures_aggregated()
-
-  def count_publishers, do: Messaging.count_publishers()
-
-  def count_pending_messages, do: Messaging.count_pending_messages()
-
-  def count_topics, do: Messaging.count_topics()
 
   def ping, do: Application.ensure_started(:postoffice)
 end

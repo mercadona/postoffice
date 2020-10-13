@@ -1,8 +1,11 @@
 defmodule PostofficeWeb.MessageController do
   use PostofficeWeb, :controller
 
+  alias Postoffice.Messaging
+  alias Postoffice.HistoricalData
+
   def index(conn, %{"id" => id}) do
-    case Postoffice.find_message_by_id(id) do
+    case Messaging.get_message!(id) do
       nil ->
         conn
         |> put_flash(:info, "Message not found")
@@ -15,14 +18,10 @@ defmodule PostofficeWeb.MessageController do
   end
 
   def show(conn, %{"id" => id}) do
-    message = Postoffice.get_message(id)
-    message_success = Postoffice.get_message_success(id)
-    message_failures = Postoffice.get_message_failures(id)
-
     render(conn, "show.html",
-      message: message,
-      message_success: message_success,
-      message_failures: message_failures,
+      message: "message",
+      message_success: HistoricalData.get_sent_message_by_message_id!(id),
+      message_failures: HistoricalData.list_failed_messages_by_message_id(id),
       page_name: "Message detail"
     )
   end
