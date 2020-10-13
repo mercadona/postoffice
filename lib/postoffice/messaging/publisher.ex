@@ -11,9 +11,6 @@ defmodule Postoffice.Messaging.Publisher do
     field :chunk_size, :integer
     field :seconds_retry, :integer, default: 30
 
-    has_many :publisher_success, Postoffice.Messaging.PublisherSuccess
-    has_many :publisher_failure, Postoffice.Messaging.PublisherFailures
-
     timestamps()
   end
 
@@ -36,19 +33,5 @@ defmodule Postoffice.Messaging.Publisher do
 
   def types do
     [Http: "http", PubSub: "pubsub"]
-  end
-
-  def calculate_chunk_size(%{type: type} = publisher) when type == "http" do
-    1
-  end
-
-  def calculate_chunk_size(publisher) do
-    case publisher.chunk_size do
-      nil ->
-        100
-
-      value ->
-        value
-    end
   end
 end

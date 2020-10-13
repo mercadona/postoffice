@@ -49,7 +49,7 @@ defmodule PostofficeWeb.PublisherController do
 
     publisher
     |> Publisher.changeset(publisher_params)
-    |> Postoffice.Repo.update()
+    |> Messaging.update_publisher()
     |> case do
       {:ok, _publisher} ->
         conn

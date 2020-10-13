@@ -6,13 +6,13 @@ defmodule PostofficeWeb.Api.MessageView do
     %{data: render_many(messages, MessageView, "message.json")}
   end
 
-  def render("show.json", %{message: message}) do
-    %{data: render_one(message, MessageView, "message.json")}
+  def render("show.json", %{message_id: message_id}) do
+    %{data: render_one(message_id, MessageView, "message.json")}
   end
 
-  def render("message.json", %{message: message}) do
+  def render("message.json", %{message_id: message_id}) do
     %{
-      id: message.id
+      id: message_id
     }
   end
 

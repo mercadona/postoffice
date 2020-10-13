@@ -1,7 +1,9 @@
 defmodule PostofficeWeb.Api.BulkMessageControllerTest do
   use PostofficeWeb.ConnCase, async: true
+  use Oban.Testing, repo: Postoffice.Repo
 
   alias Postoffice.Messaging
+  alias Postoffice.Fixtures
 
   @wrong_topic_create_attrs %{
     attributes: %{},
@@ -19,7 +21,8 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
   }
 
   setup %{conn: conn} do
-    {:ok, _topic} = Messaging.create_topic(%{name: "test", origin_host: "example.com"})
+    {:ok, topic} = Messaging.create_topic(%{name: "test", origin_host: "example.com"})
+    Fixtures.create_publisher(topic)
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
@@ -28,7 +31,7 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
       conn = post(conn, Routes.api_bulk_message_path(conn, :create), @create_attrs)
 
       assert json_response(conn, 201)
-      assert Kernel.length(Messaging.list_messages()) == 2
+      assert Kernel.length(all_enqueued(queue: :http)) == 2
     end
 
     test "returns error in case something wrong happens during insert", %{conn: conn} do

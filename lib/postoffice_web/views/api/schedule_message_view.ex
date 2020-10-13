@@ -1,9 +1,15 @@
-defmodule PostofficeWeb.Api.BulkMessageView do
+defmodule PostofficeWeb.Api.ScheduleMessageView do
   use PostofficeWeb, :view
   alias PostofficeWeb.Api.MessageView
 
-  def render("show.json", %{message_ids: message_ids}) do
-    %{result: message_ids}
+  def render("show.json", %{message_id: message_id}) do
+    %{data: render_one(message_id, MessageView, "message.json")}
+  end
+
+  def render("message.json", %{message_id: message_id}) do
+    %{
+      id: message_id
+    }
   end
 
   def render("error.json", %{changeset: changeset}) do
