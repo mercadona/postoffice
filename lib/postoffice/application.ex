@@ -19,11 +19,10 @@ defmodule Postoffice.Application do
       {Phoenix.PubSub, [name: Postoffice.PubSub, adapter: Phoenix.PubSub.PG2]},
       {Cluster.Supervisor,
        [Application.get_env(:libcluster, :topologies), [name: Postoffice.ClusterSupervisor]]},
-      Postoffice.PublisherProducer,
-      Postoffice.MessagesProducerSupervisor,
       Postoffice.Rescuer.Producer,
       Postoffice.Rescuer.Supervisor,
-      {Cachex, :retry_cache}
+      Postoffice.Cache,
+      {Oban, oban_config()}
     ]
 
     :ok =
@@ -45,5 +44,10 @@ defmodule Postoffice.Application do
   def config_change(changed, _new, removed) do
     PostofficeWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  # Conditionally disable crontab, queues, or plugins here.
+  defp oban_config do
+    Application.get_env(:postoffice, Oban)
   end
 end

@@ -1,10 +1,10 @@
 defmodule Postoffice.Rescuer.MessageRecoveryTest do
   use ExUnit.Case, async: true
+  use Oban.Testing, repo: Postoffice.Repo
 
   import Mox
 
   alias Postoffice.Fixtures
-  alias Postoffice.Messaging
   alias Postoffice.Rescuer.Adapters.HttpMock
   alias Postoffice.Rescuer.MessageRecovery
 
@@ -29,7 +29,7 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       end)
 
       MessageRecovery.run(@origin_host)
-      assert Messaging.list_messages() == []
+      assert all_enqueued(queue: :http) == []
     end
 
     test "message created if one undelivered message found" do
@@ -41,12 +41,32 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
         {:ok, %HTTPoison.Response{status_code: 204}}
       end)
 
-      Fixtures.create_topic()
+      topic = Fixtures.create_topic()
+      Fixtures.create_publisher(topic)
       MessageRecovery.run(@origin_host)
-      assert Kernel.length(Messaging.list_messages()) == 1
+      assert Kernel.length(all_enqueued(queue: :http)) == 1
     end
 
-    test "messages created if more than one undelivered message in response" do
+    test "messages created if more than one undelivered message found" do
+      expect(HttpMock, :list, fn @origin_host ->
+        {:ok, %HTTPoison.Response{status_code: 200, body: @two_messages_response}}
+      end)
+
+      expect(HttpMock, :delete, fn @origin_host, @first_message_id ->
+        {:ok, %HTTPoison.Response{status_code: 204}}
+      end)
+
+      expect(HttpMock, :delete, fn @origin_host, @second_message_id ->
+        {:ok, %HTTPoison.Response{status_code: 204}}
+      end)
+
+      topic = Fixtures.create_topic()
+      Fixtures.create_publisher(topic)
+      MessageRecovery.run(@origin_host)
+      assert Kernel.length(all_enqueued(queue: :http)) == 2
+    end
+
+    test "messages created if response is from bulk failure" do
       expect(HttpMock, :list, fn @origin_host ->
         {:ok, %HTTPoison.Response{status_code: 200, body: @bulk_message_response}}
       end)
@@ -55,65 +75,10 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
         {:ok, %HTTPoison.Response{status_code: 204}}
       end)
 
-      Fixtures.create_topic()
-      MessageRecovery.run(@origin_host)
-      assert Kernel.length(Messaging.list_messages()) == 2
-    end
-
-    test "message created as pending if one undelivered message found" do
-      expect(HttpMock, :list, fn @origin_host ->
-        {:ok, %HTTPoison.Response{status_code: 200, body: @one_message_response}}
-      end)
-
-      expect(HttpMock, :delete, fn @origin_host, @first_message_id ->
-        {:ok, %HTTPoison.Response{status_code: 204}}
-      end)
-
       topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
+      Fixtures.create_publisher(topic)
       MessageRecovery.run(@origin_host)
-
-      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id)) ==
-               1
-    end
-
-    test "more than one message is created if multiple undelivered messages found" do
-      expect(HttpMock, :list, fn @origin_host ->
-        {:ok, %HTTPoison.Response{status_code: 200, body: @two_messages_response}}
-      end)
-
-      expect(HttpMock, :delete, fn @origin_host, @first_message_id ->
-        {:ok, %HTTPoison.Response{status_code: 204}}
-      end)
-
-      expect(HttpMock, :delete, fn @origin_host, @second_message_id ->
-        {:ok, %HTTPoison.Response{status_code: 204}}
-      end)
-
-      Fixtures.create_topic()
-      MessageRecovery.run(@origin_host)
-      assert Kernel.length(Messaging.list_messages()) == 2
-    end
-
-    test "more than one message is created as pending if multiple undelivered messages found" do
-      expect(HttpMock, :list, fn @origin_host ->
-        {:ok, %HTTPoison.Response{status_code: 200, body: @two_messages_response}}
-      end)
-
-      expect(HttpMock, :delete, fn @origin_host, @first_message_id ->
-        {:ok, %HTTPoison.Response{status_code: 204}}
-      end)
-
-      expect(HttpMock, :delete, fn @origin_host, @second_message_id ->
-        {:ok, %HTTPoison.Response{status_code: 204}}
-      end)
-
-      topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
-      MessageRecovery.run(@origin_host)
-
-      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id)) ==
-               2
+      assert Kernel.length(all_enqueued(queue: :http)) == 2
     end
 
     test "no message created if something fails" do
@@ -122,7 +87,7 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       end)
 
       MessageRecovery.run(@origin_host)
-      assert Kernel.length(Messaging.list_messages()) == 0
+      assert Kernel.length(all_enqueued(queue: :http)) == 0
     end
 
     test "no message created as pending if something fails" do
@@ -131,11 +96,10 @@ defmodule Postoffice.Rescuer.MessageRecoveryTest do
       end)
 
       topic = Fixtures.create_topic()
-      publisher = Fixtures.create_publisher(topic)
+      Fixtures.create_publisher(topic)
       MessageRecovery.run(@origin_host)
 
-      assert Kernel.length(Messaging.list_pending_messages_for_publisher(publisher.id)) ==
-               0
+      assert Kernel.length(all_enqueued(queue: :http)) == 0
     end
   end
 end

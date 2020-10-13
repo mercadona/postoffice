@@ -1,4 +1,4 @@
-defmodule PostofficeWeb.Api.MessageControllerTest do
+defmodule PostofficeWeb.Api.ScheduleMessageControllerTest do
   use PostofficeWeb.ConnCase, async: true
 
   alias Postoffice.Messaging
@@ -6,13 +6,15 @@ defmodule PostofficeWeb.Api.MessageControllerTest do
   @create_attrs %{
     attributes: %{},
     payload: %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
-    topic: "test"
+    topic: "test",
+    schedule_at: "2100-12-31 10:11:12.131415"
   }
 
-  @bad_message_payload_by_topic %{
+  @wrong_payload_without_topic %{
     attributes: %{},
     payload: %{"key" => "test", "key_list" => [%{"letter" => "a"}, %{"letter" => "b"}]},
-    topic: "no_topic"
+    schedule_at: "2100-12-31 10:11:12.131415",
+    topic: "wrong_topic"
   }
 
   setup %{conn: conn} do
@@ -20,14 +22,16 @@ defmodule PostofficeWeb.Api.MessageControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
-  describe "create message" do
+  describe "schedule message" do
     test "returns 201 when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.api_message_path(conn, :create), @create_attrs)
+      conn = post(conn, Routes.api_schedule_message_path(conn, :create), @create_attrs)
       assert json_response(conn, 201)
     end
 
     test "renders errors when topic does not exists", %{conn: conn} do
-      conn = post(conn, Routes.api_message_path(conn, :create), @bad_message_payload_by_topic)
+      conn =
+        post(conn, Routes.api_schedule_message_path(conn, :create), @wrong_payload_without_topic)
+
       assert json_response(conn, 400)["data"]["errors"] == %{"topic" => ["is invalid"]}
     end
   end
