@@ -4,6 +4,7 @@ config :postoffice, PostofficeWeb.Endpoint,
   secret_key_base: {:system, "SECRET_KEY_BASE", default: "12121212"}
 
 config :postoffice, pubsub_project_name: {:system, "GCLOUD_PUBSUB_PROJECT_ID", default: "test"}
+config :postoffice, max_bulk_messages: {:system, "MAX_BULK_MESSAGES", default: 3000}
 
 config :postoffice, Postoffice.Repo,
   username: {:system, "DB_USERNAME", default: "postgres"},

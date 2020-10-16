@@ -12,10 +12,10 @@ defmodule PostofficeWeb.Api.BulkMessageController do
         |> put_status(:created)
         |> render("show.json", message_ids: ids)
 
-      {:error, _reason} ->
+      {:error, reason} ->
         conn
         |> put_status(:not_acceptable)
-        |> render("error.json", error: "Not all messages were inserted")
+        |> render("error.json", error: reason)
     end
   end
 end

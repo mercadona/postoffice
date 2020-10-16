@@ -22,3 +22,9 @@ Application.put_env(
   :rescuer_client,
   Postoffice.Rescuer.Adapters.HttpMock
 )
+
+Application.put_env(
+  :postoffice,
+  :max_bulk_messages,
+  3
+)
