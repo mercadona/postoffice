@@ -53,27 +53,16 @@ defmodule Postoffice.Messaging do
   end
 
   def add_messages_to_deliver(%{"topic" => topic} = params) do
-    messages_number = Enum.count(params["payload"])
-    case messages_number <= get_bulk_messages_limit() do
-      false ->
-        {:error, "Exceed max messages to ingest in bulk"}
-
-      true ->
-        case get_topic(topic) |> Repo.preload(:consumers) do
-          nil ->
-            {:error, "Topic does not exist"}
-          topic ->
-            Enum.map(topic.consumers, fn consumer ->
-              generate_jobs_for_messages(consumer, params)
-            end)
-            |> Enum.flat_map(fn elem -> elem end)
-            |> insert_job_changesets()
-        end
+    case get_topic(topic) |> Repo.preload(:consumers) do
+      nil ->
+        {:error, "Topic does not exist"}
+      topic ->
+        Enum.map(topic.consumers, fn consumer ->
+          generate_jobs_for_messages(consumer, params)
+        end)
+        |> Enum.flat_map(fn elem -> elem end)
+        |> insert_job_changesets()
     end
-  end
-
-  defp get_bulk_messages_limit do
-    Application.get_env(:postoffice, :max_bulk_messages, 3000)
   end
 
   def schedule_message(

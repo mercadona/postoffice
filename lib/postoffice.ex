@@ -61,4 +61,19 @@ defmodule Postoffice do
   end
 
   def ping, do: Application.ensure_started(:postoffice)
+
+  def add_messages_to_deliver(messages) do
+    messages_number = Enum.count(messages["payload"])
+    case messages_number <= get_bulk_messages_limit() do
+      false ->
+        {:error, "Exceed max messages to ingest in bulk"}
+      true ->
+        Messaging.add_messages_to_deliver(messages)
+    end
+  end
+
+  defp get_bulk_messages_limit do
+    Application.get_env(:postoffice, :max_bulk_messages, 3000)
+  end
+
 end
