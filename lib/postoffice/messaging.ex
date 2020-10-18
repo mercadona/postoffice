@@ -54,7 +54,7 @@ defmodule Postoffice.Messaging do
 
   def add_messages_to_deliver(%{"topic" => topic} = params) do
     messages_number = Enum.count(params["payload"])
-    case messages_number <= get_bulk_messages_limit do
+    case messages_number <= get_bulk_messages_limit() do
       false ->
         {:error, "Exceed max messages to ingest in bulk"}
 
