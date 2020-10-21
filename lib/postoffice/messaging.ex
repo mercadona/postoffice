@@ -56,7 +56,6 @@ defmodule Postoffice.Messaging do
     case get_topic(topic) |> Repo.preload(:consumers) do
       nil ->
         {:error, "Topic does not exist"}
-
       topic ->
         Enum.map(topic.consumers, fn consumer ->
           generate_jobs_for_messages(consumer, params)

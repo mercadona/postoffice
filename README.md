@@ -86,6 +86,7 @@ To start your Phoenix server:
   * Create the following environmet variables in order to start the application:
     * `GOOGLE_APPLICATION_CREDENTIALS` with the absolute path to the pubsub credentials file. We provide `config/dummy-credentials.json` to be able to start the app.
     * `GCLOUD_PUBSUB_PROJECT_ID` with the project_id used.
+    * `MAX_BULK_MESSAGES` with the max number of messages that postoffice is able to consume
   * `mix local.hex`
   * `mix archive.install hex phx_new 1.4.11`
   * Install dependencies with `mix deps.get`
