@@ -15,6 +15,12 @@ defmodule PostofficeWeb.Api.FallbackController do
     |> render("error.json", error: errors)
   end
 
+  def call(conn, {:deleting_error}) do
+    conn
+    |> put_status(:bad_request)
+    |> render("error.json", error: "Anything has wrong")
+  end
+
   defp select_status(errors) do
     case violate_unique_constraint(errors) do
       true ->

@@ -44,7 +44,7 @@ defmodule PostofficeWeb.Router do
     resources "/bulk_messages", ApiBulkMessageController, only: [:create, :show]
     resources "/schedule_messages", ApiScheduleMessageController, only: [:create, :show]
     resources "/topics", ApiTopicController, only: [:create, :show]
-    resources "/publishers", ApiPublisherController, only: [:create]
+    resources "/publishers", ApiPublisherController, only: [:create, :delete]
     resources "/health", ApiHealthController, only: [:index]
   end
 end
