@@ -36,8 +36,7 @@ config :libcluster,
 config :postoffice, Oban,
   repo: Postoffice.Repo,
   plugins: [
-    {Oban.Plugins.Pruner, max_age: 86400},
-    {Postoffice.Plugin.QueueLength, interval: :timer.seconds(10)}
+    {Oban.Plugins.Pruner, max_age: 86400}
   ],
   queues: [default: 10, http: 100, pubsub: 15]
 
