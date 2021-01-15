@@ -48,7 +48,7 @@ defmodule Postoffice.Messaging do
     topic = topic |> Repo.preload(:consumers)
 
     insert_job_changesets(
-      for consumer <- get_no_delete_publishers_for(topic),
+      for consumer <- get_no_deleted_publishers_for(topic),
           do: generate_job_changeset(consumer, attrs)
     )
   end
@@ -59,7 +59,7 @@ defmodule Postoffice.Messaging do
         {:error, "Topic does not exist"}
 
       topic ->
-        get_no_delete_publishers_for(topic)
+        get_no_deleted_publishers_for(topic)
         |> Enum.map(fn consumer ->
           generate_jobs_for_messages(consumer, params)
         end)
@@ -68,7 +68,7 @@ defmodule Postoffice.Messaging do
     end
   end
 
-  defp get_no_delete_publishers_for(topic) do
+  defp get_no_deleted_publishers_for(topic) do
     Enum.filter(topic.consumers, fn consumer ->
       consumer.deleted == false
     end)
@@ -88,7 +88,7 @@ defmodule Postoffice.Messaging do
 
       topic ->
         insert_job_changesets(
-          for consumer <- get_no_delete_publishers_for(topic),
+          for consumer <- get_no_deleted_publishers_for(topic),
               do: schedule_job_changeset(consumer, payload, attributes, schedule_at)
         )
     end
