@@ -3,6 +3,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
 
   import Ecto.Query, warn: false
 
+  alias Postoffice.Fixtures
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Publisher
   alias Postoffice.Repo
@@ -133,6 +134,35 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
              }
 
       assert length(Repo.all(Publisher)) == 1
+    end
+  end
+
+  describe "delete publisher" do
+    test "Delete publisher mark publisher as deleted", %{conn: conn} do
+      publisher =
+        Fixtures.create_topic()
+        |> Fixtures.create_publisher()
+
+      conn = delete(conn, Routes.api_publisher_path(conn, :delete, publisher))
+
+      assert response(conn, 204)
+
+      assert length(Repo.all(Publisher)) == 1
+      created_publisher = get_last_publisher()
+      assert created_publisher.deleted == true
+    end
+
+    test "Returns 400 when can not delete publisher", %{conn: conn} do
+      Fixtures.create_topic()
+      |> Fixtures.create_publisher()
+
+      conn = delete(conn, Routes.api_publisher_path(conn, :delete, %Publisher{id: "100000"}))
+
+      assert response(conn, 400)
+
+      assert length(Repo.all(Publisher)) == 1
+      created_publisher = get_last_publisher()
+      assert created_publisher.deleted == false
     end
   end
 end

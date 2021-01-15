@@ -42,6 +42,14 @@ defmodule Postoffice.MessagingTest do
     type: "http"
   }
 
+  @deleted_publisher_attrs %{
+    active: true,
+    target: "http://fake.target3",
+    initial_message: 0,
+    type: "http",
+    deleted: true
+  }
+
   @pubsub_publisher_attrs %{
     active: true,
     target: "test-publisher",
@@ -57,19 +65,21 @@ defmodule Postoffice.MessagingTest do
       assert Kernel.length(all_enqueued(queue: :http)) == 0
     end
 
-    test "add_message_to_deliver/1 with valid data creates one job" do
+    test "add_message_to_deliver/1 with valid data creates one job for no deleted publishers" do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
+      Fixtures.create_publisher(topic, @deleted_publisher_attrs)
 
       Messaging.add_message_to_deliver(topic, @message_attrs)
 
       assert Kernel.length(all_enqueued(queue: :http)) == 1
     end
 
-    test "add_messages_to_deliver/2 with 2 messages and 2 publishers creates 4 jobs" do
+    test "add_messages_to_deliver/2 add messages only for no deleted publishers" do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
       Fixtures.create_publisher(topic, @second_publisher_attrs)
+      Fixtures.create_publisher(topic, @deleted_publisher_attrs)
 
       Messaging.add_messages_to_deliver(@valid_message_attrs)
 
@@ -79,6 +89,19 @@ defmodule Postoffice.MessagingTest do
     test "schedule_message set the correct _at" do
       topic = Fixtures.create_topic()
       Fixtures.create_publisher(topic)
+
+      Messaging.schedule_message(@future_message_attrs)
+
+      assert Kernel.length(all_enqueued(queue: :http)) == 1
+      job = Oban.Job |> Repo.one()
+      assert job.state == "scheduled"
+      assert job.scheduled_at == ~U[2100-09-22 08:18:23.387000Z]
+    end
+
+    test "schedule_message only for no delete publishers" do
+      topic = Fixtures.create_topic()
+      Fixtures.create_publisher(topic)
+      Fixtures.create_publisher(topic, @deleted_publisher_attrs)
 
       Messaging.schedule_message(@future_message_attrs)
 

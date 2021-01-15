@@ -10,11 +10,13 @@ defmodule Postoffice.Messaging.Publisher do
     field :seconds_timeout, :integer, default: 5
     field :chunk_size, :integer
     field :seconds_retry, :integer, default: 30
+    field :deleted, :boolean, default: false
 
     timestamps()
   end
 
   @doc false
+
   def changeset(consumer_http, attrs) do
     consumer_http
     |> cast(attrs, [
@@ -24,7 +26,8 @@ defmodule Postoffice.Messaging.Publisher do
       :topic_id,
       :seconds_timeout,
       :seconds_retry,
-      :chunk_size
+      :chunk_size,
+      :deleted
     ])
     |> validate_required([:target, :active, :topic_id, :type])
     |> unique_constraint(:target, name: :publishers_topic_id_target_type_index)
