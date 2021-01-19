@@ -147,13 +147,13 @@ defmodule Postoffice.MessagingTest do
       assert Messaging.list_topics() == []
     end
 
-    test "list_publishers/0 returns empty list if no publisher exists" do
-      assert Messaging.list_publishers() == []
+    test "list_no_deleted_publishers/0 returns empty list if no publisher exists" do
+      assert Messaging.list_no_deleted_publishers() == []
     end
 
-    test "list_publishers/0 returns all existing publishers" do
+    test "list_no_deleted_publishers/0 returns all existing publishers" do
       publisher = Fixtures.create_publisher(Fixtures.create_topic())
-      listed_publisher = List.first(Messaging.list_publishers())
+      listed_publisher = List.first(Messaging.list_no_deleted_publishers())
 
       assert publisher.id == listed_publisher.id
       assert publisher.target == listed_publisher.target

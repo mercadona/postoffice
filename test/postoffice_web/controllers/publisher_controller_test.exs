@@ -118,5 +118,18 @@ defmodule PostofficeWeb.PublisherControllerTest do
       saved_publisher = Messaging.get_publisher!(publisher.id)
       assert saved_publisher.topic_id == topic.id
     end
+
+    test "delete a publisher", %{conn: conn} do
+      topic = Fixtures.create_topic()
+      second_topic = Fixtures.create_topic(%{name: "test2", origin_host: "example2.com"})
+      publisher = Fixtures.create_publisher(topic)
+
+      assert conn
+             |> delete(Routes.publisher_path(conn, :delete, publisher.id))
+             |> redirected_to() == "/publishers"
+
+      deleted_publisher = Messaging.get_publisher!(publisher.id)
+      assert deleted_publisher.deleted == true
+    end
   end
 end
