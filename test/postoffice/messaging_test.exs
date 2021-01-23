@@ -50,6 +50,14 @@ defmodule Postoffice.MessagingTest do
     deleted: true
   }
 
+  @disabled_publisher_attrs %{
+    active: false,
+    target: "http://fake.target3",
+    initial_message: 0,
+    type: "http",
+    deleted: true
+  }
+
   @pubsub_publisher_attrs %{
     active: true,
     target: "test-publisher",
@@ -151,8 +159,11 @@ defmodule Postoffice.MessagingTest do
       assert Messaging.list_no_deleted_publishers() == []
     end
 
-    test "list_no_deleted_publishers/0 returns all existing publishers" do
-      publisher = Fixtures.create_publisher(Fixtures.create_topic())
+    test "list_no_deleted_publishers/0 returns all existing no deleted publishers" do
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+      disabled_publisher = Fixtures.create_publisher(topic, @disabled_publisher_attrs)
+
       listed_publisher = List.first(Messaging.list_no_deleted_publishers())
 
       assert publisher.id == listed_publisher.id
