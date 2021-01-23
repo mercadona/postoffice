@@ -11,6 +11,13 @@ defmodule Postoffice.HttpWorkerTest do
 
   setup [:set_mox_from_context, :verify_on_exit!]
 
+  @disabled_publisher_attrs %{
+    active: false,
+    target: "http://fake.target",
+    initial_message: 0,
+    type: "http"
+  }
+
   describe "HttpWorker tests" do
     test "message is successfully sent" do
       topic = Fixtures.create_topic()
@@ -28,6 +35,21 @@ defmodule Postoffice.HttpWorkerTest do
       end)
 
       assert {:ok, sent} = perform_job(HttpWorker, args)
+    end
+
+    test "not sent message when worker is disabled" do
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic, @disabled_publisher_attrs)
+      Cachex.put(:postoffice, publisher.id, :disabled)
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      assert {:discard, "Disabled publisher"} = perform_job(HttpWorker, args)
     end
 
     test "historical data is created when message is sent" do

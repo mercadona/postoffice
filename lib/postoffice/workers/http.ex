@@ -16,7 +16,7 @@ defmodule Postoffice.Workers.Http do
 
       false ->
         Logger.info("Do not process task as publisher is disabled", publisher_id: consumer_id)
-        {:snooze, @snooze_seconds}
+        {:discard, "Disabled publisher"}
     end
   end
 
@@ -90,9 +90,11 @@ defmodule Postoffice.Workers.Http do
   defp check_publisher_active(publisher_id) do
     case Cachex.get(:postoffice, publisher_id) do
       {:ok, :disabled} ->
+        IO.inspect("\nentro ene l disabled")
         false
 
       {:ok, nil} ->
+        IO.inspect("\nentro en el que no me gusta")
         true
     end
   end
