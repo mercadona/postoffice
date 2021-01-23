@@ -164,8 +164,10 @@ defmodule Postoffice.MessagingTest do
       publisher = Fixtures.create_publisher(topic)
       disabled_publisher = Fixtures.create_publisher(topic, @disabled_publisher_attrs)
 
-      listed_publisher = List.first(Messaging.list_no_deleted_publishers())
+      publishers = Messaging.list_no_deleted_publishers()
+      assert length(publishers) == 1
 
+      listed_publisher = List.first(publishers)
       assert publisher.id == listed_publisher.id
       assert publisher.target == listed_publisher.target
       assert publisher.active == listed_publisher.active
