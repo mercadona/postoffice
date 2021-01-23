@@ -50,6 +50,9 @@ defmodule Postoffice.HttpWorkerTest do
       }
 
       assert {:discard, "Disabled publisher"} = perform_job(HttpWorker, args)
+      assert Kernel.length(all_enqueued(queue: :http)) == 0
+      assert Kernel.length(HistoricalData.list_sent_messages()) == 0
+      assert Kernel.length(HistoricalData.list_failed_messages()) == 0
     end
 
     test "historical data is created when message is sent" do
