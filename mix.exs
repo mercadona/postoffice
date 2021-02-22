@@ -38,8 +38,6 @@ defmodule Postoffice.MixProject do
         :runtime_tools,
         :httpoison,
         :logger_json,
-        :prometheus_phoenix,
-        :prometheus_ecto,
         :os_mon,
         :cachex
       ]
@@ -55,38 +53,35 @@ defmodule Postoffice.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.1"},
+      {:phoenix, "~> 1.5.7"},
       {:phoenix_pubsub, "~> 2.0"},
-      {:phoenix_ecto, "~> 4.0"},
+      {:phoenix_ecto, "~> 4.2"},
       {:ecto_sql, "~> 3.0"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.14.1"},
-      {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:phoenix_live_reload, "~> 1.3", only: :dev},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:bcrypt_elixir, "~> 2.0"},
+      {:bcrypt_elixir, "~> 2.3"},
       {:google_api_pub_sub, "~> 0.28.1"},
       {:goth, "~> 1.1.0"},
-      {:httpoison, "~> 1.6"},
+      {:httpoison, "~> 1.8"},
       {:mox, "~> 0.5", only: :test},
       {:gen_stage, "~> 0.14"},
       {:logger_json, "~> 3.0"},
       {:config_tuples, "~> 0.4"},
-      {:libcluster, "~> 3.1"},
+      {:libcluster, "~> 3.2"},
       {:swarm, "~> 3.0"},
-      {:excoveralls, "~> 0.4"},
-      {:prometheus_ex, "~> 3.0"},
-      {:prometheus_plugs, "~> 1.1"},
-      {:prometheus_phoenix, "~> 1.3.0"},
-      {:prometheus_ecto, "~> 1.4.1"},
-      {:phoenix_live_view, "~> 0.14.4"},
-      {:floki, ">= 0.0.0", only: :test},
-      {:phoenix_live_dashboard, "~> 0.2.8"},
+      {:excoveralls, "~> 0.14"},
+      {:phoenix_live_view, "~> 0.15"},
+      {:floki, "~> 0.30.0", only: :test},
+      {:phoenix_live_dashboard, "~> 0.4"},
       {:hackney, "~> 1.16"},
-      {:cachex, "~> 3.2"},
+      {:cachex, "~> 3.3"},
       {:number, "~> 1.0.1"},
-      {:oban, "~> 2.1"}
+      {:oban, "2.4.0"},
+      {:prom_ex, "~> 1.0.0"}
     ]
   end
 
