@@ -22,7 +22,8 @@ defmodule Postoffice.Application do
       Postoffice.Rescuer.Producer,
       Postoffice.Rescuer.Supervisor,
       Postoffice.Cache,
-      {Oban, oban_config()}
+      {Oban, oban_config()},
+      Postoffice.PromEx
     ]
 
     :ok =

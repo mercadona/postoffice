@@ -40,6 +40,12 @@ config :postoffice, Oban,
   ],
   queues: [default: 10, http: 100, pubsub: 15]
 
+config :postoffice, Postoffice.PromEx,
+  manual_metrics_start_delay: :no_delay,
+  drop_metrics_groups: [],
+  grafana: :disabled,
+  metrics_server: :disabled
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
