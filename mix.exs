@@ -5,7 +5,7 @@ defmodule Postoffice.MixProject do
     [
       app: :postoffice,
       version: "0.12.0",
-      elixir: "~> 1.9",
+      elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
