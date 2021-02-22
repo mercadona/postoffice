@@ -30,7 +30,6 @@ defmodule PostofficeWeb.Endpoint do
 
   plug PromEx.Plug, prom_ex_module: Postoffice.PromEx
 
-
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 

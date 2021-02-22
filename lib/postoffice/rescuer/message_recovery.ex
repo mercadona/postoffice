@@ -45,7 +45,8 @@ defmodule Postoffice.Rescuer.MessageRecovery do
     case Postoffice.receive_message(message_params) do
       {:ok, ids} ->
         Logger.info(
-          "Successfully recovered message from host #{host} and topic #{message["topic"]}", message_ids: ids
+          "Successfully recovered message from host #{host} and topic #{message["topic"]}",
+          message_ids: ids
         )
 
         Client.delete(host, id)
