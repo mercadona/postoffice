@@ -84,17 +84,25 @@ To start your Phoenix server:
   * `brew update`
   * `brew install elixir`
   * Create the following environmet variables in order to start the application:
-    * `GOOGLE_APPLICATION_CREDENTIALS` with the absolute path to the pubsub credentials file. We provide `config/dummy-credentials.json` to be able to start the app.
+    * `GOOGLE_APPLICATION_CREDENTIALS` with the absolute path to the pubsub credentials file.
     * `GCLOUD_PUBSUB_PROJECT_ID` with the project_id used.
     * `MAX_BULK_MESSAGES` with the max number of messages that postoffice is able to consume
+
+  Note: There are some dummy credentials that can be used for local development
+  ```
+    $ export GOOGLE_APPLICATION_CREDENTIALS=`pwd`/config/dummy-credentials.json
+    $ export GCLOUD_PUBSUB_PROJECT_ID=fake
+    $ export MAX_BULK_MESSAGES=10
+  ```
+  
   * `mix local.hex`
   * `mix archive.install hex phx_new 1.4.11`
   * Install dependencies with `mix deps.get`
-  * Inside `docker` directory, run `docker-compose up -d` to start a new postgres database
+  * Run `docker-compose -f docker/docker-compose.yml up -d` to start a new postgres database
   * Create and migrate your database with `mix ecto.setup`
   * Execute `npm install` inside `assets/`
   * Start Phoenix endpoint with `mix phx.server`
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+Now you can visit [`localhost:4000`](http://localhost:4000) from your browser or run tests with `mix test`
 
 ## Clustering
 Postoffice has been developed to be used forming a cluster. We use [libcluster](https://github.com/bitwalker/libcluster) under the hood to create the cluster. You can take a look at its documentation in case you want to tune settings.
