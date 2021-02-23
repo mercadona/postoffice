@@ -28,6 +28,8 @@ defmodule PostofficeWeb.Endpoint do
     param_key: "request_logger",
     cookie_key: "request_logger"
 
+  plug PromEx.Plug, prom_ex_module: Postoffice.PromEx
+
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
@@ -45,6 +47,5 @@ defmodule PostofficeWeb.Endpoint do
   plug Plug.Session, @session_options
 
   PostofficeWeb
-  plug PostofficeWeb.Metrics.Exporter
   plug PostofficeWeb.Router
 end

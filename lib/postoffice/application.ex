@@ -7,8 +7,6 @@ defmodule Postoffice.Application do
 
   def start(_type, _args) do
     # List all child processes to be supervised
-    Postoffice.MetricsSetup.setup()
-
     children = [
       # Start the Ecto repository
       Postoffice.Repo,
@@ -22,16 +20,9 @@ defmodule Postoffice.Application do
       Postoffice.Rescuer.Producer,
       Postoffice.Rescuer.Supervisor,
       Postoffice.Cache,
-      {Oban, oban_config()}
+      {Oban, oban_config()},
+      Postoffice.PromEx
     ]
-
-    :ok =
-      :telemetry.attach(
-        "prometheus-ecto",
-        [:postoffice, :repo, :query],
-        &PostofficeWeb.Metrics.Ecto.handle_event/4,
-        %{}
-      )
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

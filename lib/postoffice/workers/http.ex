@@ -5,11 +5,12 @@ defmodule Postoffice.Workers.Http do
 
   @snooze_seconds 30
 
-  def run(id,%{"consumer_id" => consumer_id, "target" => target} = args) do
+  def run(id, %{"consumer_id" => consumer_id, "target" => target} = args) do
     Logger.info("Processing http message",
       messages_ids: id,
       target: target
     )
+
     case check_publisher_active(consumer_id) do
       true ->
         publish(id, args)
@@ -29,7 +30,6 @@ defmodule Postoffice.Workers.Http do
            "target" => target
          } = args
        ) do
-
     message_id = id || 0
     historical_payload = if is_list(payload) == false, do: [payload], else: payload
 

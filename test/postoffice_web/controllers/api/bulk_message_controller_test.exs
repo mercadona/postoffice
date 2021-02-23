@@ -52,7 +52,12 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
     end
 
     test "returns error when ingest more messages than max_bulk_messages", %{conn: conn} do
-      conn = post(conn, Routes.api_bulk_message_path(conn, :create), @exceed_max_ingestion_messages_attrs)
+      conn =
+        post(
+          conn,
+          Routes.api_bulk_message_path(conn, :create),
+          @exceed_max_ingestion_messages_attrs
+        )
 
       assert json_response(conn, 406)
       assert Kernel.length(all_enqueued(queue: :http)) == 0

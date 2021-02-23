@@ -19,7 +19,7 @@ defmodule PostofficeWeb.Api.PublisherController do
       nil ->
         {:deleting_error}
 
-    publisher ->
+      publisher ->
         publisher
         |> Publisher.changeset(%{deleted: true})
         |> Messaging.update_publisher()
