@@ -23,7 +23,7 @@ defmodule PostofficeWeb.PublisherController do
   end
 
   def index(conn, _params) do
-    publishers = Messaging.list_publishers()
+    publishers = Messaging.list_no_deleted_publishers()
     render(conn, "index.html", publishers: publishers, page_name: "Publishers")
   end
 
@@ -58,6 +58,14 @@ defmodule PostofficeWeb.PublisherController do
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "edit.html", publisher: publisher, changeset: changeset)
+    end
+  end
+
+  def delete(conn, %{"id" => id}) do
+    with {:ok, _} <- Messaging.delete_publisher(id) do
+      conn
+      |> put_flash(:info, "http_consumer deleted successfully.")
+      |> redirect(to: Routes.publisher_path(conn, :index))
     end
   end
 end
