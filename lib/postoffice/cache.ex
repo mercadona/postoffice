@@ -34,11 +34,11 @@ defmodule Postoffice.Cache do
   def initialize() do
     Messaging.list_disabled_publishers()
     |> Enum.map(fn publisher -> publisher.id end)
-    |> add_publishrers(:disabled)
+    |> add_publishers(:disabled)
 
     Messaging.list_deleted_publishers()
     |> Enum.map(fn publisher -> publisher.id end)
-    |> add_publishrers(:deleted)
+    |> add_publishers(:deleted)
   end
 
   def publisher_updated(publisher) do
@@ -57,9 +57,9 @@ defmodule Postoffice.Cache do
   end
 
 
-  defp add_publishrers(disabled_publishers_ids, state) when disabled_publishers_ids == [], do: :ok
+  defp add_publishers(disabled_publishers_ids, state) when disabled_publishers_ids == [], do: :ok
 
-  defp add_publishrers(disabled_publishers_ids, state) do
+  defp add_publishers(disabled_publishers_ids, state) do
     ids_tuples = Enum.map(disabled_publishers_ids, fn id -> {id, state} end)
     Cachex.put_many(:postoffice, ids_tuples)
     PubSub.subscribe(Postoffice.PubSub, "publishers")
