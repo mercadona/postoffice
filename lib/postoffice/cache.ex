@@ -17,24 +17,16 @@ defmodule Postoffice.Cache do
 
   @impl true
   def handle_info({:publisher_updated, publisher}, state) do
-    case publisher.active do
-      false ->
-        Cachex.put(:postoffice, publisher.id, :disabled)
-
-      true ->
-        Cachex.del(:postoffice, publisher.id)
-    end
+    publisher
+    |> publisher_updated
 
     {:noreply, state}
   end
 
   @impl true
   def handle_info({:publisher_deleted, publisher}, state) do
-    case publisher.deleted do
-      true ->
-        Cachex.del(:postoffice, publisher.id)
-        Cachex.put(:postoffice, publisher.id, :deleted)
-    end
+    publisher
+    |> publisher_deleted
 
     {:noreply, state}
   end
@@ -48,6 +40,22 @@ defmodule Postoffice.Cache do
     |> Enum.map(fn publisher -> publisher.id end)
     |> add_publishrers(:deleted)
   end
+
+  def publisher_updated(publisher) do
+    case publisher.active do
+      false ->
+        Cachex.put(:postoffice, publisher.id, :disabled)
+
+      true ->
+        Cachex.del(:postoffice, publisher.id)
+    end
+  end
+
+  def publisher_deleted(publisher) do
+    Cachex.del(:postoffice, publisher.id)
+    Cachex.put(:postoffice, publisher.id, :deleted)
+  end
+
 
   defp add_publishrers(disabled_publishers_ids, state) when disabled_publishers_ids == [], do: :ok
 
