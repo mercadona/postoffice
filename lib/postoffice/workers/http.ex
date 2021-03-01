@@ -11,7 +11,7 @@ defmodule Postoffice.Workers.Http do
       target: target
     )
 
-    case check_publisher_active(consumer_id) do
+    case check_publisher_state(consumer_id) do
       :active ->
         publish(id, args)
 
@@ -87,7 +87,7 @@ defmodule Postoffice.Workers.Http do
     end
   end
 
-  defp check_publisher_active(publisher_id) do
+  defp check_publisher_state(publisher_id) do
     case Cachex.get(:postoffice, publisher_id) do
       {:ok, :disabled} ->
         :disabled
