@@ -3,6 +3,7 @@ defmodule PostofficeWeb.PublisherControllerTest do
 
   alias Postoffice.Fixtures
   alias Postoffice.Messaging
+  alias Phoenix.PubSub
 
   setup do
     Ecto.Adapters.SQL.Sandbox.mode(Postoffice.Repo, {:shared, self()})
@@ -118,5 +119,33 @@ defmodule PostofficeWeb.PublisherControllerTest do
       saved_publisher = Messaging.get_publisher!(publisher.id)
       assert saved_publisher.topic_id == topic.id
     end
+  end
+
+  describe "Delete publisher" do
+    test "delete a publisher", %{conn: conn} do
+      topic = Fixtures.create_topic()
+      second_topic = Fixtures.create_topic(%{name: "test2", origin_host: "example2.com"})
+      publisher = Fixtures.create_publisher(topic)
+
+      assert conn
+      |> delete(Routes.publisher_path(conn, :delete, publisher.id))
+      |> redirected_to() == "/publishers"
+
+      deleted_publisher = Messaging.get_publisher!(publisher.id)
+      assert deleted_publisher.deleted == true
+    end
+
+    test "Delete publisher broadcast the publisher updated", %{conn: conn} do
+      PubSub.subscribe(Postoffice.PubSub, "publishers")
+
+      publisher =
+        Fixtures.create_topic()
+        |> Fixtures.create_publisher()
+
+      conn = delete(conn, Routes.publisher_path(conn, :delete, publisher))
+
+      assert_receive {:publisher_deleted, publisher}
+    end
+
   end
 end

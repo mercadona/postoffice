@@ -28,6 +28,17 @@ defmodule Postoffice.Cache do
     {:noreply, state}
   end
 
+  @impl true
+  def handle_info({:publisher_deleted, publisher}, state) do
+    case publisher.deleted do
+      true ->
+        Cachex.del(:postoffice, publisher.id)
+        Cachex.put(:postoffice, publisher.id, :deleted)
+    end
+
+    {:noreply, state}
+  end
+
   def initialize() do
     Messaging.list_disabled_publishers()
     |> Enum.map(fn publisher -> publisher.id end)
