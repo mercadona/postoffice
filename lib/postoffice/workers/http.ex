@@ -12,6 +12,9 @@ defmodule Postoffice.Workers.Http do
     )
 
     case check_publisher_state(consumer_id) do
+      :deleted ->
+        {:discard, "Deleted publisher"}
+
       :active ->
         publish(id, args)
 
@@ -91,6 +94,9 @@ defmodule Postoffice.Workers.Http do
     case Cachex.get(:postoffice, publisher_id) do
       {:ok, :disabled} ->
         :disabled
+
+      {:ok, :deleted} ->
+        :deleted
 
       {:ok, nil} ->
         :active
