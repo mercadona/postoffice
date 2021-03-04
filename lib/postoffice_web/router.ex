@@ -33,7 +33,7 @@ defmodule PostofficeWeb.Router do
 
     resources "/publishers", PublisherController, only: [:index, :new, :create, :edit, :update, :delete]
 
-    resources "/messages", MessageController, only: [:index, :show]
+    resources "/messages", MessageController, only: [:index]
 
     live_dashboard "/dashboard"
   end

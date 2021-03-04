@@ -1,0 +1,18 @@
+<div class="row">
+  <div class="col-md-12">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for message <- @messages do %>
+        <tr>
+          <td><%= message.name %></td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
