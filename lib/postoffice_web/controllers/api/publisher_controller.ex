@@ -15,16 +15,8 @@ defmodule PostofficeWeb.Api.PublisherController do
   end
 
   def delete(conn, %{"id" => id}) do
-    case Messaging.get_publisher!(id) do
-      nil ->
-        {:deleting_error}
-
-      publisher ->
-        publisher
-        |> Publisher.changeset(%{deleted: true})
-        |> Messaging.update_publisher()
-
-        send_resp(conn, :no_content, "")
+    with {:ok, _} <- Messaging.delete_publisher(id) do
+      send_resp(conn, :no_content, "")
     end
   end
 end

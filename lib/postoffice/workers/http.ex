@@ -11,11 +11,14 @@ defmodule Postoffice.Workers.Http do
       target: target
     )
 
-    case check_publisher_active(consumer_id) do
-      true ->
+    case check_publisher_state(consumer_id) do
+      :deleted ->
+        {:discard, "Deleted publisher"}
+
+      :active ->
         publish(id, args)
 
-      false ->
+      :disabled ->
         Logger.info("Do not process task as publisher is disabled", publisher_id: consumer_id)
         {:snooze, @snooze_seconds}
     end
@@ -87,13 +90,16 @@ defmodule Postoffice.Workers.Http do
     end
   end
 
-  defp check_publisher_active(publisher_id) do
+  defp check_publisher_state(publisher_id) do
     case Cachex.get(:postoffice, publisher_id) do
       {:ok, :disabled} ->
-        false
+        :disabled
+
+      {:ok, :deleted} ->
+        :deleted
 
       {:ok, nil} ->
-        true
+        :active
     end
   end
 

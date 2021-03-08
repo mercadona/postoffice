@@ -182,14 +182,14 @@ defmodule Postoffice.Messaging do
     |> Repo.all()
   end
 
-  def list_publishers do
-    from(p in Publisher, preload: [:topic])
+  def list_no_deleted_publishers do
+    from(p in Publisher, preload: [:topic], where: p.deleted == false)
     |> Repo.all()
   end
 
   @spec list_disabled_publishers :: any
   def list_disabled_publishers do
-    from(p in Publisher, where: p.active == false)
+    from(p in Publisher, where: p.active == false and p.deleted == false)
     |> Repo.all()
   end
 
@@ -297,5 +297,28 @@ defmodule Postoffice.Messaging do
     )
 
     {:ok, publisher}
+  end
+
+  def delete_publisher(id) do
+    case get_publisher!(id) do
+      nil ->
+        {:deleting_error}
+
+      publisher ->
+        publisher
+        |> Publisher.changeset(%{deleted: true})
+        |> perform_delete_publisher()
+    end
+  end
+
+  defp perform_delete_publisher(changeset) do
+    Repo.update(changeset)
+    |> broadcast_publisher(:publisher_deleted)
+  end
+
+
+  def list_deleted_publishers do
+    from(p in Publisher, where: p.deleted == true)
+    |> Repo.all()
   end
 end
