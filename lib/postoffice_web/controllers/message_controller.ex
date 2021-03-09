@@ -5,7 +5,7 @@ defmodule PostofficeWeb.MessageController do
   alias Postoffice.HistoricalData
 
   def index(conn, _params) do
-    messages = Messaging.list_topics()
+    messages = Messaging.get_failing_messages()
     render(conn, "index.html",
       page_name: "Messages",
       messages: messages)
