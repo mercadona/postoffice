@@ -321,4 +321,9 @@ defmodule Postoffice.Messaging do
     from(p in Publisher, where: p.deleted == true)
     |> Repo.all()
   end
+
+  def get_failing_messages do
+    from(job in Oban.Job, where: job.state=="retryable")
+    |> Repo.all()
+  end
 end

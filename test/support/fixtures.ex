@@ -4,6 +4,9 @@ defmodule Postoffice.Fixtures do
   """
   alias Postoffice
   alias Postoffice.Messaging
+  alias Postoffice.Repo
+  alias Postoffice.Fixtures
+  import Ecto.Changeset
 
   @topic_attrs %{
     name: "test",
@@ -37,5 +40,19 @@ defmodule Postoffice.Fixtures do
   def create_publisher(topic, attrs \\ @publisher_attrs) do
     {:ok, publisher} = Messaging.create_publisher(Map.put(attrs, :topic_id, topic.id))
     publisher
+  end
+
+  def create_failing_message(data) do
+    {:ok, oban} =
+      data
+      |> Oban.Job.new(queue: :http, worker: Postoffice.SomeFakeWorker)
+      |> Repo.insert()
+
+    {:ok, updated_job} =
+      Repo.get(Oban.Job, oban.id)
+      |> change(%{state: "retryable"})
+      |> Repo.update()
+
+    updated_job
   end
 end
