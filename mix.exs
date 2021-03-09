@@ -4,7 +4,7 @@ defmodule Postoffice.MixProject do
   def project do
     [
       app: :postoffice,
-      version: "0.12.0",
+      version: "0.18.4",
       elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -37,7 +37,6 @@ defmodule Postoffice.MixProject do
         :logger,
         :runtime_tools,
         :httpoison,
-        :logger_json,
         :os_mon,
         :cachex
       ]
@@ -69,7 +68,7 @@ defmodule Postoffice.MixProject do
       {:httpoison, "~> 1.8"},
       {:mox, "~> 0.5", only: :test},
       {:gen_stage, "~> 0.14"},
-      {:logger_json, "~> 3.0"},
+      {:ink, "~> 1.0"},
       {:config_tuples, "~> 0.4"},
       {:libcluster, "~> 3.2"},
       {:swarm, "~> 3.0"},
@@ -80,7 +79,7 @@ defmodule Postoffice.MixProject do
       {:hackney, "~> 1.16"},
       {:cachex, "~> 3.3"},
       {:number, "~> 1.0.1"},
-      {:oban, "2.4.0"},
+      {:oban, "2.5.0"},
       {:prom_ex, "~> 1.0.0"}
     ]
   end

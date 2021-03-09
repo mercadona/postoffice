@@ -60,7 +60,7 @@ defmodule Postoffice.Workers.Http do
             response.status_code
           }"
 
-        Logger.info(error_reason)
+        Logger.info(error_reason, message_id: id)
 
         {:ok, _data} =
           HistoricalData.create_failed_messages(%{
@@ -75,7 +75,7 @@ defmodule Postoffice.Workers.Http do
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         error_reason = "Error trying to process message from HttpConsumer: #{reason}"
-        Logger.info(error_reason)
+        Logger.info(error_reason, message_id: id)
 
         {:ok, _data} =
           HistoricalData.create_failed_messages(%{
