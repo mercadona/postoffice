@@ -80,7 +80,7 @@ defmodule Postoffice.MixProject do
       {:hackney, "~> 1.16"},
       {:cachex, "~> 3.3"},
       {:number, "~> 1.0.1"},
-      {:oban, "2.5.0"},
+      {:oban, "2.4.0"},
       {:prom_ex, "~> 1.0.0"}
     ]
   end
