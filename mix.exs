@@ -69,7 +69,7 @@ defmodule Postoffice.MixProject do
       {:httpoison, "~> 1.8"},
       {:mox, "~> 0.5", only: :test},
       {:gen_stage, "~> 0.14"},
-      {:logger_json, "~> 3.0"},
+      {:ink, "~> 1.0"},
       {:config_tuples, "~> 0.4"},
       {:libcluster, "~> 3.2"},
       {:swarm, "~> 3.0"},
