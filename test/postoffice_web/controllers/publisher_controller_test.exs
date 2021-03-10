@@ -123,8 +123,8 @@ defmodule PostofficeWeb.PublisherControllerTest do
 
   describe "Delete publisher" do
     test "delete a publisher", %{conn: conn} do
+      Fixtures.create_topic(%{name: "test2", origin_host: "example2.com"})
       topic = Fixtures.create_topic()
-      second_topic = Fixtures.create_topic(%{name: "test2", origin_host: "example2.com"})
       publisher = Fixtures.create_publisher(topic)
 
       assert conn
@@ -142,9 +142,9 @@ defmodule PostofficeWeb.PublisherControllerTest do
         Fixtures.create_topic()
         |> Fixtures.create_publisher()
 
-      conn = delete(conn, Routes.publisher_path(conn, :delete, publisher))
+      delete(conn, Routes.publisher_path(conn, :delete, publisher))
 
-      assert_receive {:publisher_deleted, publisher}
+      assert_receive {:publisher_deleted, _publisher}
     end
 
   end

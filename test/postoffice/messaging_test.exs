@@ -232,8 +232,8 @@ defmodule Postoffice.MessagingTest do
     end
 
     test "count_failing_jobs/0 returns failing job existents" do
-      first_failing_job = Fixtures.create_failing_message(%{id: 1, user_id: 2})
-      second_failing_job = Fixtures.create_failing_message(%{id: 2, user_id: 3})
+      Fixtures.create_failing_message(%{id: 1, user_id: 2})
+      Fixtures.create_failing_message(%{id: 2, user_id: 3})
 
       assert Messaging.count_failing_jobs() == 2
     end

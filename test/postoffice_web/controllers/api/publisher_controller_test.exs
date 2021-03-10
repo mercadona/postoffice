@@ -160,9 +160,9 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
         Fixtures.create_topic()
         |> Fixtures.create_publisher()
 
-      conn = delete(conn, Routes.api_publisher_path(conn, :delete, publisher))
+      delete(conn, Routes.api_publisher_path(conn, :delete, publisher))
 
-      assert_receive {:publisher_deleted, publisher}
+      assert_receive {:publisher_deleted, _publisher}
     end
 
     test "Returns 400 when can not delete publisher", %{conn: conn} do

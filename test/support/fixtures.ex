@@ -5,7 +5,6 @@ defmodule Postoffice.Fixtures do
   alias Postoffice
   alias Postoffice.Messaging
   alias Postoffice.Repo
-  alias Postoffice.Fixtures
   import Ecto.Changeset
 
   @topic_attrs %{

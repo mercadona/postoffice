@@ -28,7 +28,7 @@ defmodule Postoffice.PubsubWorkerTest do
         {:ok, %PublishResponse{}}
       end)
 
-      assert {:ok, sent} = perform_job(PubsubWorker, args)
+      assert {:ok, _sent} = perform_job(PubsubWorker, args)
     end
 
     test "historical data is created if message is successfully sent" do
@@ -65,7 +65,7 @@ defmodule Postoffice.PubsubWorkerTest do
         {:ok, %PublishResponse{}}
       end)
 
-      assert {:ok, sent} = perform_job(PubsubWorker, args)
+      assert {:ok, _sent} = perform_job(PubsubWorker, args)
     end
 
     test "message is not send if there is any error on the request" do
@@ -120,7 +120,7 @@ defmodule Postoffice.PubsubWorkerTest do
         {:ok, %PublishResponse{}}
       end)
 
-      assert {:ok, sent} = perform_job(PubsubWorker, args, attempt: 100)
+      assert {:ok, _sent} = perform_job(PubsubWorker, args, attempt: 100)
     end
   end
 end
