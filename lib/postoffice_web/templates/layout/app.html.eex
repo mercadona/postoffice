@@ -42,7 +42,7 @@
           <li class="nav-item <%= if @page_name == "Messages" do %>active <% end %>">
             <a class="nav-link" href="<%= Routes.message_path(@conn, :index) %>">
               <i class="material-icons">mail_outline</i>
-              <p>Messages</p>
+              <p>Failing Messages</p>
             </a>
           </li>
         </ul>
