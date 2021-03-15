@@ -5,9 +5,6 @@ defmodule PostofficeWeb.MessageController do
   alias Postoffice.HistoricalData
 
   def index(conn, %{"page" => page, "page_size" => page_size} = params) do
-    IO.inspect(params, label: "\nMi amigo el controlador")
-
-    # messages = Messaging.get_failing_messages(%{page: String.to_integer(page), page_size: String.to_integer(page_size)})
     messages = Messaging.get_failing_messages(params)
 
     render(conn, "index.html",
