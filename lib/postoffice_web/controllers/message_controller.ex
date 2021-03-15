@@ -10,7 +10,13 @@ defmodule PostofficeWeb.MessageController do
     render(conn, "index.html",
       page_name: "Messages",
       messages: messages.entries,
-      page_number: messages.page_number)
+      page_number: messages.page_number,
+      total_pages: messages.total_pages
+    )
+  end
+
+  def index(conn, %{}) do
+    index(conn, %{"page" => 1, "page_size" => 100})
   end
 
   def show(conn, %{"id" => id}) do

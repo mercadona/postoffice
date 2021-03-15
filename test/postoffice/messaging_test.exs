@@ -227,25 +227,25 @@ defmodule Postoffice.MessagingTest do
       assert Messaging.get_estimated_count("topics") == 0
     end
 
-    test "count_failing_jobs/1 returns 0 if no retryable job exists" do
+    test "count_failing_jobs/0 returns 0 if no retryable job exists" do
       assert Messaging.count_failing_jobs() == 0
     end
 
-    test "count_failing_jobs/1 returns failing job existents" do
+    test "count_failing_jobs/0 returns failing job existents" do
       Fixtures.create_failing_message(%{id: 1, user_id: 2})
       Fixtures.create_failing_message(%{id: 2, user_id: 3})
 
       assert Messaging.count_failing_jobs() == 2
     end
 
-    test "count_failing_jobs/1 no returns retryable jobs when no exists" do
+    test "count_failing_jobs/0 no returns retryable jobs when no exists" do
       failing_messages = %{"page"=> 1, "page_size"=> 4}
       |> Messaging.get_failing_messages
 
       assert failing_messages == %{entries: [], page_number: 1, page_size: 4, total_entries: 0, total_pages: 1}
     end
 
-    test "count_failing_jobs/1 returns retryable jobs" do
+    test "get_failing_messages/1 returns retryable jobs" do
       first_failing_job = Fixtures.create_failing_message(%{id: 1, user_id: 2})
       second_failing_job = Fixtures.create_failing_message(%{id: 2, user_id: 3})
 
@@ -255,7 +255,7 @@ defmodule Postoffice.MessagingTest do
       assert failing_messages ==  %{entries: [first_failing_job, second_failing_job], page_number: 1, page_size: 4, total_entries: 2, total_pages: 1}
     end
 
-    test "count_failing_jobs/1 returns retryable jobs paginating" do
+    test "get_failing_messages/1 returns retryable jobs paginating" do
       first_failing_job = Fixtures.create_failing_message(%{id: 1, user_id: 2})
       second_failing_job = Fixtures.create_failing_message(%{id: 2, user_id: 3})
 
