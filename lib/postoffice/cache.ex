@@ -57,7 +57,7 @@ defmodule Postoffice.Cache do
   end
 
 
-  defp add_publishers(disabled_publishers_ids, state) when disabled_publishers_ids == [], do: :ok
+  defp add_publishers(disabled_publishers_ids, _state) when disabled_publishers_ids == [], do: :ok
 
   defp add_publishers(disabled_publishers_ids, state) do
     ids_tuples = Enum.map(disabled_publishers_ids, fn id -> {id, state} end)

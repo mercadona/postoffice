@@ -321,4 +321,10 @@ defmodule Postoffice.Messaging do
     from(p in Publisher, where: p.deleted == true)
     |> Repo.all()
   end
+
+  def get_failing_messages(%{"page"=> _page, "page_size"=> _page_size} = params) do
+    from(job in Oban.Job, where: job.state=="retryable")
+    |> Repo.paginate(params)
+    |> Map.from_struct
+  end
 end

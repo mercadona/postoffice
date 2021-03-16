@@ -35,7 +35,7 @@ defmodule Postoffice.HttpWorkerTest do
         {:ok, %HTTPoison.Response{status_code: 201}}
       end)
 
-      assert {:ok, sent} = perform_job(HttpWorker, args)
+      assert {:ok, _sent} = perform_job(HttpWorker, args)
     end
 
     test "historical data is created when message is sent" do
@@ -147,7 +147,7 @@ defmodule Postoffice.HttpWorkerTest do
       {:ok, %HTTPoison.Response{status_code: 201}}
     end)
 
-    assert {:ok, sent} = perform_job(HttpWorker, args, attempt: 100)
+    assert {:ok, _sent} = perform_job(HttpWorker, args, attempt: 100)
   end
 
   test "not sent message when worker is deleted" do

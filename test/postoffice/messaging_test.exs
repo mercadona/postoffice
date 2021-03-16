@@ -154,7 +154,7 @@ defmodule Postoffice.MessagingTest do
     test "list_no_deleted_publishers/0 returns all existing no deleted publishers" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
-      disabled_publisher = Fixtures.create_publisher(topic, @deleted_publisher_attrs)
+      Fixtures.create_publisher(topic, @deleted_publisher_attrs)
 
       publishers = Messaging.list_no_deleted_publishers()
       assert length(publishers) == 1
@@ -230,5 +230,43 @@ defmodule Postoffice.MessagingTest do
     test "count_failing_jobs/0 returns 0 if no retryable job exists" do
       assert Messaging.count_failing_jobs() == 0
     end
+
+    test "count_failing_jobs/0 returns failing job existents" do
+      Fixtures.create_failing_message(%{id: 1, user_id: 2})
+      Fixtures.create_failing_message(%{id: 2, user_id: 3})
+
+      assert Messaging.count_failing_jobs() == 2
+    end
+
+    test "count_failing_jobs/0 no returns retryable jobs when no exists" do
+      failing_messages = %{"page"=> 1, "page_size"=> 4}
+      |> Messaging.get_failing_messages
+
+      assert failing_messages == %{entries: [], page_number: 1, page_size: 4, total_entries: 0, total_pages: 1}
+    end
+
+    test "get_failing_messages/1 returns retryable jobs" do
+      first_failing_job = Fixtures.create_failing_message(%{id: 1, user_id: 2})
+      second_failing_job = Fixtures.create_failing_message(%{id: 2, user_id: 3})
+
+      failing_messages = %{"page"=> 1, "page_size"=> 4}
+      |> Messaging.get_failing_messages
+
+      assert failing_messages ==  %{entries: [first_failing_job, second_failing_job], page_number: 1, page_size: 4, total_entries: 2, total_pages: 1}
+    end
+
+    test "get_failing_messages/1 returns retryable jobs paginating" do
+      first_failing_job = Fixtures.create_failing_message(%{id: 1, user_id: 2})
+      second_failing_job = Fixtures.create_failing_message(%{id: 2, user_id: 3})
+
+      failing_messages = %{"page"=> 1, "page_size"=> 1}
+      |> Messaging.get_failing_messages
+      assert failing_messages ==  %{entries: [first_failing_job], page_number: 1, page_size: 1, total_entries: 2, total_pages: 2}
+
+      failing_messages = %{"page"=> 2, "page_size"=> 1}
+      |> Messaging.get_failing_messages
+      assert failing_messages ==  %{entries: [second_failing_job], page_number: 2, page_size: 1, total_entries: 2, total_pages: 2}
+    end
+
   end
 end
