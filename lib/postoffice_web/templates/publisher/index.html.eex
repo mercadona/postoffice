@@ -23,6 +23,7 @@
             <td><i class="material-icons" style="color:#cc0000">toggle_off</i></td>
           <% end %>
           <td><%= publisher.type %></td>
+          <td><%=  link("Delete", to: Routes.publisher_path(@conn, :delete, publisher.id), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger") %></td>
         </tr>
         <% end %>
       </tbody>

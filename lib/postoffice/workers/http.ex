@@ -11,11 +11,14 @@ defmodule Postoffice.Workers.Http do
       target: target
     )
 
-    case check_publisher_active(consumer_id) do
-      true ->
+    case check_publisher_state(consumer_id) do
+      :deleted ->
+        {:discard, "Deleted publisher"}
+
+      :active ->
         publish(id, args)
 
-      false ->
+      :disabled ->
         Logger.info("Do not process task as publisher is disabled", publisher_id: consumer_id)
         {:snooze, @snooze_seconds}
     end
@@ -37,7 +40,7 @@ defmodule Postoffice.Workers.Http do
       {:ok, %HTTPoison.Response{status_code: status_code, body: _body}}
       when status_code in 200..299 ->
         Logger.info("Succesfully sent http message",
-          message_id: id,
+          postoffice_message_id: id,
           target: target
         )
 
@@ -57,7 +60,7 @@ defmodule Postoffice.Workers.Http do
             response.status_code
           }"
 
-        Logger.info(error_reason)
+        Logger.info(error_reason, postoffice_message_id: id)
 
         {:ok, _data} =
           HistoricalData.create_failed_messages(%{
@@ -72,7 +75,7 @@ defmodule Postoffice.Workers.Http do
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         error_reason = "Error trying to process message from HttpConsumer: #{reason}"
-        Logger.info(error_reason)
+        Logger.info(error_reason, postoffice_message_id: id)
 
         {:ok, _data} =
           HistoricalData.create_failed_messages(%{
@@ -87,13 +90,16 @@ defmodule Postoffice.Workers.Http do
     end
   end
 
-  defp check_publisher_active(publisher_id) do
+  defp check_publisher_state(publisher_id) do
     case Cachex.get(:postoffice, publisher_id) do
       {:ok, :disabled} ->
-        false
+        :disabled
+
+      {:ok, :deleted} ->
+        :deleted
 
       {:ok, nil} ->
-        true
+        :active
     end
   end
 

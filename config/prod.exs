@@ -15,9 +15,12 @@ config :postoffice, PostofficeWeb.Endpoint,
   server: true,
   check_origin: false
 
-config :logger_json, :backend, metadata: :all
-config :logger, backends: [LoggerJSON]
-config :logger, level: :info
+config :logger,
+  backends: [Ink]
+
+config :logger, Ink,
+  name: "postoffice",
+  level: :info
 
 # Do not print debug messages in production
 # ## SSL Support
