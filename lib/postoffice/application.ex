@@ -8,6 +8,8 @@ defmodule Postoffice.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
+      # Start PomEx process first to catch all init metrics
+      Postoffice.PromEx,
       # Start the Ecto repository
       Postoffice.Repo,
       # Start the endpoint when the application starts
@@ -20,8 +22,7 @@ defmodule Postoffice.Application do
       Postoffice.Rescuer.Producer,
       Postoffice.Rescuer.Supervisor,
       Postoffice.Cache,
-      {Oban, oban_config()},
-      Postoffice.PromEx
+      {Oban, oban_config()}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
