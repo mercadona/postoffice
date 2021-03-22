@@ -4,17 +4,19 @@ defmodule PostofficeWeb.MessageController do
   alias Postoffice.Messaging
   alias Postoffice.HistoricalData
 
-  def index(conn, %{"id" => id}) do
-    case Messaging.get_message!(id) do
-      nil ->
-        conn
-        |> put_flash(:info, "Message not found")
-        |> redirect(to: Routes.dashboard_path(conn, :index))
+  def index(conn, %{"page" => page, "page_size" => page_size} = params) do
+    messages = Messaging.get_failing_messages(params)
 
-      message ->
-        conn
-        |> redirect(to: Routes.message_path(conn, :show, message.id))
-    end
+    render(conn, "index.html",
+      page_name: "Messages",
+      messages: messages.entries,
+      page_number: messages.page_number,
+      total_pages: messages.total_pages
+    )
+  end
+
+  def index(conn, %{}) do
+    index(conn, %{"page" => 1, "page_size" => 100})
   end
 
   def show(conn, %{"id" => id}) do

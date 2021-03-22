@@ -11,6 +11,14 @@ defmodule Postoffice.HttpWorkerTest do
 
   setup [:set_mox_from_context, :verify_on_exit!]
 
+  @deleted_publisher_attrs %{
+    active: true,
+    target: "http://fake.target3",
+    initial_message: 0,
+    type: "http",
+    deleted: true
+  }
+
   describe "HttpWorker tests" do
     test "message is successfully sent" do
       topic = Fixtures.create_topic()
@@ -27,7 +35,7 @@ defmodule Postoffice.HttpWorkerTest do
         {:ok, %HTTPoison.Response{status_code: 201}}
       end)
 
-      assert {:ok, sent} = perform_job(HttpWorker, args)
+      assert {:ok, _sent} = perform_job(HttpWorker, args)
     end
 
     test "historical data is created when message is sent" do
@@ -139,6 +147,25 @@ defmodule Postoffice.HttpWorkerTest do
       {:ok, %HTTPoison.Response{status_code: 201}}
     end)
 
-    assert {:ok, sent} = perform_job(HttpWorker, args, attempt: 100)
+    assert {:ok, _sent} = perform_job(HttpWorker, args, attempt: 100)
+  end
+
+  test "not sent message when worker is deleted" do
+    topic = Fixtures.create_topic()
+    publisher = Fixtures.create_publisher(topic, @deleted_publisher_attrs)
+    Cachex.put(:postoffice, publisher.id, :deleted)
+
+    args = %{
+      "consumer_id" => publisher.id,
+      "target" => publisher.target,
+      "payload" => %{"action" => "test"},
+      "attributes" => %{"hive_id" => "vlc"}
+    }
+
+    assert {:discard, "Deleted publisher"} = perform_job(HttpWorker, args)
+
+    assert Kernel.length(all_enqueued(queue: :http)) == 0
+    assert Kernel.length(HistoricalData.list_sent_messages()) == 0
+    assert Kernel.length(HistoricalData.list_failed_messages()) == 0
   end
 end

@@ -1,5 +1,5 @@
 # BUILD
-FROM elixir:1.9.4-alpine as build
+FROM elixir:1.11.2-alpine as build
 
 RUN apk add --no-cache --update make g++ nodejs npm
 

@@ -1,0 +1,45 @@
+<div class="row">
+  <div class="col-md-12">
+    <%= if @page_number >= 2 do%>
+      <span>
+        <%= link "Prev Page",
+        class: "btn btn-primary btn-round",
+        to: Routes.message_path(@conn, :index, page: @page_number - 1, page_size: 100) %>
+      </span>
+    <% end %>
+    <%= if @page_number < @total_pages do%>
+      <span>
+        <%= link "Next Page",
+        class: "btn btn-primary btn-round",
+        to: Routes.message_path(@conn, :index, page: @page_number + 1, page_size: 100) %>
+      </span>
+    <% end %>
+    <span>
+      <p class="font-weight-bold">Pages: <%= @page_number %>/<%= @total_pages %></p>
+    </span>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Attemps</th>
+          <th scope="col">Max attempts</th>
+          <th scope="col">Last error</th>
+          <th scope="col">Scheduled at</th>
+          <th scope="col">Args</th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= for message <- @messages do %>
+        <tr>
+          <td><%= message.id %></td>
+          <td><%= message.attempt %></td>
+          <td><%= message.max_attempts %></td>
+          <td><%= message.attempted_at%></td>
+          <td><%= message.scheduled_at%></td>
+          <td><%= Poison.encode!(message.args)%></td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

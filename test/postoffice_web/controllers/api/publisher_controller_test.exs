@@ -7,6 +7,7 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
   alias Postoffice.Messaging
   alias Postoffice.Messaging.Publisher
   alias Postoffice.Repo
+  alias Phoenix.PubSub
 
   @valid_http_publisher_payload %{
     active: true,
@@ -150,6 +151,18 @@ defmodule PostofficeWeb.Api.PublisherControllerTest do
       assert length(Repo.all(Publisher)) == 1
       created_publisher = get_last_publisher()
       assert created_publisher.deleted == true
+    end
+
+    test "Delete publisher broadcast the publisher updated", %{conn: conn} do
+      PubSub.subscribe(Postoffice.PubSub, "publishers")
+
+      publisher =
+        Fixtures.create_topic()
+        |> Fixtures.create_publisher()
+
+      delete(conn, Routes.api_publisher_path(conn, :delete, publisher))
+
+      assert_receive {:publisher_deleted, _publisher}
     end
 
     test "Returns 400 when can not delete publisher", %{conn: conn} do
