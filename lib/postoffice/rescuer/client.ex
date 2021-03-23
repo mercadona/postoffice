@@ -20,7 +20,7 @@ defmodule Postoffice.Rescuer.Client do
         {:error, []}
 
       {:error, %HTTPoison.Error{reason: reason}} ->
-        Logger.info("Error trying to list pending messages #{reason}")
+        Logger.error("Error trying to list pending messages #{reason}")
         {:error, []}
     end
   end
@@ -40,7 +40,7 @@ defmodule Postoffice.Rescuer.Client do
         {:error, "Request status code #{status_code}"}
 
       {:error, %HTTPoison.Error{reason: reason}} ->
-        Logger.info("Error trying to delete message #{host}: #{reason}")
+        Logger.error("Error trying to delete message #{host}: #{reason}")
         {:error, reason}
     end
   end

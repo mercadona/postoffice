@@ -15,7 +15,7 @@ defmodule Postoffice.Rescuer.MessageRecovery do
         |> Enum.each(fn message -> handle_message(message, host) end)
 
       {:error, []} ->
-        Logger.info("Error on #{host} listing undelivering messages")
+        Logger.error("Error on #{host} listing undelivering messages")
     end
   end
 
@@ -35,7 +35,7 @@ defmodule Postoffice.Rescuer.MessageRecovery do
         Client.delete(host, id)
 
       false ->
-        Logger.info("Unable to recover bulk messages with id #{id}")
+        Logger.error("Unable to recover bulk messages with id #{id}")
     end
   end
 
