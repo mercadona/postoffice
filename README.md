@@ -1,5 +1,5 @@
 # Postoffice
-[![CircleCI](https://circleci.com/gh/lonamiaec/postoffice/tree/master.svg?style=svg)](https://circleci.com/gh/lonamiaec/postoffice/tree/master) [![Coverage Status](https://coveralls.io/repos/github/lonamiaec/postoffice/badge.svg?branch=master)](https://coveralls.io/github/lonamiaec/postoffice?branch=master)
+[![CircleCI](https://circleci.com/gh/mercadona/postoffice/tree/master.svg?style=svg)](https://circleci.com/gh/mercadona/postoffice/tree/master) [![Coverage Status](https://coveralls.io/repos/github/lonamiaec/postoffice/badge.svg?branch=master)](https://coveralls.io/github/lonamiaec/postoffice?branch=master)
 
 ---
 ## What's Postoffice?
