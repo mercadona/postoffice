@@ -52,14 +52,14 @@ defmodule Postoffice.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.7"},
+      {:phoenix, "~> 1.5.8"},
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_ecto, "~> 4.2"},
-      {:ecto_sql, "~> 3.0"},
+      {:ecto_sql, "~> 3.6.1"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.14.1"},
       {:phoenix_live_reload, "~> 1.3", only: :dev},
-      {:gettext, "~> 0.11"},
+      {:gettext, "~> 0.18.2"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:bcrypt_elixir, "~> 2.3"},
@@ -74,13 +74,13 @@ defmodule Postoffice.MixProject do
       {:swarm, "~> 3.0"},
       {:excoveralls, "~> 0.14"},
       {:phoenix_live_view, "~> 0.15"},
-      {:floki, "~> 0.30.0", only: :test},
+      {:floki, "~> 0.30.1", only: :test},
       {:phoenix_live_dashboard, "~> 0.4"},
-      {:hackney, "~> 1.16"},
+      {:hackney, "~> 1.17.4"},
       {:cachex, "~> 3.3"},
       {:number, "~> 1.0.1"},
       {:oban, "2.5.0"},
-      {:prom_ex, "~> 1.0.0"},
+      {:prom_ex, "~> 1.0.1"},
       {:scrivener_ecto, "~> 2.0"}
     ]
   end
