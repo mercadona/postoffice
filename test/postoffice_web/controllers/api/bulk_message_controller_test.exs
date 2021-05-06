@@ -20,6 +20,20 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
     topic: "test"
   }
 
+  @messages_with_multiple_topics [%{
+    attributes: %{},
+    payload:
+      %{"id" => 1, "orders" => [%{"order_id" => 1}, %{"order_id" => 2}]},
+    topic: "topic"
+  },
+  %{
+    attributes: %{},
+    payload:
+      %{"id" => 2, "routes" => [%{"route_id" => 3}, %{"route_id" => 4}]},
+    topic: "another-topic"
+  }
+]
+
   @exceed_max_ingestion_messages_attrs %{
     attributes: %{},
     payload: [
@@ -33,13 +47,24 @@ defmodule PostofficeWeb.Api.BulkMessageControllerTest do
 
   setup %{conn: conn} do
     {:ok, topic} = Messaging.create_topic(%{name: "test", origin_host: "example.com"})
+    {:ok, a_topic} = Messaging.create_topic(%{name: "topic", origin_host: "example.com"})
+    {:ok, another_topic} = Messaging.create_topic(%{name: "another-topic", origin_host: "example.com"})
     Fixtures.create_publisher(topic)
+    Fixtures.create_publisher(a_topic)
+    Fixtures.create_publisher(another_topic)
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
   describe "create bulk message" do
     test "accept more than one message", %{conn: conn} do
       conn = post(conn, Routes.api_bulk_message_path(conn, :create), @create_attrs)
+
+      assert json_response(conn, 201)
+      assert Kernel.length(all_enqueued(queue: :http)) == 2
+    end
+
+    test "accept more than one message with different topics", %{conn: conn} do
+      conn = post(conn, Routes.api_bulk_message_path(conn, :create), @messages_with_multiple_topics)
 
       assert json_response(conn, 201)
       assert Kernel.length(all_enqueued(queue: :http)) == 2
