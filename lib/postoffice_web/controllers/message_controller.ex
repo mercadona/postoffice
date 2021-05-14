@@ -56,7 +56,7 @@ defmodule PostofficeWeb.MessageController do
   end
 
   def index(conn, %{}) do
-    index(conn, %{"page" => 1, "page_size" => 1})
+    index(conn, %{"page" => 1, "page_size" => 100})
   end
 
   def show(conn, %{"id" => id}) do
