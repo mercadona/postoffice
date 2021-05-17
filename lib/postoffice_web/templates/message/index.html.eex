@@ -4,14 +4,14 @@
       <span>
         <%= link "Prev Page",
         class: "btn btn-primary btn-round",
-        to: Routes.message_path(@conn, :index, page: @page_number - 1, page_size: 1, topic: @topic) %>
+        to: Routes.message_path(@conn, :index, page: @page_number - 1, page_size: 100, topic: @topic) %>
       </span>
     <% end %>
     <%= if @page_number < @total_pages do%>
       <span>
         <%= link "Next Page",
         class: "btn btn-primary btn-round",
-        to: Routes.message_path(@conn, :index, page: @page_number + 1, page_size: 1, topic: @topic) %>
+        to: Routes.message_path(@conn, :index, page: @page_number + 1, page_size: 100, topic: @topic) %>
       </span>
     <% end %>
     <span>
