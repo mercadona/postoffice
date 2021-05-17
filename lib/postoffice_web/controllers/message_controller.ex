@@ -7,15 +7,15 @@ defmodule PostofficeWeb.MessageController do
 
   def index(
         %{params: %{"topic" => topic}} = conn,
-        %{"page" => page, "page_size" => page_size} = params
-      )
+        %{"page" => page, "page_size" => page_size})
       when topic != "" do
     messages =
-      Messaging.get_failing_messages(%MessageSearchParams{
+      %MessageSearchParams{
         topic: topic,
         page: page,
         page_size: page_size
-      })
+      }
+      |> Messaging.get_failing_messages()
 
     render(conn, "index.html",
       page_name: "Messages",
@@ -26,13 +26,14 @@ defmodule PostofficeWeb.MessageController do
     )
   end
 
-  def index(conn, %{"page" => page, "page_size" => page_size} = params) do
+  def index(conn, %{"page" => page, "page_size" => page_size}) do
     messages =
-      Messaging.get_failing_messages(%MessageSearchParams{
+      %MessageSearchParams{
         topic: "",
         page: page,
         page_size: page_size
-      })
+      }
+      |> Messaging.get_failing_messages()
 
     render(conn, "index.html",
       page_name: "Messages",
