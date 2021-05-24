@@ -4,19 +4,32 @@
       <span>
         <%= link "Prev Page",
         class: "btn btn-primary btn-round",
-        to: Routes.message_path(@conn, :index, page: @page_number - 1, page_size: 100) %>
+        to: Routes.message_path(@conn, :index, page: @page_number - 1, page_size: 100, topic: @topic) %>
       </span>
     <% end %>
     <%= if @page_number < @total_pages do%>
       <span>
         <%= link "Next Page",
         class: "btn btn-primary btn-round",
-        to: Routes.message_path(@conn, :index, page: @page_number + 1, page_size: 100) %>
+        to: Routes.message_path(@conn, :index, page: @page_number + 1, page_size: 100, topic: @topic) %>
       </span>
     <% end %>
     <span>
       <p class="font-weight-bold">Pages: <%= @page_number %>/<%= @total_pages %></p>
     </span>
+    <div class="navbar-collapse justify-content-end">
+      <%= form_for @conn, Routes.message_path(@conn, :index), [method: :get, class: "navbar-form"],fn _f -> %>
+        <span class="bmd-form-group">
+          <div class="input-group no-border">
+            <input type="text" id="topic" name="topic" class="form-control" placeholder="Search message by topic" value=<%= @topic %>>
+            <button type="submit" class="btn btn-white btn-round btn-just-icon">
+              <i class="material-icons">search</i>
+              <div class="ripple-container"></div>
+            </button>
+          </div>
+        </span>
+      <% end %>
+    </div>
     <table class="table">
       <thead>
         <tr>

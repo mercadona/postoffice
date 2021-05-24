@@ -12,6 +12,8 @@ defmodule Postoffice.Messaging do
   alias Postoffice.Messaging.Message
   alias Postoffice.Messaging.Publisher
   alias Postoffice.Messaging.Topic
+  alias Postoffice.Messaging
+  alias Postoffice.Messaging.MessageSearchParams
 
   @doc """
   Gets a single message.
@@ -316,15 +318,27 @@ defmodule Postoffice.Messaging do
     |> broadcast_publisher(:publisher_deleted)
   end
 
-
   def list_deleted_publishers do
     from(p in Publisher, where: p.deleted == true)
     |> Repo.all()
   end
 
-  def get_failing_messages(%{"page"=> _page, "page_size"=> _page_size} = params) do
-    from(job in Oban.Job, where: job.state=="retryable")
-    |> Repo.paginate(params)
-    |> Map.from_struct
+  def get_failing_messages(%MessageSearchParams{} = params) when params.topic == "" do
+    pagination_params = %{"page" => params.page, page_size: params.page_size}
+
+    from(job in Oban.Job, where: job.state == "retryable")
+    |> Repo.paginate(pagination_params)
+    |> Map.from_struct()
+  end
+
+  def get_failing_messages(%MessageSearchParams{} = params) do
+    topic = String.trim(params.topic)
+    pagination_params = %{"page" => params.page, page_size: params.page_size}
+
+    from(job in Oban.Job,
+      where: job.state == "retryable" and fragment("args->>'topic' = ?", ^topic)
+    )
+    |> Repo.paginate(pagination_params)
+    |> Map.from_struct()
   end
 end

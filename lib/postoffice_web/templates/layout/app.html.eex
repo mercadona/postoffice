@@ -61,19 +61,6 @@
             <span class="navbar-toggler-icon icon-bar"></span>
             <span class="navbar-toggler-icon icon-bar"></span>
           </button>
-          <div class="collapse navbar-collapse justify-content-end">
-            <%= form_for @conn, Routes.message_path(@conn, :index), [method: :get, class: "navbar-form"],fn _f -> %>
-              <span class="bmd-form-group">
-                <div class="input-group no-border">
-                  <input type="text" id="id" name="id" value="" class="form-control" placeholder="Search message by id">
-                  <button type="submit" class="btn btn-white btn-round btn-just-icon">
-                    <i class="material-icons">search</i>
-                    <div class="ripple-container"></div>
-                  </button>
-                </div>
-              </span>
-            <% end %>
-          </div>
         </div>
       </nav>
       <!-- End Navbar -->
