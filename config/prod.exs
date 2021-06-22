@@ -20,7 +20,7 @@ config :logger,
 
 config :logger, Ink,
   name: "postoffice",
-  level: :debug
+  level: :info
 
 # Do not print debug messages in production
 # ## SSL Support
