@@ -42,7 +42,7 @@ config :libcluster,
 config :postoffice, Oban,
   repo: Postoffice.Repo,
   plugins: [
-    {Oban.Plugins.Pruner, max_age: 86400}
+    {Oban.Plugins.Pruner, max_age: System.get_env("OBAN_PRUNER_MAX_AGE", 60)}
   ],
   queues: [default: 10, http: 100, pubsub: 15]
 
