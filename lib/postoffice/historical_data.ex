@@ -167,14 +167,13 @@ defmodule Postoffice.HistoricalData do
   end
 
   def clean_sent_messages() do
-    {threshold, _} = System.get_env("MESSAGES_CLEANING_THRESHOLD", "7890000")
-    |> Integer.parse()
+    threshold = Application.get_env(:postoffice, :clean_messages_threshold)
+    |> String.to_integer()
 
-    three_months_ago = DateTime.utc_now()
+    maintain_messages_from = DateTime.utc_now()
     |> DateTime.add(-threshold, :second)
 
-    IO.inspect(three_months_ago)
-    (from message in SentMessages, where: message.inserted_at < ^three_months_ago)
+    (from message in SentMessages, where: message.inserted_at < ^maintain_messages_from)
     |> Repo.delete_all()
   end
 end

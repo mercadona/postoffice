@@ -42,7 +42,11 @@ config :libcluster,
 config :postoffice, Oban,
   repo: Postoffice.Repo,
   plugins: [
-    {Oban.Plugins.Pruner, max_age: String.to_integer(System.get_env("OBAN_PRUNER_MAX_AGE", "60"))}
+    {Oban.Plugins.Pruner, max_age: String.to_integer(System.get_env("OBAN_PRUNER_MAX_AGE", "60"))},
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"* * * * *", Postoffice.Workers.CleanMessages},
+     ]}
   ],
   queues: [default: 10, http: 100, pubsub: 15]
 

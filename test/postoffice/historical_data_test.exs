@@ -2,6 +2,7 @@ defmodule Postoffice.HistoricalDataTest do
   use Postoffice.DataCase
 
   alias Postoffice.HistoricalData
+  alias Postoffice.FakeClock
 
   describe "sent_messages" do
     alias Postoffice.HistoricalData.SentMessages
@@ -170,13 +171,13 @@ defmodule Postoffice.HistoricalDataTest do
     test "cleans historical data" do
       clean_messages_fixture()
 
+      FakeClock.freeze(~U[2021-09-02 23:00:07Z])
+
       Repo.get_by(SentMessages, message_id: 42)
       |> change(%{inserted_at: ~N[2021-01-03 23:00:07]})
       |> Repo.update()
 
-      {_, message_to_preserve} = Repo.get_by(SentMessages, message_id: 43)
-      |> change(%{inserted_at: ~N[2021-09-02 23:00:07]})
-      |> Repo.update()
+      message_to_preserve = Repo.get_by(SentMessages, message_id: 43)
 
       HistoricalData.clean_sent_messages()
 
