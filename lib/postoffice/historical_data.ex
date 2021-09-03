@@ -165,4 +165,16 @@ defmodule Postoffice.HistoricalData do
   def change_failed_messages(%FailedMessages{} = failed_messages, attrs \\ %{}) do
     FailedMessages.changeset(failed_messages, attrs)
   end
+
+  def clean_sent_messages() do
+    {threshold, _} = System.get_env("MESSAGES_CLEANING_THRESHOLD", "7890000")
+    |> Integer.parse()
+
+    three_months_ago = DateTime.utc_now()
+    |> DateTime.add(-threshold, :second)
+
+    IO.inspect(three_months_ago)
+    (from message in SentMessages, where: message.inserted_at < ^three_months_ago)
+    |> Repo.delete_all()
+  end
 end
