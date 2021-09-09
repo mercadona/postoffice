@@ -38,9 +38,7 @@ Application.put_env(
 
 
 defmodule Postoffice.FakeClock do
-
   def freeze(%DateTime{} = on) do
     Process.put(:mock_utc_now, on)
   end
-
 end
