@@ -45,7 +45,7 @@ config :postoffice, Oban,
     {Oban.Plugins.Pruner, max_age: String.to_integer(System.get_env("OBAN_PRUNER_MAX_AGE", "60"))},
     {Oban.Plugins.Cron,
      crontab: [
-       {"* * * * *", Postoffice.Workers.CleanMessages},
+       {System.get_env("CLEAN_MESSAGES_CRONTAB"), Postoffice.Workers.CleanMessages},
      ]}
   ],
   queues: [default: 10, http: 100, pubsub: 15]

@@ -6,6 +6,7 @@ config :postoffice, PostofficeWeb.Endpoint,
 config :postoffice, pubsub_project_name: {:system, "GCLOUD_PUBSUB_PROJECT_ID", default: "test"}
 config :postoffice, max_bulk_messages: {:system, "MAX_BULK_MESSAGES", default: 3000}
 config :postoffice, clean_messages_threshold: {:system, "CLEAN_MESSAGES_THRESHOLD", default: "7890000"}
+config :postoffice, clean_messages_crontab: {:system, "CLEAN_MESSAGES_CRONTAB", default: "0 12 * * 0"}
 
 config :postoffice, Postoffice.Repo,
   username: {:system, "DB_USERNAME", default: "postgres"},
