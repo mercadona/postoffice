@@ -104,6 +104,14 @@ To start your Phoenix server:
   * Start Phoenix endpoint with `mix phx.server`
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser or run tests with `mix test`
 
+## Environment variables
+
+* `GOOGLE_APPLICATION_CREDENTIALS` is the Google Cloud Platform service account json path.
+* `GCLOUD_PUBSUB_PROJECT_ID` is the Google Cloud Platform project where your PubSub topics/subscriptions are located.
+* `MAX_BULK_MESSAGES` is the maximum number of messages that Postoffice would be able to instert in bulk.
+* `CLEAN_MESSAGES_THRESHOLD` defines from what time you want to keep the historical data from the `sent_messages` table (in seconds)
+* `CLEAN_MESSAGES_CRONTAB` defines when the Oban cronjob to clean historical data from the `sent_messages` table should be run.  Must be a valid crontab declaration.
+
 ## Clustering
 Postoffice has been developed to be used forming a cluster. We use [libcluster](https://github.com/bitwalker/libcluster) under the hood to create the cluster. You can take a look at its documentation in case you want to tune settings.
 
