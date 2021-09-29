@@ -28,3 +28,17 @@ Application.put_env(
   :max_bulk_messages,
   3
 )
+
+
+Application.put_env(
+  :postoffice,
+  :clean_messages_threshold,
+  "7890000"
+)
+
+
+defmodule Postoffice.FakeClock do
+  def freeze(%DateTime{} = on) do
+    Process.put(:mock_utc_now, on)
+  end
+end

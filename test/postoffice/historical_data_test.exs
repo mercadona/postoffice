@@ -2,6 +2,7 @@ defmodule Postoffice.HistoricalDataTest do
   use Postoffice.DataCase
 
   alias Postoffice.HistoricalData
+  alias Postoffice.FakeClock
 
   describe "sent_messages" do
     alias Postoffice.HistoricalData.SentMessages
@@ -136,5 +137,55 @@ defmodule Postoffice.HistoricalDataTest do
       failed_messages = failed_messages_fixture()
       assert %Ecto.Changeset{} = HistoricalData.change_failed_messages(failed_messages)
     end
+  end
+
+  describe "clean_messages" do
+    alias Postoffice.HistoricalData.SentMessages
+
+    @message_to_delete %{
+      attributes: %{"key" => "some attributes"},
+      consumer_id: 42,
+      message_id: 42,
+      payload: [%{"key" => "some payload"}]
+    }
+    @message_to_preserve %{
+      attributes: %{"key" => "some attributes"},
+      consumer_id: 43,
+      message_id: 43,
+      payload: [%{"key" => "some payload"}]
+    }
+
+    def clean_messages_fixture(attrs \\ %{}) do
+      {:ok, sent_messages} =
+        attrs
+        |> Enum.into(@message_to_delete)
+        |> HistoricalData.create_sent_messages()
+
+      {:ok, sent_messages} =
+        attrs
+        |> Enum.into(@message_to_preserve)
+        |> HistoricalData.create_sent_messages()
+
+    end
+
+    test "cleans historical data" do
+      clean_messages_fixture()
+
+      FakeClock.freeze(~U[2021-09-02 23:00:07Z])
+
+      Repo.get_by(SentMessages, message_id: 42)
+      |> change(%{inserted_at: ~N[2021-01-03 23:00:07]})
+      |> Repo.update()
+
+      message_to_preserve = Repo.get_by(SentMessages, message_id: 43)
+
+      HistoricalData.clean_sent_messages()
+
+      messages_count = Repo.one(from data in SentMessages, select: count(data.id))
+
+      assert messages_count == 1
+      assert Repo.one(SentMessages) == message_to_preserve
+    end
+
   end
 end

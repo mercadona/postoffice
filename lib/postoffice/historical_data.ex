@@ -165,4 +165,15 @@ defmodule Postoffice.HistoricalData do
   def change_failed_messages(%FailedMessages{} = failed_messages, attrs \\ %{}) do
     FailedMessages.changeset(failed_messages, attrs)
   end
+
+  def clean_sent_messages() do
+    threshold = Application.get_env(:postoffice, :clean_messages_threshold)
+    |> String.to_integer()
+
+    maintain_messages_from = DateTime.utc_now()
+    |> DateTime.add(-threshold, :second)
+
+    (from message in SentMessages, where: message.inserted_at < ^maintain_messages_from)
+    |> Repo.delete_all()
+  end
 end
