@@ -35,6 +35,7 @@ defmodule Postoffice.Workers.Http do
        ) do
     message_id = id || 0
     historical_payload = if is_list(payload) == false, do: [payload], else: payload
+    args = Map.put(args, "payload", Map.merge(payload, %{"attributes" => attributes}))
 
     case impl().publish(id, args) do
       {:ok, %HTTPoison.Response{status_code: status_code, body: _body}}

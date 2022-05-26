@@ -31,7 +31,14 @@ defmodule Postoffice.HttpWorkerTest do
         "attributes" => %{"hive_id" => "vlc"}
       }
 
-      expect(HttpMock, :publish, fn _id, ^args ->
+      expected_args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      expect(HttpMock, :publish, fn _id, ^expected_args ->
         {:ok, %HTTPoison.Response{status_code: 201}}
       end)
 
@@ -49,7 +56,14 @@ defmodule Postoffice.HttpWorkerTest do
         "attributes" => %{"hive_id" => "vlc"}
       }
 
-      expect(HttpMock, :publish, fn _id, ^args ->
+      expected_args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      expect(HttpMock, :publish, fn _id, ^expected_args ->
         {:ok, %HTTPoison.Response{status_code: 201}}
       end)
 
@@ -68,7 +82,14 @@ defmodule Postoffice.HttpWorkerTest do
         "attributes" => %{"hive_id" => "vlc"}
       }
 
-      expect(HttpMock, :publish, fn _id, ^args ->
+      expected_args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      expect(HttpMock, :publish, fn _id, ^expected_args ->
         {:ok, %HTTPoison.Response{status_code: 302}}
       end)
 
@@ -86,7 +107,14 @@ defmodule Postoffice.HttpWorkerTest do
         "attributes" => %{"hive_id" => "vlc"}
       }
 
-      expect(HttpMock, :publish, fn _id, ^args ->
+      expected_args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      expect(HttpMock, :publish, fn _id, ^expected_args ->
         {:ok, %HTTPoison.Response{status_code: 302}}
       end)
 
@@ -105,7 +133,14 @@ defmodule Postoffice.HttpWorkerTest do
         "attributes" => %{"hive_id" => "vlc"}
       }
 
-      expect(HttpMock, :publish, fn _id, ^args ->
+      expected_args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      expect(HttpMock, :publish, fn _id, ^expected_args ->
         {:error, %HTTPoison.Error{reason: "Fake error"}}
       end)
 
@@ -123,7 +158,14 @@ defmodule Postoffice.HttpWorkerTest do
         "attributes" => %{"hive_id" => "vlc"}
       }
 
-      expect(HttpMock, :publish, fn _id, ^args ->
+      expected_args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      expect(HttpMock, :publish, fn _id, ^expected_args ->
         {:error, %HTTPoison.Error{reason: "Fake error"}}
       end)
 
@@ -143,7 +185,14 @@ defmodule Postoffice.HttpWorkerTest do
       "attributes" => %{"hive_id" => "vlc"}
     }
 
-    expect(HttpMock, :publish, fn _id, ^args ->
+    expected_args = %{
+      "consumer_id" => publisher.id,
+      "target" => publisher.target,
+      "payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
+      "attributes" => %{"hive_id" => "vlc"}
+    }
+
+    expect(HttpMock, :publish, fn _id, ^expected_args ->
       {:ok, %HTTPoison.Response{status_code: 201}}
     end)
 
