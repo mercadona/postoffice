@@ -39,7 +39,9 @@ build: ## Build project image
 	$(DOCKER_COMPOSE_COMMAND) build --no-cache --pull
 
 env-start: ## Start project containers defined in docker-compose
-	$(DOCKER_COMPOSE_COMMAND) up -d
+	$(DOCKER_COMPOSE_COMMAND) up -d db
+	$(DOCKER_COMPOSE_COMMAND) up migrations
+	$(DOCKER_COMPOSE_COMMAND) up -d app
 
 env-stop: ## Stop project containers defined in docker-compose
 	$(DOCKER_COMPOSE_COMMAND) stop
