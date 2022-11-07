@@ -16,6 +16,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile.local
+    image: $DOCKER_NAMESPACE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG$DOCKER_BRANCH_NAME
     env_file:
       - envfiles/local.env
     depends_on:
@@ -29,11 +30,13 @@ services:
       - --
 
   app:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.local
+    image: $DOCKER_NAMESPACE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG$DOCKER_BRANCH_NAME
     env_file:
       - envfiles/local.env
+    restart: on-failure
+    stdin_open: true
+    container_name: app
+    tty: true
     depends_on:
       migrations:
         condition: "service_completed_successfully"
