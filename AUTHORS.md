@@ -4,3 +4,5 @@ Thank you!
 * Juanjo Ponz (@jjponz)
 * Santiago Lanús (@sanntt)
 * Sergio Revilla (@elreplicante)
+* Lucas Yarza (@lucasyarza)
+* Adrià Sansaloni (@jsansaloni)
