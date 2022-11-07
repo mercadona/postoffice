@@ -1,0 +1,27 @@
+FROM elixir
+
+RUN apt update \
+    && apt upgrade -y \
+    && apt install curl -y
+
+ENV APP_HOME /app
+RUN mkdir -p $APP_HOME
+WORKDIR $APP_HOME
+
+COPY . .
+RUN chmod +x docker/scripts/wait-for-it.sh
+
+RUN mix local.hex --force \
+    && mix archive.install --force hex phx_new 1.4.11\
+    && apt-get update \
+    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash \
+    && apt-get install -y apt-utils \
+    && apt-get install -y nodejs \
+    && apt-get install -y build-essential \
+    && apt-get install -y inotify-tools \
+    && mix deps.get \
+    && mix local.rebar --force
+
+RUN cd assets && npm install
+
+CMD ["mix", "phx.server"]

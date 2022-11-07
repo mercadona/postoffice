@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 services:
   db:
     image: postgres:12.1
@@ -12,16 +12,42 @@ services:
     ports:
       - "6543:5432"
 
-  # In case you wan to run the application inside a container, you just need to remove comments from thw following lines.
-  # Inside the container you run a release, not `mix phx.server` so you don't have code reloading, and other things
-  # app:
-  #   build:
-  #     context: ..
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - db
-  #   ports:
-  #     - "4001:4000"
+  migrations:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.local
+    image: $DOCKER_NAMESPACE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG$DOCKER_BRANCH_NAME
+    env_file:
+      - envfiles/local.env
+    depends_on:
+      - db
+    command: mix ecto.setup
+    entrypoint:
+      - /app/docker/scripts/wait-for-it.sh
+      - db:5432
+      - --timeout=0
+      - --strict
+      - --
+
+  app:
+    image: $DOCKER_NAMESPACE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG$DOCKER_BRANCH_NAME
+    env_file:
+      - envfiles/local.env
+    restart: on-failure
+    stdin_open: true
+    container_name: app
+    tty: true
+    depends_on:
+      migrations:
+        condition: "service_completed_successfully"
+    ports:
+      - "4001:4000"
+    command: mix phx.server
+    volumes:
+      - '../lib:/app/lib'
+      - '../priv:/app/priv'
+      - '../secrets:/app/secrets'
+      - '../test:/app/test'
 
 volumes:
   pgdata12:

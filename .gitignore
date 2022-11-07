@@ -38,6 +38,4 @@ rel/
 # User-specific stuff:
 .idea/
 
-Makefile
-
 .DS_Store

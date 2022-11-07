@@ -104,6 +104,15 @@ To start your Phoenix server:
   * Start Phoenix endpoint with `mix phx.server`
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser or run tests with `mix test`
 
+## How to install it locally with docker
+To start postoffice bundle with docker:
+  * Build postoffice image `make build`
+  * Start postoffice app with `make env-start` [1]. Now you can visit [`localhost:4001`](http://localhost:4001) from your browser 
+  * Run test `make test`
+  * Show logs with `make view-logs`
+
+[1] _While `make env-start` you can execute `make view-logs` in other terminal to show what is happening_ 
+
 ## Environment variables
 
 * `GOOGLE_APPLICATION_CREDENTIALS` is the Google Cloud Platform service account json path.
