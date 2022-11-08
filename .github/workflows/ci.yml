@@ -4,7 +4,10 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Hello Codelies!
+        run: echo "Hello!!!! from ${{ github.workflow }} triggered by the ${{ github.event_name }} done by ${{ github.actor }}"
