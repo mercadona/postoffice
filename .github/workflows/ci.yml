@@ -11,3 +11,9 @@ jobs:
 
       - name: docker-compose build
         run: make build
+
+      - name: Start env
+        run: make env-start
+
+      - name: Test
+        run: make test
