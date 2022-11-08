@@ -12,7 +12,11 @@ WORKDIR /app
 
 COPY . .
 
-RUN mix deps.get --only prod && npm run deploy --prefix ./assets && mix phx.digest && mix release --quiet
+RUN mix deps.get --only prod 
+RUN cd assets && npm install && cd - 
+RUN npm run deploy --prefix ./assets 
+RUN mix phx.digest 
+RUN mix release --quiet
 
 # RELEASE
 FROM alpine:3.10.3
