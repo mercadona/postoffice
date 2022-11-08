@@ -9,5 +9,5 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Hello Codelies!
-        run: echo "Hello!!!! from ${{ github.workflow }} triggered by the ${{ github.event_name }} done by ${{ github.actor }}"
+      - name: docker-compose build
+        run: make build
