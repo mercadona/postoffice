@@ -15,5 +15,8 @@ jobs:
       - name: Start env
         run: make env-start
 
+      - name: Wait for start
+        run: while true; do curl -sSf http://localhost:4001 && break || sleep 1; done
+
       - name: Test
         run: make test
