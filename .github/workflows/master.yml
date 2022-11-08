@@ -1,0 +1,25 @@
+name: Master build & test
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: docker-compose build
+        run: make build
+
+      - name: Start env
+        run: APP_COMMAND='tail -f /dev/null' make env-start
+
+      - name: Test
+        run: make test
+
+      - name: Coveralls
+        run: make coveralls-github
