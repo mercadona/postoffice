@@ -31,6 +31,9 @@ ifeq ($(DOCKER_BRANCH_NAME),)
 export DOCKER_BRANCH_NAME := local
 endif
 
+ifeq ($(APP_COMMAND),)
+export APP_COMMAND := mix phx.server
+endif
 
 test: ## Run test suite in project's main container
 	$(DOCKER_COMPOSE_COMMAND) exec -T $(POSTOFFICE_SERVICE) mix test

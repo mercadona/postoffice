@@ -43,3 +43,4 @@ jobs:
           body: ${{steps.github_release.outputs.changelog}}
           files: |
             LICENSE
+            AUTHORS.md
