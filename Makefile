@@ -38,10 +38,13 @@ endif
 test: ## Run test suite in project's main container
 	$(DOCKER_COMPOSE_COMMAND) exec -T $(POSTOFFICE_SERVICE) mix test
 
+coveralls-github: ## Run coveralls in github action
+	$(DOCKER_COMPOSE_COMMAND) exec -T $(POSTOFFICE_SERVICE) mix coveralls.github
+
 build: ## Build project image
 	$(DOCKER_COMPOSE_COMMAND) build --no-cache --pull
 
-build-prod:
+build-prod: ## Build prod image
 	docker build -t $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)$(DOCKER_BRANCH_NAME) .
 
 env-start: ## Start project containers defined in docker-compose
@@ -52,7 +55,7 @@ env-start: ## Start project containers defined in docker-compose
 env-stop: ## Stop project containers defined in docker-compose
 	$(DOCKER_COMPOSE_COMMAND) stop
 
-env-restart: env-stop env-start
+env-restart: env-stop env-start ## Restart all containers
 
 env-destroy: ## Destroy all project containers
 	$(DOCKER_COMPOSE_COMMAND) down -v --rmi all --remove-orphans
