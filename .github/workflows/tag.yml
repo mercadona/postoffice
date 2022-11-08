@@ -1,4 +1,4 @@
-name: First workflow
+name: Release
 
 on: [push]
 
