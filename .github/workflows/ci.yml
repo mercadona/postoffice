@@ -9,14 +9,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: docker-compose build
-        run: make build
+#      - name: docker-compose build
+#        run: make build
+#
+#      - name: Start env
+#        run: make env-start
+#
+#      - name: Wait for start
+#        run: while true; do curl -sSf http://localhost:4001 > /dev/null 2&>1 && break || echo “Waiting to elixir server” && sleep 10; done
+#
+#      - name: Test
+#        run: make test
 
-      - name: Start env
-        run: make env-start
+      - name: Build image
+        run: make build-prod
 
-      - name: Wait for start
-        run: while true; do curl -sSf http://localhost:4001 && break || sleep 1; done
+      - name: Dockerhub push
+        run: echo "Aqui lo subo a docker hub"
 
-      - name: Test
-        run: make test
+      - name: Create Release
+        run: echo "Aqui creo la release"

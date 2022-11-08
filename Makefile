@@ -38,6 +38,9 @@ test: ## Run test suite in project's main container
 build: ## Build project image
 	$(DOCKER_COMPOSE_COMMAND) build --no-cache --pull
 
+build-prod:
+	docker build -t $(DOCKER_NAMESPACE)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)$(DOCKER_BRANCH_NAME) .
+
 env-start: ## Start project containers defined in docker-compose
 	$(DOCKER_COMPOSE_COMMAND) up -d db
 	$(DOCKER_COMPOSE_COMMAND) up migrations
