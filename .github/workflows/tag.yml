@@ -1,6 +1,10 @@
 name: Release
 
-on: [push]
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -21,11 +25,11 @@ jobs:
 #      - name: Test
 #        run: make test
 
-      - name: Build image
-        run: make build-prod
+#      - name: Build image
+#        run: make build-prod
 
       - name: Dockerhub push
         run: echo "Aqui lo subo a docker hub"
 
-      - name: Create Release
-        run: echo "Aqui creo la release"
+      - name: Release
+        uses: softprops/action-gh-release@v1
