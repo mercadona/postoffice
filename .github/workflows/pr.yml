@@ -1,4 +1,4 @@
-name: Pull Request build & test
+name: pr
 
 on: [pull_request]
 
