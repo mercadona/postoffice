@@ -18,7 +18,7 @@ services:
       dockerfile: docker/Dockerfile.local
     image: $DOCKER_NAMESPACE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG$DOCKER_BRANCH_NAME
     env_file:
-      - envfiles/local.env
+      - envfiles/$ENV_FILE
     depends_on:
       - db
     command: mix ecto.setup
@@ -32,7 +32,7 @@ services:
   app:
     image: $DOCKER_NAMESPACE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG$DOCKER_BRANCH_NAME
     env_file:
-      - envfiles/local.env
+      - envfiles/$ENV_FILE
     restart: on-failure
     stdin_open: true
     container_name: app
