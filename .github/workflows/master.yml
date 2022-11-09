@@ -11,14 +11,11 @@ jobs:
     runs-on: ubuntu-20.04
 
     env:
-      ENV_FILE: test.env
+      MIX_ENV: test
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Append GITHUB_TOKEN
-        run: echo -e "\nGITHUB_TOKEN=${GITHUB_TOKEN}" >> docker/envfiles/test.env
 
       - name: docker-compose build
         run: make build
@@ -29,8 +26,8 @@ jobs:
       - name: Test
         run: make test
 
-      - name: Coveralls
-        run: make coveralls-github
+#      - name: Coveralls
+#        run: make coveralls-github
 
       #      - name: Login to Docker Hub
       #        uses: docker/login-action@v2
