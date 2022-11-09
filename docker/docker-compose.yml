@@ -35,6 +35,7 @@ services:
     image: $DOCKER_NAMESPACE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG$DOCKER_BRANCH_NAME
     environment:
       - MIX_ENV
+      - GITHUB_TOKEN
     env_file:
       - envfiles/local.env
     restart: on-failure
