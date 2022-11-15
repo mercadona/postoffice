@@ -66,7 +66,7 @@ defmodule Postoffice.MixProject do
       {:plug_cowboy, "~> 2.6"}, 
       {:bcrypt_elixir, "~> 2.3"}, # https://hexdocs.pm/bcrypt_elixir/Bcrypt.html --> 3.0.1
       {:google_api_pub_sub, "~> 0.36.0"}, # https://hexdocs.pm/google_api_pub_sub/0.36.0/api-reference.html --> 0.36.0
-      {:goth, "~> 1.1.0"}, # https://hexdocs.pm/goth/api-reference.html -> 1.3.1
+      {:goth, "~> 1.3.1"}, # https://hexdocs.pm/goth/api-reference.html -> 1.3.1
       {:httpoison, "~> 1.8"}, 
       {:mox, "~> 0.5", only: :test}, # https://hexdocs.pm/mox/Mox.html -> 1.0.2
       {:gen_stage, "~> 0.14"}, # https://hexdocs.pm/gen_stage/GenStage.html -> 1.1.2
@@ -80,7 +80,7 @@ defmodule Postoffice.MixProject do
       {:cachex, "~> 3.4"}, 
       {:number, "~> 1.0.3"}, 
       {:oban, "2.7.2"}, # 2.13.5; No updated; dependencies(ecto_sql, jason,postgrex , telemetry); https://hex.pm/packages/oban
-      {:prom_ex, "~> 1.0.1"}, # 1.7.1; No updated; dependencies(); https://hexdocs.pm/prom_ex/PromEx.html
+      {:prom_ex, "~> 1.7.1"}, # 1.7.1; No updated; dependencies(); https://hexdocs.pm/prom_ex/PromEx.html
       {:scrivener_ecto, "~> 2.7"} 
     ]
   end
