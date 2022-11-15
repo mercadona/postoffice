@@ -52,14 +52,14 @@ defmodule Postoffice.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6.15"}, # https://hexdocs.pm/phoenix/Phoenix.html --> 1.6.15
+      {:phoenix, "~> 1.6.15"},
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_ecto, "~> 4.4"},
-      {:ecto_sql, "~> 3.7.0"}, # https://hexdocs.pm/ecto_sql/Ecto.Adapters.SQL.html --> 3.9.0 -- depends on postgrex
+      {:ecto_sql, "~> 3.9.0"}, # https://hexdocs.pm/ecto_sql/Ecto.Adapters.SQL.html --> 3.9.0 -- red test with > 3.8
       {:postgrex, ">= 0.15.0"}, 
-      {:phoenix_html, "~> 3.2.0"}, # https://hexdocs.pm/phoenix_html/Phoenix.HTML.html --> 3.2.0
-      {:phoenix_live_view, "~> 0.18"}, # !!Depends on phoenix_html
-      {:phoenix_live_dashboard, "~> 0.7"}, # !! Depends on phoenix_live_view
+      {:phoenix_html, "~> 3.2.0"},
+      {:phoenix_live_view, "~> 0.18"},
+      {:phoenix_live_dashboard, "~> 0.7"},
       {:phoenix_live_reload, "~> 1.4", only: :dev}, 
       {:gettext, "~> 0.20.0"},
       {:jason, "~> 1.4"}, 
