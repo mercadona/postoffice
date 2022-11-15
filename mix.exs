@@ -52,15 +52,15 @@ defmodule Postoffice.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.6.15"},
+      {:phoenix, "~> 1.5.8"},
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.7.0"},
       {:postgrex, ">= 0.15.0"}, 
-      {:phoenix_html, "~> 3.2.0"},
-      {:phoenix_live_view, "~> 0.18"},
-      {:phoenix_live_dashboard, "~> 0.7"},
-      {:phoenix_live_reload, "~> 1.4", only: :dev}, 
+      {:phoenix_html, "~> 2.14.1"},
+      {:phoenix_live_view, "~> 0.15"},
+      {:phoenix_live_dashboard, "~> 0.4"},
+      {:phoenix_live_reload, "~> 1.3", only: :dev}, 
       {:gettext, "~> 0.20.0"},
       {:jason, "~> 1.4"}, 
       {:plug_cowboy, "~> 2.6"}, 
