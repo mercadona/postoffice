@@ -61,6 +61,7 @@ defmodule Postoffice.MixProject do
       {:phoenix_live_view, "~> 0.18"},
       {:phoenix_live_dashboard, "~> 0.7"},
       {:phoenix_live_reload, "~> 1.4", only: :dev}, 
+      {:gettext, "~> 0.20.0"},
       {:jason, "~> 1.4"}, 
       {:plug_cowboy, "~> 2.6"}, 
       {:bcrypt_elixir, "~> 2.3"}, # https://hexdocs.pm/bcrypt_elixir/Bcrypt.html --> 3.0.1
