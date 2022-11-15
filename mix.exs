@@ -58,6 +58,8 @@ defmodule Postoffice.MixProject do
       {:ecto_sql, "~> 3.6.1"}, # https://hexdocs.pm/ecto_sql/Ecto.Adapters.SQL.html --> 3.9.0
       {:postgrex, ">= 0.15.0"}, 
       {:phoenix_html, "~> 2.14.1"}, # https://hexdocs.pm/phoenix_html/Phoenix.HTML.html --> 3.2.0
+      {:phoenix_live_view, "~> 0.15"}, # !!Depends on phoenix_html
+      {:phoenix_live_dashboard, "~> 0.4"}, # !! Depends on phoenix_live_view
       {:phoenix_live_reload, "~> 1.4", only: :dev}, 
       {:gettext, "~> 0.18.2"}, # https://hexdocs.pm/gettext/Gettext.html -> 0.20.0
       {:jason, "~> 1.4"}, 
@@ -73,9 +75,7 @@ defmodule Postoffice.MixProject do
       {:libcluster, "~> 3.3"}, 
       {:swarm, "~> 3.4"}, 
       {:excoveralls, "~> 0.15"}, 
-      {:phoenix_live_view, "~> 0.15"}, # !!Depends on phoenix_html
       {:floki, "~> 0.30.1", only: :test}, # https://hexdocs.pm/floki/readme.html -> 0.34.0
-      {:phoenix_live_dashboard, "~> 0.7"}, 
       {:hackney, "~> 1.17.4"}, # https://hexdocs.pm/hackney/ -> 1.18.1
       {:cachex, "~> 3.4"}, 
       {:number, "~> 1.0.3"}, 
