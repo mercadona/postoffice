@@ -55,13 +55,12 @@ defmodule Postoffice.MixProject do
       {:phoenix, "~> 1.6.15"},
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_ecto, "~> 4.4"},
-      {:ecto_sql, "~> 3.9.0"}, # https://hexdocs.pm/ecto_sql/Ecto.Adapters.SQL.html --> 3.9.0 -- red test with > 3.8
+      {:ecto_sql, "~> 3.7.0"}, # https://hexdocs.pm/ecto_sql/Ecto.Adapters.SQL.html --> 3.9.0 -- red test with > 3.8
       {:postgrex, ">= 0.15.0"}, 
       {:phoenix_html, "~> 3.2.0"},
       {:phoenix_live_view, "~> 0.18"},
       {:phoenix_live_dashboard, "~> 0.7"},
       {:phoenix_live_reload, "~> 1.4", only: :dev}, 
-      {:gettext, "~> 0.20.0"},
       {:jason, "~> 1.4"}, 
       {:plug_cowboy, "~> 2.6"}, 
       {:bcrypt_elixir, "~> 2.3"}, # https://hexdocs.pm/bcrypt_elixir/Bcrypt.html --> 3.0.1
