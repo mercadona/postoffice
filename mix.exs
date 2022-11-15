@@ -55,7 +55,7 @@ defmodule Postoffice.MixProject do
       {:phoenix, "~> 1.6.15"},
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_ecto, "~> 4.4"},
-      {:ecto_sql, "~> 3.7.0"}, # https://hexdocs.pm/ecto_sql/Ecto.Adapters.SQL.html --> 3.9.0 -- red test with > 3.8
+      {:ecto_sql, "~> 3.7.0"},
       {:postgrex, ">= 0.15.0"}, 
       {:phoenix_html, "~> 3.2.0"},
       {:phoenix_live_view, "~> 0.18"},
@@ -66,10 +66,10 @@ defmodule Postoffice.MixProject do
       {:plug_cowboy, "~> 2.6"}, 
       {:bcrypt_elixir, "~> 3.0"},
       {:google_api_pub_sub, "~> 0.36.0"},
-      {:goth, "~> 1.2.0"}, # https://hexdocs.pm/goth/api-reference.html -> 1.3.1 -- depends on finth also prom_ex
+      {:goth, "~> 1.2.0"},
       {:httpoison, "~> 1.8"}, 
       {:mox, "~> 1.0", only: :test},
-      {:gen_stage, "~> 0.14"}, # https://hexdocs.pm/gen_stage/GenStage.html -> 1.1.2
+      {:gen_stage, "~> 0.14"},
       {:ink, "~> 1.2"}, 
       {:config_tuples, "~> 0.4"},
       {:libcluster, "~> 3.3"}, 
@@ -79,8 +79,8 @@ defmodule Postoffice.MixProject do
       {:hackney, "~> 1.18.1"},
       {:cachex, "~> 3.4"}, 
       {:number, "~> 1.0.3"}, 
-      {:oban, "2.7.2"}, # 2.13.5; No updated; dependencies(ecto_sql, jason,postgrex , telemetry); https://hex.pm/packages/oban
-      {:prom_ex, "~> 1.4.1"}, # 1.7.1; No updated; dependencies(); https://hexdocs.pm/prom_ex/PromEx.html -- depends on dependencies of oban
+      {:oban, "2.7.2"},
+      {:prom_ex, "~> 1.4.1"},
       {:scrivener_ecto, "~> 2.7"} 
     ]
   end
