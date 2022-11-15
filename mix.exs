@@ -66,7 +66,7 @@ defmodule Postoffice.MixProject do
       {:plug_cowboy, "~> 2.6"}, 
       {:bcrypt_elixir, "~> 2.3"}, # https://hexdocs.pm/bcrypt_elixir/Bcrypt.html --> 3.0.1
       {:google_api_pub_sub, "~> 0.36.0"}, # https://hexdocs.pm/google_api_pub_sub/0.36.0/api-reference.html --> 0.36.0
-      {:goth, "~> 1.3.1"}, # https://hexdocs.pm/goth/api-reference.html -> 1.3.1 --
+      {:goth, "~> 1.2.0"}, # https://hexdocs.pm/goth/api-reference.html -> 1.3.1 --
       {:httpoison, "~> 1.8"}, 
       {:mox, "~> 0.5", only: :test}, # https://hexdocs.pm/mox/Mox.html -> 1.0.2
       {:gen_stage, "~> 0.14"}, # https://hexdocs.pm/gen_stage/GenStage.html -> 1.1.2
