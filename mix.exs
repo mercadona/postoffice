@@ -56,7 +56,7 @@ defmodule Postoffice.MixProject do
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.6.1"}, # https://hexdocs.pm/ecto_sql/Ecto.Adapters.SQL.html --> 3.9.0
-      {:postgrex, ">= 0.16.0"}, 
+      {:postgrex, ">= 0.0.0"}, 
       {:phoenix_html, "~> 2.14.1"}, # https://hexdocs.pm/phoenix_html/Phoenix.HTML.html --> 3.2.0
       {:phoenix_live_reload, "~> 1.4", only: :dev}, 
       {:gettext, "~> 0.18.2"}, # https://hexdocs.pm/gettext/Gettext.html -> 0.20.0
