@@ -57,9 +57,9 @@ defmodule Postoffice.MixProject do
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.7.0"}, # https://hexdocs.pm/ecto_sql/Ecto.Adapters.SQL.html --> 3.9.0 -- depends on postgrex
       {:postgrex, ">= 0.15.0"}, 
-      {:phoenix_html, "~> 2.14.1"}, # https://hexdocs.pm/phoenix_html/Phoenix.HTML.html --> 3.2.0
-      {:phoenix_live_view, "~> 0.15"}, # !!Depends on phoenix_html
-      {:phoenix_live_dashboard, "~> 0.4"}, # !! Depends on phoenix_live_view
+      {:phoenix_html, "~> 3.2.0"}, # https://hexdocs.pm/phoenix_html/Phoenix.HTML.html --> 3.2.0
+      {:phoenix_live_view, "~> 0.18"}, # !!Depends on phoenix_html
+      {:phoenix_live_dashboard, "~> 0.7"}, # !! Depends on phoenix_live_view
       {:phoenix_live_reload, "~> 1.4", only: :dev}, 
       {:gettext, "~> 0.20.0"},
       {:jason, "~> 1.4"}, 
