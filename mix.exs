@@ -61,11 +61,11 @@ defmodule Postoffice.MixProject do
       {:phoenix_live_view, "~> 0.15"}, # !!Depends on phoenix_html
       {:phoenix_live_dashboard, "~> 0.4"}, # !! Depends on phoenix_live_view
       {:phoenix_live_reload, "~> 1.4", only: :dev}, 
-      {:gettext, "~> 0.20.0"}, # https://hexdocs.pm/gettext/Gettext.html -> 0.20.0
+      {:gettext, "~> 0.20.0"},
       {:jason, "~> 1.4"}, 
       {:plug_cowboy, "~> 2.6"}, 
       {:bcrypt_elixir, "~> 2.3"}, # https://hexdocs.pm/bcrypt_elixir/Bcrypt.html --> 3.0.1
-      {:google_api_pub_sub, "~> 0.28.1"}, # https://hexdocs.pm/google_api_pub_sub/0.36.0/api-reference.html --> 0.36.0
+      {:google_api_pub_sub, "~> 0.36.0"}, # https://hexdocs.pm/google_api_pub_sub/0.36.0/api-reference.html --> 0.36.0
       {:goth, "~> 1.1.0"}, # https://hexdocs.pm/goth/api-reference.html -> 1.3.1
       {:httpoison, "~> 1.8"}, 
       {:mox, "~> 0.5", only: :test}, # https://hexdocs.pm/mox/Mox.html -> 1.0.2
