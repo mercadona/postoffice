@@ -64,7 +64,7 @@ defmodule Postoffice.MixProject do
       {:gettext, "~> 0.20.0"},
       {:jason, "~> 1.4"}, 
       {:plug_cowboy, "~> 2.6"}, 
-      {:bcrypt_elixir, "~> 2.3"}, # https://hexdocs.pm/bcrypt_elixir/Bcrypt.html --> 3.0.1
+      {:bcrypt_elixir, "~> 3.0"}, # https://hexdocs.pm/bcrypt_elixir/Bcrypt.html --> 3.0.1
       {:google_api_pub_sub, "~> 0.36.0"},
       {:goth, "~> 1.2.0"}, # https://hexdocs.pm/goth/api-reference.html -> 1.3.1 -- depends on finth also prom_ex
       {:httpoison, "~> 1.8"}, 
