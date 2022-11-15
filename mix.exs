@@ -64,11 +64,11 @@ defmodule Postoffice.MixProject do
       {:gettext, "~> 0.20.0"},
       {:jason, "~> 1.4"}, 
       {:plug_cowboy, "~> 2.6"}, 
-      {:bcrypt_elixir, "~> 3.0"}, # https://hexdocs.pm/bcrypt_elixir/Bcrypt.html --> 3.0.1
+      {:bcrypt_elixir, "~> 3.0"},
       {:google_api_pub_sub, "~> 0.36.0"},
       {:goth, "~> 1.2.0"}, # https://hexdocs.pm/goth/api-reference.html -> 1.3.1 -- depends on finth also prom_ex
       {:httpoison, "~> 1.8"}, 
-      {:mox, "~> 0.5", only: :test}, # https://hexdocs.pm/mox/Mox.html -> 1.0.2
+      {:mox, "~> 1.0", only: :test},
       {:gen_stage, "~> 0.14"}, # https://hexdocs.pm/gen_stage/GenStage.html -> 1.1.2
       {:ink, "~> 1.2"}, 
       {:config_tuples, "~> 0.4"},
