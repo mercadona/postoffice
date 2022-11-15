@@ -70,7 +70,7 @@ defmodule Postoffice.MixProject do
       {:httpoison, "~> 1.8"}, 
       {:mox, "~> 1.0", only: :test},
       {:gen_stage, "~> 0.14"},
-      {:ink, "~> 1.2"}, 
+      {:ink, "~> 1.2"},
       {:config_tuples, "~> 0.4"},
       {:libcluster, "~> 3.3"}, 
       {:swarm, "~> 3.4"}, 
@@ -81,7 +81,7 @@ defmodule Postoffice.MixProject do
       {:number, "~> 1.0.3"}, 
       {:oban, "2.7.2"},
       {:prom_ex, "~> 1.4.1"},
-      {:scrivener_ecto, "~> 2.7"} 
+      {:scrivener_ecto, "~> 2.7"}
     ]
   end
 
