@@ -38,7 +38,7 @@ module.exports = {
   },
 
   plugins: [
-      new MiniCssExtractPlugin({filename: "../css/app.css"}),
+    new MiniCssExtractPlugin({filename: "../css/app.css"}),
     new CopyPlugin({
       patterns: [{ from: "static", to: "../" }],
     }),
