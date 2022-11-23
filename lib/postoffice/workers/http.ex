@@ -53,6 +53,8 @@ defmodule Postoffice.Workers.Http do
             attributes: attributes
           })
 
+        impl_pubsub().publish(id, args)
+
         {:ok, :sent}
 
       {:ok, response} ->
@@ -106,5 +108,9 @@ defmodule Postoffice.Workers.Http do
 
   defp impl do
     Application.get_env(:postoffice, :http_consumer_impl, Postoffice.Adapters.Http)
+  end
+
+  defp impl_pubsub do
+    Application.get_env(:postoffice, :pubsub_consumer_impl, Postoffice.Adapters.Pubsub)
   end
 end
