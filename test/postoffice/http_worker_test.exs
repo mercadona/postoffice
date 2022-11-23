@@ -4,7 +4,9 @@ defmodule Postoffice.HttpWorkerTest do
 
   import Mox
 
+  alias GoogleApi.PubSub.V1.Model.PublishResponse
   alias Postoffice.Adapters.HttpMock
+  alias Postoffice.Adapters.PubsubMock
   alias Postoffice.HttpWorker
   alias Postoffice.Fixtures
   alias Postoffice.HistoricalData
@@ -42,6 +44,10 @@ defmodule Postoffice.HttpWorkerTest do
         {:ok, %HTTPoison.Response{status_code: 201}}
       end)
 
+      expect(PubsubMock, :publish, fn  _, _ ->
+        {:ok, %PublishResponse{}}
+      end)
+
       assert {:ok, _sent} = perform_job(HttpWorker, args)
     end
 
@@ -67,8 +73,13 @@ defmodule Postoffice.HttpWorkerTest do
         {:ok, %HTTPoison.Response{status_code: 201}}
       end)
 
+      expect(PubsubMock, :publish, fn  _id, ^expected_args ->
+        {:ok, %PublishResponse{}}
+      end)
+
       perform_job(HttpWorker, args)
       assert Kernel.length(HistoricalData.list_sent_messages()) == 1
+
     end
 
     test "message is not send if response code is out of 2xx range" do
@@ -91,6 +102,10 @@ defmodule Postoffice.HttpWorkerTest do
 
       expect(HttpMock, :publish, fn _id, ^expected_args ->
         {:ok, %HTTPoison.Response{status_code: 302}}
+      end)
+
+      expect(PubsubMock, :publish, 0, fn  _id, ^expected_args ->
+        {:ok, %PublishResponse{}}
       end)
 
       assert {:error, :nosent} = perform_job(HttpWorker, args)
@@ -194,6 +209,10 @@ defmodule Postoffice.HttpWorkerTest do
 
     expect(HttpMock, :publish, fn _id, ^expected_args ->
       {:ok, %HTTPoison.Response{status_code: 201}}
+    end)
+
+    expect(PubsubMock, :publish, fn  _, _ ->
+      {:ok, %PublishResponse{}}
     end)
 
     assert {:ok, _sent} = perform_job(HttpWorker, args, attempt: 100)
