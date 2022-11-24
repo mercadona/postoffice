@@ -36,6 +36,12 @@ Application.put_env(
   "7890000"
 )
 
+Application.put_env(
+  :postoffice,
+  :cluster_name,
+  "vlc"
+)
+
 
 defmodule Postoffice.FakeClock do
   def freeze(%DateTime{} = on) do

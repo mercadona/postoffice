@@ -77,14 +77,14 @@ defmodule Postoffice.HttpWorkerTest do
         "consumer_id" => publisher.id,
         "target" => "postoffice-sent-messages",
         "payload" => %{
-          "topic" => topic.name,
+          "message_id" => 1000,
+          "consumer_id" => publisher.id,
           "target" => publisher.target,
           "type" => publisher.type,
           "message_payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
           "attributes" => %{"hive_id" => "vlc"},
-          "timestamp" => "2021-04-14 11:49:50"
         },
-        "attributes" => %{"center_id" => "vlc"}
+        "attributes" => %{"cluster_name" => "vlc"}
       }
 
       expect(PubsubMock, :publish, fn  _id, ^expected_pubsub_args ->
