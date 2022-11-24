@@ -120,6 +120,8 @@ To start postoffice bundle with docker:
 * `MAX_BULK_MESSAGES` is the maximum number of messages that Postoffice would be able to instert in bulk.
 * `CLEAN_MESSAGES_THRESHOLD` defines from what time you want to keep the historical data from the `sent_messages` table (in seconds)
 * `CLEAN_MESSAGES_CRONTAB` defines when the Oban cronjob to clean historical data from the `sent_messages` table should be run.  Must be a valid crontab declaration.
+* `CLUSTER_NAME` defines cluster name to diferentiate historical data in pubsub from diferent clusters
+* `PUBSUB_HISTORICAL_TOPIC_NAME` defines the name of pubsub topic to send historical data. Defaul `postoffice-sent-messages`
 
 ## Clustering
 Postoffice has been developed to be used forming a cluster. We use [libcluster](https://github.com/bitwalker/libcluster) under the hood to create the cluster. You can take a look at its documentation in case you want to tune settings.
