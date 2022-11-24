@@ -53,7 +53,20 @@ defmodule Postoffice.Workers.Http do
             attributes: attributes
           })
 
-        impl_pubsub().publish(id, args)
+        historical_pubsub_args = %{
+          "consumer_id" => consumer_id,
+          "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
+          "payload" => %{
+            "consumer_id" => consumer_id,
+            "target" => target,
+            "type" => "http",
+            "message_payload" => Map.get(args, "payload"),
+            "attributes" => attributes,
+          },
+          "attributes" => %{"cluster_name" => Application.get_env(:postoffice, :cluster_name)}
+        }
+
+        impl_pubsub().publish(id, historical_pubsub_args)
 
         {:ok, :sent}
 
