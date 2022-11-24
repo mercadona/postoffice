@@ -42,6 +42,12 @@ Application.put_env(
   "vlc"
 )
 
+Application.put_env(
+  :postoffice,
+  :pubsub_historical_topic_name,
+  "postoffice-sent-messages"
+)
+
 
 defmodule Postoffice.FakeClock do
   def freeze(%DateTime{} = on) do

@@ -55,9 +55,8 @@ defmodule Postoffice.Workers.Http do
 
         historical_pubsub_args = %{
           "consumer_id" => consumer_id,
-          "target" => "postoffice-sent-messages",
+          "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
           "payload" => %{
-            "message_id" => message_id,
             "consumer_id" => consumer_id,
             "target" => target,
             "type" => "http",

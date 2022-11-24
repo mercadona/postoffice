@@ -54,6 +54,9 @@ defmodule Postoffice.HttpWorkerTest do
     test "historical data is created when message is sent" do
       topic = Fixtures.create_topic()
       publisher = Fixtures.create_publisher(topic)
+      # message = Fixtures.add_message_to_deliver(topic)
+#
+      # message |> IO.inspect()
 
       args = %{
         "consumer_id" => publisher.id,
@@ -77,7 +80,6 @@ defmodule Postoffice.HttpWorkerTest do
         "consumer_id" => publisher.id,
         "target" => "postoffice-sent-messages",
         "payload" => %{
-          "message_id" => 1000,
           "consumer_id" => publisher.id,
           "target" => publisher.target,
           "type" => publisher.type,
