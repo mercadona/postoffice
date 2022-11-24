@@ -73,7 +73,21 @@ defmodule Postoffice.HttpWorkerTest do
         {:ok, %HTTPoison.Response{status_code: 201}}
       end)
 
-      expect(PubsubMock, :publish, fn  _id, ^expected_args ->
+      expected_pubsub_args = %{
+        "consumer_id" => publisher.id,
+        "target" => "postoffice-sent-messages",
+        "payload" => %{
+          "topic" => topic.name,
+          "target" => publisher.target,
+          "type" => publisher.type,
+          "message_payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
+          "attributes" => %{"hive_id" => "vlc"},
+          "timestamp" => "2021-04-14 11:49:50"
+        },
+        "attributes" => %{"center_id" => "vlc"}
+      }
+
+      expect(PubsubMock, :publish, fn  _id, ^expected_pubsub_args ->
         {:ok, %PublishResponse{}}
       end)
 
