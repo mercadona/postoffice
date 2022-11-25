@@ -68,7 +68,7 @@ defmodule Postoffice.PubsubWorkerTest do
       end)
 
       perform_job(PubsubWorker, args)
-      assert Kernel.length(HistoricalData.list_sent_messages()) == 1
+      assert Kernel.length(HistoricalData.list_sent_messages()) == 0
     end
 
     test "messages can be sent in bulk" do
