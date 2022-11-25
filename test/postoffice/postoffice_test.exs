@@ -8,7 +8,7 @@ defmodule Postoffice.PostofficeTest do
       assert Postoffice.ping() == :ok
     end
 
-    test "receive_message/1 returns error when topic doesnt exist" do
+    test "receive_message/1 returns error when topic doesn't exist" do
       assert {:relationship_does_not_exists, _error} =
                Postoffice.receive_message(%{
                  "topic" => "invalid",

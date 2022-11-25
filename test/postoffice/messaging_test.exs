@@ -59,7 +59,7 @@ defmodule Postoffice.MessagingTest do
   }
 
   describe "messages" do
-    test "add_message_to_deliver/1 without publisher created for this topics doesnt create any job" do
+    test "add_message_to_deliver/1 without publisher created for this topics doesn't create any job" do
       topic = Fixtures.create_topic()
       Messaging.add_message_to_deliver(topic, @message_attrs)
 

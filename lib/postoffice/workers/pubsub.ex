@@ -36,7 +36,7 @@ defmodule Postoffice.Workers.Pubsub do
 
     case impl().publish(id, args) do
       {:ok, _response = %PublishResponse{}} ->
-        Logger.info("Succesfully sent pubsub message",
+        Logger.info("Successfully sent pubsub message",
           target: target
         )
 
