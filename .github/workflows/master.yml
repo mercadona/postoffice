@@ -27,7 +27,7 @@ jobs:
         run: make test
 
       - name: Coveralls
-        run: make coveralls-github
+        run: make coveralls
 
       - name: Set outputs
         id: vars

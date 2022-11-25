@@ -42,7 +42,7 @@ endif
 test: ## Run test suite in project's main container
 	$(DOCKER_COMPOSE_COMMAND) exec -T $(POSTOFFICE_SERVICE) mix test
 
-coveralls-github: ## Run coveralls in github action
+coveralls: ## Run coveralls in github action
 	$(DOCKER_COMPOSE_COMMAND) exec -T $(POSTOFFICE_SERVICE) mix coveralls.detail | less -R
 
 build: ## Build project image
