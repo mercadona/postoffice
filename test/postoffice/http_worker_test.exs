@@ -91,7 +91,7 @@ defmodule Postoffice.HttpWorkerTest do
       end)
 
       perform_job(HttpWorker, args)
-      assert Kernel.length(HistoricalData.list_sent_messages()) == 1
+      assert Kernel.length(HistoricalData.list_sent_messages()) == 0
 
     end
 

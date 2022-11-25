@@ -45,14 +45,6 @@ defmodule Postoffice.Workers.Http do
           target: target
         )
 
-        {:ok, _data} =
-          HistoricalData.create_sent_messages(%{
-            message_id: message_id,
-            consumer_id: consumer_id,
-            payload: historical_payload,
-            attributes: attributes
-          })
-
         historical_pubsub_args = %{
           "consumer_id" => consumer_id,
           "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
