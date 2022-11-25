@@ -45,13 +45,20 @@ defmodule Postoffice.Workers.Http do
           target: target
         )
 
-        {:ok, _data} =
-          HistoricalData.create_sent_messages(%{
-            message_id: message_id,
-            consumer_id: consumer_id,
-            payload: historical_payload,
-            attributes: attributes
-          })
+        historical_pubsub_args = %{
+          "consumer_id" => consumer_id,
+          "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
+          "payload" => %{
+            "consumer_id" => consumer_id,
+            "target" => target,
+            "type" => "http",
+            "message_payload" => Map.get(args, "payload"),
+            "attributes" => attributes,
+          },
+          "attributes" => %{"cluster_name" => Application.get_env(:postoffice, :cluster_name)}
+        }
+
+        impl_pubsub().publish(id, historical_pubsub_args)
 
         {:ok, :sent}
 
@@ -106,5 +113,9 @@ defmodule Postoffice.Workers.Http do
 
   defp impl do
     Application.get_env(:postoffice, :http_consumer_impl, Postoffice.Adapters.Http)
+  end
+
+  defp impl_pubsub do
+    Application.get_env(:postoffice, :pubsub_consumer_impl, Postoffice.Adapters.Pubsub)
   end
 end

@@ -28,6 +28,10 @@ defmodule Postoffice.PubsubWorkerTest do
         {:ok, %PublishResponse{}}
       end)
 
+      expect(PubsubMock, :publish, fn  _, _ ->
+        {:ok, %PublishResponse{}}
+      end)
+
       assert {:ok, _sent} = perform_job(PubsubWorker, args)
     end
 
@@ -46,8 +50,25 @@ defmodule Postoffice.PubsubWorkerTest do
         {:ok, %PublishResponse{}}
       end)
 
+      expected_pubsub_args = %{
+        "consumer_id" => publisher.id,
+        "target" => "postoffice-sent-messages",
+        "payload" => %{
+          "consumer_id" => publisher.id,
+          "target" => publisher.target,
+          "type" => "pubsub",
+          "message_payload" => %{"action" => "test"},
+          "attributes" => %{"hive_id" => "vlc"},
+        },
+        "attributes" => %{"cluster_name" => "vlc"}
+      }
+
+      expect(PubsubMock, :publish, fn  _id, ^expected_pubsub_args ->
+        {:ok, %PublishResponse{}}
+      end)
+
       perform_job(PubsubWorker, args)
-      assert Kernel.length(HistoricalData.list_sent_messages()) == 1
+      assert Kernel.length(HistoricalData.list_sent_messages()) == 0
     end
 
     test "messages can be sent in bulk" do
@@ -65,6 +86,9 @@ defmodule Postoffice.PubsubWorkerTest do
         {:ok, %PublishResponse{}}
       end)
 
+      expect(PubsubMock, :publish, fn  _, _ ->
+        {:ok, %PublishResponse{}}
+      end)
       assert {:ok, _sent} = perform_job(PubsubWorker, args)
     end
 
@@ -117,6 +141,10 @@ defmodule Postoffice.PubsubWorkerTest do
       }
 
       expect(PubsubMock, :publish, fn _id, ^args ->
+        {:ok, %PublishResponse{}}
+      end)
+
+      expect(PubsubMock, :publish, fn  _, _ ->
         {:ok, %PublishResponse{}}
       end)
 

@@ -40,13 +40,20 @@ defmodule Postoffice.Workers.Pubsub do
           target: target
         )
 
-        {:ok, _data} =
-          HistoricalData.create_sent_messages(%{
-            message_id: message_id,
-            consumer_id: consumer_id,
-            payload: historical_payload,
-            attributes: attributes
-          })
+        historical_pubsub_args = %{
+          "consumer_id" => consumer_id,
+          "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
+          "payload" => %{
+            "consumer_id" => consumer_id,
+            "target" => target,
+            "type" => "pubsub",
+            "message_payload" => Map.get(args, "payload"),
+            "attributes" => attributes,
+          },
+          "attributes" => %{"cluster_name" => Application.get_env(:postoffice, :cluster_name)}
+        }
+
+        impl().publish(id, historical_pubsub_args)
 
         {:ok, :sent}
 

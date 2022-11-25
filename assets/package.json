@@ -13,19 +13,20 @@
     "phoenix_live_view": "file:../deps/phoenix_live_view"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
+    "@babel/core": "^7.20.2",
+    "@babel/preset-env": "^7.20.2",
+    "babel-loader": "^9.1.0",
     "babel-preset-env": "^1.7.0",
-    "copy-webpack-plugin": "^5.1.1",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^3.4.1",
-    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "mini-css-extract-plugin": "^2.6.1",
     "file-loader": "^5.0.2",
     "font-awesome-loader": "^1.0.2",
-    "phoenix": "^1.4.7",
-    "phoenix_html": "^2.13.2",
+    "phoenix": "^1.6.15",
+    "phoenix_html": "^3.2.0",
     "popper.js": "^1.14.3",
     "style-loader": "^1.1.2",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10"
+    "webpack": "^5.75.0",
+    "webpack-cli": "^4.10.0"
   }
 }
