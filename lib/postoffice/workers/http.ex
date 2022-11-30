@@ -40,7 +40,7 @@ defmodule Postoffice.Workers.Http do
     case impl().publish(id, args) do
       {:ok, %HTTPoison.Response{status_code: status_code, body: _body}}
       when status_code in 200..299 ->
-        Logger.info("Succesfully sent http message",
+        Logger.info("Successfully sent http message",
           postoffice_message_id: id,
           target: target
         )
