@@ -9,6 +9,7 @@ config :postoffice, clean_messages_threshold: {:system, "CLEAN_MESSAGES_THRESHOL
 config :postoffice, clean_messages_crontab: {:system, "CLEAN_MESSAGES_CRONTAB", default: "0 12 * * 0"}
 config :postoffice, cluster_name: {:system, "CLUSTER_NAME", default: "postoffice"}
 config :postoffice, pubsub_historical_topic_name: {:system, "PUBSUB_HISTORICAL_TOPIC_NAME", default: "postoffice-sent-messages"}
+config :postoffice, enable_historical_data: {:system, "ENABLE_HISTORICAL_DATA", default: true}
 
 config :postoffice, Postoffice.Repo,
   username: {:system, "DB_USERNAME", default: "postgres"},
