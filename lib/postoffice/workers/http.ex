@@ -45,7 +45,7 @@ defmodule Postoffice.Workers.Http do
           target: target
         )
 
-        if is_enable_historical_data do
+        if is_enable_historical_data() do
           historical_pubsub_args = %{
             "consumer_id" => consumer_id,
             "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),

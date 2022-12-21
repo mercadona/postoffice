@@ -108,29 +108,10 @@ defmodule Postoffice.HttpWorkerTest do
         "attributes" => %{"hive_id" => "vlc"}
       }
 
-      expected_args = %{
-        "consumer_id" => publisher.id,
-        "target" => publisher.target,
-        "payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
-        "attributes" => %{"hive_id" => "vlc"}
-      }
-
-      expect(HttpMock, :publish, fn _id, ^expected_args ->
+      expect(HttpMock, :publish, fn _id, _expected_args ->
         {:ok, %HTTPoison.Response{status_code: 201}}
       end)
 
-      # expected_pubsub_args = %{
-      #   "consumer_id" => publisher.id,
-      #   "target" => "postoffice-sent-messages",
-      #   "payload" => %{
-      #     "consumer_id" => publisher.id,
-      #     "target" => publisher.target,
-      #     "type" => publisher.type,
-      #     "message_payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
-      #     "attributes" => %{"hive_id" => "vlc"},
-      #   },
-      #   "attributes" => %{"cluster_name" => "vlc"}
-      # }
 
       expect(PubsubMock, :publish, 0, fn  _id, _expected_pubsub_args ->
         {:ok, %PublishResponse{}}
@@ -138,6 +119,8 @@ defmodule Postoffice.HttpWorkerTest do
 
       perform_job(HttpWorker, args)
       assert Kernel.length(HistoricalData.list_sent_messages()) == 0
+
+      Application.delete_env(:postoffice, :enable_historical_data)
 
     end
 
