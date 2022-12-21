@@ -12,7 +12,6 @@ jobs:
     env:
       MIX_ENV: test
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GITHUB_SHA:
 
     steps:
       - uses: actions/checkout@v3

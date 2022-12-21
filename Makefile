@@ -35,10 +35,6 @@ ifeq ($(APP_COMMAND),)
 export APP_COMMAND := mix phx.server
 endif
 
-ifeq ($(MIX_ENV),)
-export MIX_ENV := test
-endif
-
 test: ## Run test suite in project's main container
 	$(DOCKER_COMPOSE_COMMAND) exec -T $(POSTOFFICE_SERVICE) mix test
 
