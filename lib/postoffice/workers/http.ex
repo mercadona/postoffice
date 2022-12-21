@@ -45,20 +45,22 @@ defmodule Postoffice.Workers.Http do
           target: target
         )
 
-        historical_pubsub_args = %{
-          "consumer_id" => consumer_id,
-          "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
-          "payload" => %{
+        if is_enable_historical_data do
+          historical_pubsub_args = %{
             "consumer_id" => consumer_id,
-            "target" => target,
-            "type" => "http",
-            "message_payload" => Map.get(args, "payload"),
-            "attributes" => attributes,
-          },
-          "attributes" => %{"cluster_name" => Application.get_env(:postoffice, :cluster_name)}
-        }
+            "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
+            "payload" => %{
+              "consumer_id" => consumer_id,
+              "target" => target,
+              "type" => "http",
+              "message_payload" => Map.get(args, "payload"),
+              "attributes" => attributes,
+            },
+            "attributes" => %{"cluster_name" => Application.get_env(:postoffice, :cluster_name)}
+          }
 
-        impl_pubsub().publish(id, historical_pubsub_args)
+          impl_pubsub().publish(id, historical_pubsub_args)
+        end
 
         {:ok, :sent}
 
