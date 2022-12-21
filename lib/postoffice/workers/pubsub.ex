@@ -87,4 +87,8 @@ defmodule Postoffice.Workers.Pubsub do
   defp impl do
     Application.get_env(:postoffice, :pubsub_consumer_impl, Postoffice.Adapters.Pubsub)
   end
+
+  defp is_enable_historical_data do
+    Application.get_env(:postoffice, :enable_historical_data, true)
+  end
 end
