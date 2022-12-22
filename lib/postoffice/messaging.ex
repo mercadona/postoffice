@@ -341,4 +341,5 @@ defmodule Postoffice.Messaging do
     |> Repo.paginate(pagination_params)
     |> Map.from_struct()
   end
+
 end

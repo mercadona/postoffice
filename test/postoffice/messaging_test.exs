@@ -279,5 +279,22 @@ defmodule Postoffice.MessagingTest do
 
       assert failing_messages ==  %{entries: [second_failing_job, third_failing_job], page_number: 1, page_size: 4, total_entries: 2, total_pages: 1}
     end
+
+    test "delete_failing_message/1 return :ok" do
+      Fixtures.create_failing_message(%{id: 1, user_id: 2})
+      assert Messaging.delete_failing_message(1) == :ok
+    end
+
+    test "delete_failing_message/1 count 0 retrivel jobs" do
+      Fixtures.create_failing_message(%{id: 1, user_id: 2})
+      Fixtures.create_failing_message(%{id: 2, user_id: 3})
+
+      assert Messaging.count_failing_jobs() == 2
+
+      Messaging.delete_failing_message(1)
+      Messaging.delete_failing_message(2)
+
+      assert Messaging.count_failing_jobs() == 0
+    end
   end
 end
