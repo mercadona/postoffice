@@ -323,7 +323,7 @@ defmodule Postoffice.Messaging do
     |> Repo.all()
   end
 
-  def get_failing_message(id) do
+  def get_failing_message!(id) do
     from(job in Oban.Job, where: job.id == ^id and job.state == "retryable")
     |> Repo.one()
   end
@@ -348,16 +348,12 @@ defmodule Postoffice.Messaging do
   end
 
   def delete_failing_message(failing_message_id) do
-    get_message!(failing_message_id) |> IO.inspect()
-    case get_message!(failing_message_id) do
+    case get_failing_message!(failing_message_id) do
       nil ->
         {:deleting_error}
 
-      # publisher ->
-      #   publisher
-      #   |> Publisher.changeset(%{deleted: true})
-      #   |> perform_delete_publisher()
-      message -> {:ok}
+      failing_message ->
+        {Oban.cancel_job(failing_message.id)}
     end
 
   end
