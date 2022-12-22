@@ -323,6 +323,11 @@ defmodule Postoffice.Messaging do
     |> Repo.all()
   end
 
+  def get_failing_message(id) do
+    from(job in Oban.Job, where: job.id == ^id and job.state == "retryable")
+    |> Repo.one()
+  end
+
   def get_failing_messages(%MessageSearchParams{} = params) when params.topic == "" do
     pagination_params = %{"page" => params.page, page_size: params.page_size}
 
@@ -340,6 +345,21 @@ defmodule Postoffice.Messaging do
     )
     |> Repo.paginate(pagination_params)
     |> Map.from_struct()
+  end
+
+  def delete_failing_message(failing_message_id) do
+    get_message!(failing_message_id) |> IO.inspect()
+    case get_message!(failing_message_id) do
+      nil ->
+        {:deleting_error}
+
+      # publisher ->
+      #   publisher
+      #   |> Publisher.changeset(%{deleted: true})
+      #   |> perform_delete_publisher()
+      message -> {:ok}
+    end
+
   end
 
 end
