@@ -39,6 +39,7 @@
           <th scope="col">Last error</th>
           <th scope="col">Scheduled at</th>
           <th scope="col">Args</th>
+          <th scope="col"></th>
         </tr>
       </thead>
       <tbody>
@@ -50,6 +51,7 @@
           <td><%= message.attempted_at%></td>
           <td><%= message.scheduled_at%></td>
           <td><%= Poison.encode!(message.args)%></td>
+          <td><%=  link("Delete", to: Routes.message_path(@conn, :delete, message.id), method: :delete, data: [confirm: "Are you sure?"], class: "btn btn-danger") %></td>
         </tr>
         <% end %>
       </tbody>

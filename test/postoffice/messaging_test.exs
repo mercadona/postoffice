@@ -199,6 +199,16 @@ defmodule Postoffice.MessagingTest do
 
       assert hosts == []
     end
+
+    test "get_failing_message!/1 returns message" do
+      job = Fixtures.create_failing_message(%{id: 1, user_id: 2})
+      assert Messaging.get_failing_message!(job.id) == job
+    end
+
+    test "get_failing_message!/1 returns nil" do
+      assert Messaging.get_failing_message!(1) == nil
+    end
+
   end
 
   describe "counters" do
@@ -278,6 +288,27 @@ defmodule Postoffice.MessagingTest do
       |> Messaging.get_failing_messages
 
       assert failing_messages ==  %{entries: [second_failing_job, third_failing_job], page_number: 1, page_size: 4, total_entries: 2, total_pages: 1}
+    end
+
+    test "delete_failing_message/1 return :ok" do
+      job = Fixtures.create_failing_message(%{id: 1, user_id: 2})
+      assert Messaging.delete_failing_message(job.id) == {:ok}
+    end
+
+    test "delete_failing_message/1 return :error when failing_messages does not exist" do
+      assert Messaging.delete_failing_message(1) == {:deleting_error}
+    end
+
+    test "delete_failing_message/1 count 0 retrivel jobs" do
+      job1 = Fixtures.create_failing_message(%{id: 1, user_id: 2})
+      job2 = Fixtures.create_failing_message(%{id: 2, user_id: 3})
+
+      assert Messaging.count_failing_jobs() == 2
+
+      Messaging.delete_failing_message(job1.id)
+      Messaging.delete_failing_message(job2.id)
+
+      assert Messaging.count_failing_jobs() == 0
     end
   end
 end
