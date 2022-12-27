@@ -28,4 +28,4 @@ config :libcluster,
     ]
   ]
 
-config :postoffice, Oban, crontab: false, queues: false, plugins: false
+config :postoffice, Oban, crontab: false, testing: :manual

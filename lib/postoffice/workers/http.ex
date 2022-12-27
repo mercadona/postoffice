@@ -40,18 +40,27 @@ defmodule Postoffice.Workers.Http do
     case impl().publish(id, args) do
       {:ok, %HTTPoison.Response{status_code: status_code, body: _body}}
       when status_code in 200..299 ->
-        Logger.info("Succesfully sent http message",
+        Logger.info("Successfully sent http message",
           postoffice_message_id: id,
           target: target
         )
 
-        {:ok, _data} =
-          HistoricalData.create_sent_messages(%{
-            message_id: message_id,
-            consumer_id: consumer_id,
-            payload: historical_payload,
-            attributes: attributes
-          })
+        if is_enable_historical_data() do
+          historical_pubsub_args = %{
+            "consumer_id" => consumer_id,
+            "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
+            "payload" => %{
+              "consumer_id" => consumer_id,
+              "target" => target,
+              "type" => "http",
+              "message_payload" => Map.get(args, "payload"),
+              "attributes" => attributes,
+            },
+            "attributes" => %{"cluster_name" => Application.get_env(:postoffice, :cluster_name)}
+          }
+
+          impl_pubsub().publish(id, historical_pubsub_args)
+        end
 
         {:ok, :sent}
 
@@ -106,5 +115,13 @@ defmodule Postoffice.Workers.Http do
 
   defp impl do
     Application.get_env(:postoffice, :http_consumer_impl, Postoffice.Adapters.Http)
+  end
+
+  defp impl_pubsub do
+    Application.get_env(:postoffice, :pubsub_consumer_impl, Postoffice.Adapters.Pubsub)
+  end
+
+  defp is_enable_historical_data do
+    Application.get_env(:postoffice, :enable_historical_data, true)
   end
 end

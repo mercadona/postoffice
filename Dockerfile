@@ -11,6 +11,7 @@ ENV MIX_ENV prod
 WORKDIR /app
 
 COPY . .
+
 RUN mix deps.get --only prod
 RUN cd assets && npm install && cd -
 RUN npm run deploy --prefix ./assets

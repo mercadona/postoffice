@@ -68,4 +68,12 @@ defmodule PostofficeWeb.MessageController do
       page_name: "Message detail"
     )
   end
+
+  def delete(conn, %{"id" => id}) do
+    with {:ok} <- Messaging.delete_failing_message(id) do
+      conn
+      |> put_flash(:info, "Failing message deleted successfully.")
+      |> redirect(to: Routes.message_path(conn, :index))
+    end
+  end
 end

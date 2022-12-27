@@ -42,7 +42,7 @@ services:
         condition: "service_completed_successfully"
     ports:
       - "4001:4000"
-    command: mix phx.server
+    command: $APP_COMMAND
     volumes:
       - '../lib:/app/lib'
       - '../priv:/app/priv'
