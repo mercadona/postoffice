@@ -4,7 +4,9 @@ defmodule Postoffice.HttpWorkerTest do
 
   import Mox
 
+  alias GoogleApi.PubSub.V1.Model.PublishResponse
   alias Postoffice.Adapters.HttpMock
+  alias Postoffice.Adapters.PubsubMock
   alias Postoffice.HttpWorker
   alias Postoffice.Fixtures
   alias Postoffice.HistoricalData
@@ -42,6 +44,10 @@ defmodule Postoffice.HttpWorkerTest do
         {:ok, %HTTPoison.Response{status_code: 201}}
       end)
 
+      expect(PubsubMock, :publish, fn  _, _ ->
+        {:ok, %PublishResponse{}}
+      end)
+
       assert {:ok, _sent} = perform_job(HttpWorker, args)
     end
 
@@ -67,8 +73,55 @@ defmodule Postoffice.HttpWorkerTest do
         {:ok, %HTTPoison.Response{status_code: 201}}
       end)
 
+      expected_pubsub_args = %{
+        "consumer_id" => publisher.id,
+        "target" => "postoffice-sent-messages",
+        "payload" => %{
+          "consumer_id" => publisher.id,
+          "target" => publisher.target,
+          "type" => publisher.type,
+          "message_payload" => %{"action" => "test", "attributes" => %{"hive_id" => "vlc"}},
+          "attributes" => %{"hive_id" => "vlc"},
+        },
+        "attributes" => %{"cluster_name" => "vlc"}
+      }
+
+      expect(PubsubMock, :publish, fn  _id, ^expected_pubsub_args ->
+        {:ok, %PublishResponse{}}
+      end)
+
       perform_job(HttpWorker, args)
-      assert Kernel.length(HistoricalData.list_sent_messages()) == 1
+      assert Kernel.length(HistoricalData.list_sent_messages()) == 0
+
+    end
+
+    test "historical data is not created when enabled_historical_data is false" do
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+
+      Application.put_env(:postoffice, :enable_historical_data, false)
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      expect(HttpMock, :publish, fn _id, _expected_args ->
+        {:ok, %HTTPoison.Response{status_code: 201}}
+      end)
+
+
+      expect(PubsubMock, :publish, 0, fn  _id, _expected_pubsub_args ->
+        {:ok, %PublishResponse{}}
+      end)
+
+      perform_job(HttpWorker, args)
+      assert Kernel.length(HistoricalData.list_sent_messages()) == 0
+
+      Application.delete_env(:postoffice, :enable_historical_data)
+
     end
 
     test "message is not send if response code is out of 2xx range" do
@@ -91,6 +144,10 @@ defmodule Postoffice.HttpWorkerTest do
 
       expect(HttpMock, :publish, fn _id, ^expected_args ->
         {:ok, %HTTPoison.Response{status_code: 302}}
+      end)
+
+      expect(PubsubMock, :publish, 0, fn  _id, ^expected_args ->
+        {:ok, %PublishResponse{}}
       end)
 
       assert {:error, :nosent} = perform_job(HttpWorker, args)
@@ -194,6 +251,10 @@ defmodule Postoffice.HttpWorkerTest do
 
     expect(HttpMock, :publish, fn _id, ^expected_args ->
       {:ok, %HTTPoison.Response{status_code: 201}}
+    end)
+
+    expect(PubsubMock, :publish, fn  _, _ ->
+      {:ok, %PublishResponse{}}
     end)
 
     assert {:ok, _sent} = perform_job(HttpWorker, args, attempt: 100)

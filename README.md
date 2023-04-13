@@ -83,7 +83,7 @@ Attributes:
 To start your Phoenix server:
   * `brew update`
   * `brew install elixir`
-  * Create the following environmet variables in order to start the application:
+  * Create the following environment variables in order to start the application:
     * `GOOGLE_APPLICATION_CREDENTIALS` with the absolute path to the pubsub credentials file.
     * `GCLOUD_PUBSUB_PROJECT_ID` with the project_id used.
     * `MAX_BULK_MESSAGES` with the max number of messages that postoffice is able to consume
@@ -117,9 +117,12 @@ To start postoffice bundle with docker:
 
 * `GOOGLE_APPLICATION_CREDENTIALS` is the Google Cloud Platform service account json path.
 * `GCLOUD_PUBSUB_PROJECT_ID` is the Google Cloud Platform project where your PubSub topics/subscriptions are located.
-* `MAX_BULK_MESSAGES` is the maximum number of messages that Postoffice would be able to instert in bulk.
+* `MAX_BULK_MESSAGES` is the maximum number of messages that Postoffice would be able to insert in bulk.
 * `CLEAN_MESSAGES_THRESHOLD` defines from what time you want to keep the historical data from the `sent_messages` table (in seconds)
 * `CLEAN_MESSAGES_CRONTAB` defines when the Oban cronjob to clean historical data from the `sent_messages` table should be run.  Must be a valid crontab declaration.
+* `CLUSTER_NAME` defines cluster name to know the source of historical data in pubsub from different clusters
+* `PUBSUB_HISTORICAL_TOPIC_NAME` defines the name of pubsub topic to send historical data. Default `postoffice-sent-messages`
+* `ENABLE_HISTORICAL_DATA` defines if you want to send the historical data to Pub/Sub. Default `true`
 
 ## Clustering
 Postoffice has been developed to be used forming a cluster. We use [libcluster](https://github.com/bitwalker/libcluster) under the hood to create the cluster. You can take a look at its documentation in case you want to tune settings.

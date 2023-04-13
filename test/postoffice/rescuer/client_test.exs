@@ -84,7 +84,7 @@ defmodule Postoffice.Rescuer.ClientTest do
       assert reason == "Something weird happened"
     end
 
-    test "messages are successfuly deleted" do
+    test "messages are successfully deleted" do
       expect(HttpMock, :delete, fn @origin_host, @external_message_id ->
         {:ok, %HTTPoison.Response{status_code: 204, body: ""}}
       end)

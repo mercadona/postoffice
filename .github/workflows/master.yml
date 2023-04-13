@@ -1,0 +1,42 @@
+name: master
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    env:
+      MIX_ENV: test
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: docker-compose build
+        run: make build
+
+      - name: Start env
+        run: APP_COMMAND='tail -f /dev/null' make env-start
+
+      - name: Test
+        run: make test
+
+      - name: Coveralls
+        run: make coveralls
+
+      - name: Set outputs
+        id: vars
+        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Check outputs
+        run: echo ${{ steps.vars.outputs.sha_short }}
+
+      - name: Build image
+        uses: docker/build-push-action@v3
+        with:
+          push: false
+          tags: mercadonatechoss/postoffice:beta, mercadonatechoss/postoffice:master-${{ steps.vars.outputs.sha_short }}

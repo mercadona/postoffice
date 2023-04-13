@@ -28,6 +28,10 @@ defmodule Postoffice.PubsubWorkerTest do
         {:ok, %PublishResponse{}}
       end)
 
+      expect(PubsubMock, :publish, fn  _, _ ->
+        {:ok, %PublishResponse{}}
+      end)
+
       assert {:ok, _sent} = perform_job(PubsubWorker, args)
     end
 
@@ -46,8 +50,52 @@ defmodule Postoffice.PubsubWorkerTest do
         {:ok, %PublishResponse{}}
       end)
 
+      expected_pubsub_args = %{
+        "consumer_id" => publisher.id,
+        "target" => "postoffice-sent-messages",
+        "payload" => %{
+          "consumer_id" => publisher.id,
+          "target" => publisher.target,
+          "type" => "pubsub",
+          "message_payload" => %{"action" => "test"},
+          "attributes" => %{"hive_id" => "vlc"},
+        },
+        "attributes" => %{"cluster_name" => "vlc"}
+      }
+
+      expect(PubsubMock, :publish, fn  _id, ^expected_pubsub_args ->
+        {:ok, %PublishResponse{}}
+      end)
+
       perform_job(PubsubWorker, args)
-      assert Kernel.length(HistoricalData.list_sent_messages()) == 1
+      assert Kernel.length(HistoricalData.list_sent_messages()) == 0
+    end
+
+    test "historical data is not created when enabled_historical_data is false" do
+      topic = Fixtures.create_topic()
+      publisher = Fixtures.create_publisher(topic)
+
+      Application.put_env(:postoffice, :enable_historical_data, false)
+
+      args = %{
+        "consumer_id" => publisher.id,
+        "target" => publisher.target,
+        "payload" => %{"action" => "test"},
+        "attributes" => %{"hive_id" => "vlc"}
+      }
+
+      expect(PubsubMock, :publish, fn _id, ^args ->
+        {:ok, %PublishResponse{}}
+      end)
+
+      expect(PubsubMock, :publish, 0,  fn  _id, _expected_pubsub_args ->
+        {:ok, %PublishResponse{}}
+      end)
+
+      perform_job(PubsubWorker, args)
+      assert Kernel.length(HistoricalData.list_sent_messages()) == 0
+
+      Application.delete_env(:postoffice, :enable_historical_data)
     end
 
     test "messages can be sent in bulk" do
@@ -65,6 +113,9 @@ defmodule Postoffice.PubsubWorkerTest do
         {:ok, %PublishResponse{}}
       end)
 
+      expect(PubsubMock, :publish, fn  _, _ ->
+        {:ok, %PublishResponse{}}
+      end)
       assert {:ok, _sent} = perform_job(PubsubWorker, args)
     end
 
@@ -117,6 +168,10 @@ defmodule Postoffice.PubsubWorkerTest do
       }
 
       expect(PubsubMock, :publish, fn _id, ^args ->
+        {:ok, %PublishResponse{}}
+      end)
+
+      expect(PubsubMock, :publish, fn  _, _ ->
         {:ok, %PublishResponse{}}
       end)
 

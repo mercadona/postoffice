@@ -36,17 +36,25 @@ defmodule Postoffice.Workers.Pubsub do
 
     case impl().publish(id, args) do
       {:ok, _response = %PublishResponse{}} ->
-        Logger.info("Succesfully sent pubsub message",
+        Logger.info("Successfully sent pubsub message",
           target: target
         )
+        if is_enable_historical_data() do
+          historical_pubsub_args = %{
+            "consumer_id" => consumer_id,
+            "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
+            "payload" => %{
+              "consumer_id" => consumer_id,
+              "target" => target,
+              "type" => "pubsub",
+              "message_payload" => Map.get(args, "payload"),
+              "attributes" => attributes,
+            },
+            "attributes" => %{"cluster_name" => Application.get_env(:postoffice, :cluster_name)}
+          }
 
-        {:ok, _data} =
-          HistoricalData.create_sent_messages(%{
-            message_id: message_id,
-            consumer_id: consumer_id,
-            payload: historical_payload,
-            attributes: attributes
-          })
+          impl().publish(id, historical_pubsub_args)
+        end
 
         {:ok, :sent}
 
@@ -79,5 +87,9 @@ defmodule Postoffice.Workers.Pubsub do
 
   defp impl do
     Application.get_env(:postoffice, :pubsub_consumer_impl, Postoffice.Adapters.Pubsub)
+  end
+
+  defp is_enable_historical_data do
+    Application.get_env(:postoffice, :enable_historical_data, true)
   end
 end

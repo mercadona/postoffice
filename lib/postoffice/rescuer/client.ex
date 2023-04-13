@@ -7,7 +7,7 @@ defmodule Postoffice.Rescuer.Client do
     case impl().list(host) do
       {:ok, %HTTPoison.Response{status_code: status_code, body: body}}
       when status_code in 200..299 ->
-        Logger.info("Succesfully listed pending messages from #{host}")
+        Logger.info("Successfully listed pending messages from #{host}")
         {:ok, Poison.decode!(body)}
 
       {:ok, %HTTPoison.Response{status_code: status_code}} ->
