@@ -11,17 +11,16 @@ WORKDIR $APP_HOME
 COPY . .
 RUN chmod +x docker/scripts/wait-for-it.sh
 
-RUN mix local.hex --force \
-    && mix archive.install --force hex phx_new 1.4.11 \
-    && mix deps.update ecto \
-    && apt-get update \
+RUN apt-get update \
     && curl -fsSL https://deb.nodesource.com/setup_16.x | bash \
     && apt-get install -y apt-utils \
     && apt-get install -y nodejs \
     && apt-get install -y build-essential \
     && apt-get install -y inotify-tools \
-    && mix deps.get \
-    && mix local.rebar --force
+
+RUN mix local.hex --force && \
+    mix local.rebar --force && \
+    mix deps.get
 
 RUN cd assets && npm install
 
