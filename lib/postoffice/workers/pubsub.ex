@@ -46,15 +46,6 @@ defmodule Postoffice.Workers.Pubsub do
         error_reason = "Error trying to process message from PubsubConsumer: #{error}"
         Logger.error(error_reason, postoffice_message_id: id)
 
-        {:ok, _data} =
-          HistoricalData.create_failed_messages(%{
-            message_id: message_id,
-            consumer_id: consumer_id,
-            payload: historical_payload,
-            attributes: attributes,
-            reason: error_reason
-          })
-
         {:error, :nosent}
     end
   end
