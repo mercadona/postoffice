@@ -32,7 +32,6 @@ defmodule Postoffice.Workers.Pubsub do
          } = args
        ) do
     message_id = id || 0
-    historical_payload = if not is_list(payload), do: [payload], else: payload
 
     case impl().publish(id, args) do
       {:ok, _response = %PublishResponse{}} ->
@@ -64,7 +63,4 @@ defmodule Postoffice.Workers.Pubsub do
     Application.get_env(:postoffice, :pubsub_consumer_impl, Postoffice.Adapters.Pubsub)
   end
 
-  defp is_enable_historical_data do
-    Application.get_env(:postoffice, :enable_historical_data, true)
-  end
 end

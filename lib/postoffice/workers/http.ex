@@ -45,23 +45,6 @@ defmodule Postoffice.Workers.Http do
           target: target
         )
 
-        if is_enable_historical_data() do
-          historical_pubsub_args = %{
-            "consumer_id" => consumer_id,
-            "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
-            "payload" => %{
-              "consumer_id" => consumer_id,
-              "target" => target,
-              "type" => "http",
-              "message_payload" => Map.get(args, "payload"),
-              "attributes" => attributes,
-            },
-            "attributes" => %{"cluster_name" => Application.get_env(:postoffice, :cluster_name)}
-          }
-
-          impl_pubsub().publish(id, historical_pubsub_args)
-        end
-
         {:ok, :sent}
 
       {:ok, response} ->
@@ -71,15 +54,6 @@ defmodule Postoffice.Workers.Http do
           }"
 
         Logger.error(error_reason, postoffice_message_id: id)
-
-        {:ok, _data} =
-          HistoricalData.create_failed_messages(%{
-            message_id: message_id,
-            consumer_id: consumer_id,
-            payload: historical_payload,
-            attributes: attributes,
-            reason: error_reason
-          })
 
         {:error, :nosent}
 
@@ -121,7 +95,4 @@ defmodule Postoffice.Workers.Http do
     Application.get_env(:postoffice, :pubsub_consumer_impl, Postoffice.Adapters.Pubsub)
   end
 
-  defp is_enable_historical_data do
-    Application.get_env(:postoffice, :enable_historical_data, true)
-  end
 end
