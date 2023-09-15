@@ -12,7 +12,8 @@ COPY . .
 RUN chmod +x docker/scripts/wait-for-it.sh
 
 RUN mix local.hex --force \
-    && mix archive.install --force hex phx_new 1.4.11\
+    && mix archive.install --force hex phx_new 1.4.11 \
+    && mix deps.update ecto \
     && apt-get update \
     && curl -fsSL https://deb.nodesource.com/setup_16.x | bash \
     && apt-get install -y apt-utils \
