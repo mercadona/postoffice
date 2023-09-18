@@ -32,44 +32,18 @@ defmodule Postoffice.Workers.Pubsub do
          } = args
        ) do
     message_id = id || 0
-    historical_payload = if not is_list(payload), do: [payload], else: payload
 
     case impl().publish(id, args) do
       {:ok, _response = %PublishResponse{}} ->
         Logger.info("Successfully sent pubsub message",
           target: target
         )
-        if is_enable_historical_data() do
-          historical_pubsub_args = %{
-            "consumer_id" => consumer_id,
-            "target" => Application.get_env(:postoffice, :pubsub_historical_topic_name),
-            "payload" => %{
-              "consumer_id" => consumer_id,
-              "target" => target,
-              "type" => "pubsub",
-              "message_payload" => Map.get(args, "payload"),
-              "attributes" => attributes,
-            },
-            "attributes" => %{"cluster_name" => Application.get_env(:postoffice, :cluster_name)}
-          }
-
-          impl().publish(id, historical_pubsub_args)
-        end
 
         {:ok, :sent}
 
       {:error, error} ->
         error_reason = "Error trying to process message from PubsubConsumer: #{error}"
         Logger.error(error_reason, postoffice_message_id: id)
-
-        {:ok, _data} =
-          HistoricalData.create_failed_messages(%{
-            message_id: message_id,
-            consumer_id: consumer_id,
-            payload: historical_payload,
-            attributes: attributes,
-            reason: error_reason
-          })
 
         {:error, :nosent}
     end
@@ -89,7 +63,4 @@ defmodule Postoffice.Workers.Pubsub do
     Application.get_env(:postoffice, :pubsub_consumer_impl, Postoffice.Adapters.Pubsub)
   end
 
-  defp is_enable_historical_data do
-    Application.get_env(:postoffice, :enable_historical_data, true)
-  end
 end
