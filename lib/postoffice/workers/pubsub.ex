@@ -42,10 +42,8 @@ defmodule Postoffice.Workers.Pubsub do
         {:ok, :sent}
 
       {:error, error} ->
-        error_reason = "Error trying to process message from PubsubConsumer: #{error}"
-        Logger.error(
-          error_reason, postoffice_message_id: id, consumer_id: consumer_id, target: target, payload: payload
-        )
+        error_reason = "Error trying to process message from PubsubConsumer: #{error} consumer_id: #{consumer_id} target: #{target}"
+        Logger.error(error_reason, postoffice_message_id: id)
 
         {:error, :nosent}
     end
