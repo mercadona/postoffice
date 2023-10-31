@@ -28,7 +28,8 @@ config :postoffice, PostofficeWeb.Endpoint,
   ]
 
 # Configures Elixir's Logger
-config :logger, :console,
+config :logger,
+  backends: [:console, Sentry.LoggerBackend],
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
@@ -49,6 +50,16 @@ config :postoffice, Oban,
      ]}
   ],
   queues: [default: 10, http: 100, pubsub: 15]
+
+config :sentry,
+  dsn: System.get_env("POSTOFFICE_SENTRY_DSN", ""),
+  environment_name: Mix.env(),
+  enable_source_code_context: true,
+  root_source_code_path: File.cwd!(),
+  tags: %{
+    env: Mix.env()
+  },
+  included_environments: [:prod]
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

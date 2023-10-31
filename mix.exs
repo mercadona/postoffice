@@ -62,6 +62,7 @@ defmodule Postoffice.MixProject do
       {:phoenix_live_dashboard, "0.7.2"},
       {:phoenix_live_reload, "1.4.0", only: :dev},
       {:gettext, "0.20.0"},
+      {:sentry, "8.1.0"},
       {:jason, "1.4.0"},
       {:plug_cowboy, "2.5.2"},
       {:bcrypt_elixir, "3.0.1"},

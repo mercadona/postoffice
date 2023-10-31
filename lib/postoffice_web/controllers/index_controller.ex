@@ -5,6 +5,7 @@ defmodule PostofficeWeb.IndexController do
   alias Postoffice.Messaging
 
   def index(conn, _params) do
+    1/0
     render(conn, "index.html",
       page_name: "Dashboard",
       topics: Delimit.number_to_delimited(Messaging.count_topics(), precision: 0),
