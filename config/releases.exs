@@ -19,6 +19,16 @@ config :postoffice, Postoffice.Repo,
   queue_target: {:system, "DB_QUEUE_TARGET", type: :integer, default: 3000},
   show_sensitive_data_on_connection_error: false
 
+config :sentry,
+  dsn: {:system, "POSTOFFICE_SENTRY_DSN", default: "http://b09884b492cb4b18a71f377052bc19a9@sentry.sta.monline/123"},
+  environment_name: Mix.env(),
+  enable_source_code_context: true,
+  root_source_code_path: File.cwd!(),
+  tags: %{
+    env: Mix.env()
+  },
+  included_environments: [:prod]
+
 # If K8S_CLUSTER env_variable is set we'll try to setup a k8s cluster
 if System.get_env("K8S_CLUSTER") do
   config :libcluster,
