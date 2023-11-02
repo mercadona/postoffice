@@ -48,6 +48,7 @@ services:
       - '../priv:/app/priv'
       - '../secrets:/app/secrets'
       - '../test:/app/test'
+      - '../assets:/app/assets'
 
 volumes:
   pgdata12:
