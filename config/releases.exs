@@ -21,13 +21,13 @@ config :postoffice, Postoffice.Repo,
 
 config :sentry,
   dsn: {:system, "POSTOFFICE_SENTRY_DSN", default: ""},
-  environment_name: Mix.env(),
+  environment_name: {:system, "SENTRY_ENVIRONMENT", default: ""},
   enable_source_code_context: true,
   root_source_code_path: File.cwd!(),
   tags: %{
-    env: Mix.env()
+    namespace: {:system, "NAMESPACE", default: ""}
   },
-  included_environments: [:prod]
+  included_environments: [:production, :staging]
 
 # If K8S_CLUSTER env_variable is set we'll try to setup a k8s cluster
 if System.get_env("K8S_CLUSTER") do
