@@ -20,7 +20,7 @@ config :postoffice, Postoffice.Repo,
   show_sensitive_data_on_connection_error: false
 
 config :sentry,
-  dsn: {:system, "POSTOFFICE_SENTRY_DSN", default: "http://b09884b492cb4b18a71f377052bc19a9@sentry.sta.monline/123"},
+  dsn: {:system, "POSTOFFICE_SENTRY_DSN", default: ""},
   environment_name: Mix.env(),
   enable_source_code_context: true,
   root_source_code_path: File.cwd!(),

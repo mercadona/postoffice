@@ -33,7 +33,7 @@ config :postoffice, PostofficeWeb.Endpoint,
   ]
 
 config :sentry,
-  dsn: System.get_env("POSTOFFICE_SENTRY_DSN", "http://b09884b492cb4b18a71f377052bc19a9@sentry.sta.monline/123"),
+  dsn: System.get_env("POSTOFFICE_SENTRY_DSN", ""),
   environment_name: Mix.env(),
   enable_source_code_context: true,
   root_source_code_path: File.cwd!(),
