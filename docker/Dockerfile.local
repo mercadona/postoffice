@@ -22,5 +22,6 @@ RUN mix local.hex --force \
     && mix deps.get \
     && mix local.rebar --force
 
+RUN cd assets && npm install
 
 CMD ["mix", "phx.server"]
