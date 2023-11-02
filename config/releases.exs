@@ -21,7 +21,7 @@ config :postoffice, Postoffice.Repo,
 
 config :sentry,
   dsn: {:system, "POSTOFFICE_SENTRY_DSN", default: ""},
-  environment_name: {:system, "SENTRY_ENVIRONMENT", default: ""},
+  environment_name: String.to_atom(System.get_env("SENTRY_ENVIRONMENT", "")),
   enable_source_code_context: true,
   root_source_code_path: File.cwd!(),
   tags: %{
