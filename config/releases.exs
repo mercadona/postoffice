@@ -17,8 +17,7 @@ config :postoffice, Postoffice.Repo,
   port: {:system, "DB_PORT", type: :integer, default: 5432},
   pool_size: {:system, "DB_POOL_SIZE", type: :integer, default: 20},
   queue_target: {:system, "DB_QUEUE_TARGET", type: :integer, default: 3000},
-  show_sensitive_data_on_connection_error: false,
-  ssl_opts: [verify: :verify_none]
+  show_sensitive_data_on_connection_error: false
 
 config :sentry,
   dsn: {:system, "POSTOFFICE_SENTRY_DSN", default: ""},
