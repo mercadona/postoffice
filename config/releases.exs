@@ -9,6 +9,8 @@ config :postoffice, clean_messages_threshold: {:system, "CLEAN_MESSAGES_THRESHOL
 config :postoffice, clean_messages_crontab: {:system, "CLEAN_MESSAGES_CRONTAB", default: "0 12 * * 0"}
 config :postoffice, cluster_name: {:system, "CLUSTER_NAME", default: "postoffice"}
 
+config :google_api_pub_sub, base_url: {:system, "PUBSUB_API_ENDPOINT", default: "https://pubsub.googleapis.com/"}
+
 config :postoffice, Postoffice.Repo,
   username: {:system, "DB_USERNAME", default: "postgres"},
   hostname: {:system, "DB_HOST", default: "db"},
