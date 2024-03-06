@@ -65,6 +65,7 @@ defmodule Postoffice.MixProject do
       {:sentry, "8.1.0"},
       {:jason, "1.4.0"},
       {:plug_cowboy, "2.5.2"},
+      {:cowboy, "2.10.0"},
       {:bcrypt_elixir, "3.0.1"},
       {:google_api_pub_sub, "0.36.0"},
       {:goth, "1.3.1"},
